@@ -77,9 +77,6 @@
     });
 
 
-
-
-
     function dateRowCheckStyle(value) {
         if ((value.days_to_next_audit) && (value.days_to_next_audit < {{ $snipeSettings->audit_warning_days ?: 0 }})) {
             return { classes : "danger" }
@@ -365,23 +362,23 @@
             if ((!this) || (!this.title)) {
                 return '';
             }
+            var temp = '';
 
-            var field_column = this.title;
-
+            var field_column = this.title; //TODO:Rating
             // Pull out any HTMl that might be passed via the presenter
             // (for example, the locked icon for encrypted fields)
-            var field_column_plain = field_column.replace(/<(?:.|\n)*?> ?/gm, '');
+            var field_column_plain = field_column.replace(/<(?:.|\n)*?> ?/gm, ''); //TODO: Rating
+            console.log(row.custom_fields[field_column_plain].field);
             if ((row.custom_fields) && (row.custom_fields[field_column_plain])) {
-
-                // If the field type needs special formatting, do that here
                 if ((row.custom_fields[field_column_plain].field_format) && (row.custom_fields[field_column_plain].value)) {
-                    if (row.custom_fields[field_column_plain].field_format=='URL') {
-                        return '<a href="' + row.custom_fields[field_column_plain].value + '" target="_blank" rel="noopener">' + row.custom_fields[field_column_plain].value + '</a>';
-                    } else if (row.custom_fields[field_column_plain].field_format=='EMAIL') {
-                        return '<a href="mailto:' + row.custom_fields[field_column_plain].value + '">' + row.custom_fields[field_column_plain].value + '</a>';
+                    if (row.custom_fields[field_column_plain].field=='_snipeit_rating_6') {
+                        for($i=0; $i<row.custom_fields[field_column_plain].value; $i++) {
+                             temp = temp + '<label style="color: rgb(233, 222, 16);" class="star">&bigstar;</label>';
+                        }
+                        return temp;
                     }
                 }
-                return row.custom_fields[field_column_plain].value;
+                //return temp;
 
             }
 
