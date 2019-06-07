@@ -510,6 +510,7 @@ Form::macro('customfield_elements', function ($name = "customfield_elements", $s
         'text' => 'Text Box',
         'listbox' => 'List Box',
         'textarea' => 'Textarea (multi-line) ',
+        'rating' =>'Rating'
      //   'checkbox' => 'Checkbox',
      //   'radio' => 'Radio Buttons',
     );
@@ -524,9 +525,6 @@ Form::macro('customfield_elements', function ($name = "customfield_elements", $s
     return $select;
 
 });
-
-
-
 Form::macro('skin', function ($name = "skin", $selected = null, $class = null) {
 
     $formats = array(

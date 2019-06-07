@@ -1,3 +1,37 @@
+<style>
+/* component */
+
+.star-rating {
+  border: 0;
+  display: flex;
+
+  font-size: 20px;
+  justify-content: auto;
+  text-align: center;
+  width: 5em;
+}
+
+.star-rating input {
+  display: none;
+}
+
+.star-rating label {
+  color: rgb(233, 222, 16);
+  cursor: pointer;
+}
+
+.star-rating :checked ~ label {
+  color: rgb(255, 212, 59);
+}
+
+.star-rating :hover ~ label {
+  color: rgb(250, 176, 5);
+}
+
+body {
+  background-color: rgb(50, 50, 50);
+}
+</style>
 @extends('layouts/default')
 
 {{-- Page title --}}
@@ -256,7 +290,6 @@
                       </td>
                     </tr>
 
-
                     @if (($asset->model) && ($asset->model->fieldset))
                       @foreach($asset->model->fieldset->fields as $field)
                         <tr>
@@ -283,7 +316,54 @@
                               @if (($field->format=='URL') && ($asset->{$field->db_column_name()}!=''))
                                 <a href="{{ $asset->{$field->db_column_name()} }}" target="_new">{{ $asset->{$field->db_column_name()} }}</a>
                               @else
-                                {!! nl2br(e($asset->{$field->db_column_name()})) !!}
+                                @if (($asset->{$field->db_column_name()}) ==1)
+                                  <div class="star-rating">
+                                    <input type="radio" id="5-stars" name="{{ $field->db_column_name() }}" value="1" />
+                                    <label for="5-stars" class="star">&bigstar;</label>
+                                  </div>
+                                @elseif (($asset->{$field->db_column_name()}) ==2)
+                                  <div class="star-rating">
+                                    <input type="radio" id="5-stars" name="{{ $field->db_column_name() }}" value="1" />
+                                    <label for="5-stars" class="star">&bigstar;</label>
+                                    <input type="radio" id="5-stars" name="{{ $field->db_column_name() }}" value="2" />
+                                    <label for="5-stars" class="star">&bigstar;</label>
+                                  </div>
+                                
+                                @elseif (($asset->{$field->db_column_name()}) ==3)
+                                  <div class="star-rating">
+                                    <input type="radio" id="5-stars" name="{{ $field->db_column_name() }}" value="1" />
+                                    <label for="5-stars" class="star">&bigstar;</label>
+                                    <input type="radio" id="5-stars" name="{{ $field->db_column_name() }}" value="2" />
+                                    <label for="5-stars" class="star">&bigstar;</label>
+                                    <input type="radio" id="5-stars" name="{{ $field->db_column_name() }}" value="3" />
+                                    <label for="5-stars" class="star">&bigstar;</label>
+                                  </div>
+                                
+                                @elseif (($asset->{$field->db_column_name()}) ==4)
+                                  <div class="star-rating">
+                                    <input type="radio" id="1-stars" name="{{ $field->db_column_name() }}" value="1" />
+                                    <label for="1-stars" class="star">&bigstar;</label>
+                                    <input type="radio" id="2-stars" name="{{ $field->db_column_name() }}" value="2" />
+                                    <label for="2-stars" class="star">&bigstar;</label>
+                                    <input type="radio" id="3-stars" name="{{ $field->db_column_name() }}" value="3" />
+                                    <label for="3-stars" class="star">&bigstar;</label>
+                                    <input type="radio" id="4-stars" name="{{ $field->db_column_name() }}" value="4" />
+                                    <label for="4-stars" class="star">&bigstar;</label>
+                                  </div>
+                                  @elseif (($asset->{$field->db_column_name()}) ==5)
+                                  <div class="star-rating">
+                                    <input type="radio" id="5-stars" name="{{ $field->db_column_name() }}" value="1" />
+                                    <label for="5-stars" class="star">&bigstar;</label>
+                                    <input type="radio" id="5-stars" name="{{ $field->db_column_name() }}" value="2" />
+                                    <label for="5-stars" class="star">&bigstar;</label>
+                                    <input type="radio" id="5-stars" name="{{ $field->db_column_name() }}" value="3" />
+                                    <label for="5-stars" class="star">&bigstar;</label>
+                                    <input type="radio" id="5-stars" name="{{ $field->db_column_name() }}" value="4" />
+                                    <label for="5-stars" class="star">&bigstar;</label>
+                                    <input type="radio" id="5-stars" name="{{ $field->db_column_name() }}" value="5" />
+                                    <label for="5-stars" class="star">&bigstar;</label>
+                                  </div>
+                                @endif
                               @endif
                             @endif
                            </td>

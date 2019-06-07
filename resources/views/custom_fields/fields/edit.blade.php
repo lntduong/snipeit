@@ -48,7 +48,6 @@
 
             {!! Form::customfield_elements('element', Input::old('element', $field->element), 'field_element select2 form-control') !!}
             {!! $errors->first('element', '<span class="alert-msg"><i class="fa fa-times"></i> :message</span>') !!}
-
             </div>
           </div>
 
@@ -63,7 +62,6 @@
               <p class="help-block">{{ trans('admin/custom_fields/general.field_values_help') }}</p>
             </div>
           </div>
-
           <!-- Format -->
           <div class="form-group {{ $errors->has('format') ? ' has-error' : '' }}">
             <label for="format" class="col-md-4 control-label">
@@ -74,7 +72,6 @@
               {!! $errors->first('format', '<span class="alert-msg"><i class="fa fa-times"></i> :message</span>') !!}
             </div>
           </div>
-
           <!-- Custom Format -->
           <div class="form-group {{ $errors->has('custom_format') ? ' has-error' : '' }}" id="custom_regex" style="display:none;">
             <label for="custom_format" class="col-md-4 control-label">

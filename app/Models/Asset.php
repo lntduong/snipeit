@@ -111,6 +111,7 @@ class Asset extends Depreciable
         'status_id',
         'supplier_id',
         'warranty_months',
+        'custom_fields'
     ];
 
     use Searchable;
