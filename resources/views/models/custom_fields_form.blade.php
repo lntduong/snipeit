@@ -22,7 +22,7 @@
 }
 
 .star-rating :checked ~ label {
-  color: rgb(255, 212, 59);
+  color: #8a9304cc;
 }
 
 .star-rating :hover ~ label {
@@ -30,6 +30,12 @@
 }
 .star.star-checked {
     color: #d2dd2bcc;
+}
+.star.star-checked :checked {
+  color: rgb(255, 212, 59);
+}
+.star.star-checked :hover {
+  color: #d2dd2bcc;
 }
 body {
   background-color: rgb(50, 50, 50);

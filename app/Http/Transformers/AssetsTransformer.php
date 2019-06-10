@@ -24,6 +24,7 @@ class AssetsTransformer
         $array = [
             'id' => (int) $asset->id,
             'name' => e($asset->name),
+            'custom_fields' => e($asset->custom_fields),
             'asset_tag' => e($asset->asset_tag),
             'serial' => e($asset->serial),
             'model' => ($asset->model) ? [
@@ -83,10 +84,8 @@ class AssetsTransformer
             'user_can_checkout' => (bool) $asset->availableForCheckout(),
         ];
 
-
         if (($asset->model) && ($asset->model->fieldset) && ($asset->model->fieldset->fields->count() > 0)) {
             $fields_array = array();
-
             foreach ($asset->model->fieldset->fields as $field) {
 
                 if ($field->isFieldDecryptable($asset->{$field->convertUnicodeDbSlug()})) {
@@ -97,6 +96,7 @@ class AssetsTransformer
                             'field' => $field->convertUnicodeDbSlug(),
                             'value' => $value,
                             'field_format' => $field->format,
+                            'db_column' => $field->db_column,
                         ];
 
                 } else {
@@ -104,6 +104,7 @@ class AssetsTransformer
                         'field' => $field->convertUnicodeDbSlug(),
                         'value' => $asset->{$field->convertUnicodeDbSlug()},
                         'field_format' => $field->format,
+                        'db_column' => $field->db_column,
                     ];
 
 

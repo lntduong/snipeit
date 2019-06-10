@@ -368,10 +368,10 @@
             // Pull out any HTMl that might be passed via the presenter
             // (for example, the locked icon for encrypted fields)
             var field_column_plain = field_column.replace(/<(?:.|\n)*?> ?/gm, ''); //TODO: Rating
-            console.log(row.custom_fields[field_column_plain].field);
+            console.log(row.custom_fields);
             if ((row.custom_fields) && (row.custom_fields[field_column_plain])) {
                 if ((row.custom_fields[field_column_plain].field_format) && (row.custom_fields[field_column_plain].value)) {
-                    if (row.custom_fields[field_column_plain].field=='_snipeit_rating_6') {
+                    if (row.custom_fields[field_column_plain].field==row.custom_fields[field_column_plain].db_column) {
                         for($i=0; $i<row.custom_fields[field_column_plain].value; $i++) {
                              temp = temp + '<label style="color: rgb(233, 222, 16);" class="star">&bigstar;</label>';
                         }
