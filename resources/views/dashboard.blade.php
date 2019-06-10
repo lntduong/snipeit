@@ -6,11 +6,32 @@
 @parent
 @stop
 
-
+<style>
+background: #62c8d0;
+&.selected {
+  background-color: #333;
+}
+</style>
 {{-- Page content --}}
 @section('content')
 
+<div class="row">
+    <div class="col-md-12">
+        <div class="box">
+            <!-- /.box-header -->
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-md-12">
+                      <label>Menu's Status (default):</label>
+                      <button class="btn btn-danger" id="btnStatus" onCLick="hideFunc()">Hide</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 @if ($snipeSettings->dashboard_message!='')
+
 <div class="row">
     <div class="col-md-12">
         <div class="box">
@@ -367,5 +388,35 @@
 
 </script>
 
+<script>
+  var hideComponents = document.getElementById('hideComponents').classList;
+  var hideConsumable = document.getElementById('hideConsumable').classList;
+  var hideAccessories = document.getElementById('hideAccessories').classList;
+  var hideLicenses = document.getElementById('hideLicenses').classList;
+  var hideImport = document.getElementById('hideImport').classList;
+  var btnStatus = document.getElementById('btnStatus');
+  var hideAccessoriesCreate = document.getElementById('hideAccessoriesCreate').classList;
+  var hideConsumableCreate = document.getElementById('hideConsumableCreate').classList;
+  var hideComponentsCreate = document.getElementById('hideComponentsCreate').classList;
+  var hideLicenseCreate = document.getElementById('hideLicenseCreate').classList;
 
+
+  function hideFunc() {
+    hideComponents.toggle('hide');
+    hideConsumable.toggle('hide');
+    hideAccessories.toggle('hide');
+    hideLicenses.toggle('hide');
+    hideImport.toggle('hide');
+    hideLicenseCreate.toggle('hide');
+    hideComponentsCreate.toggle('hide');
+    hideConsumableCreate.toggle('hide');
+    hideAccessoriesCreate.toggle('hide');
+    
+    if(btnStatus.innerHTML === "Hide") {
+      btnStatus.innerHTML = "Active";
+    } else {
+      btnStatus.innerHTML = "Hide";
+    }
+  }
+</script>
 @stop

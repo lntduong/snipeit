@@ -66,6 +66,9 @@
         clear: none;
       }
     }
+    .hide {
+        display: none;
+    }
     </style>
 
       @if (($snipeSettings) && ($snipeSettings->custom_css))
@@ -103,7 +106,6 @@
       <header class="main-header">
 
         <!-- Logo -->
-
 
         <!-- Header Navbar: style can be found in header.less -->
         <nav class="navbar navbar-static-top" role="navigation">
@@ -204,7 +206,7 @@
                       </li>
                        @endcan
                        @can('create', \App\Models\License::class)
-                       <li {!! (Request::is('licenses/create') ? 'class="active"' : '') !!}>
+                       <li {!! (Request::is('licenses/create') ? 'class="active"' : '') !!} class="hide" id="hideLicenseCreate">
                            <a href="{{ route('licenses.create') }}">
                                <i class="fa fa-floppy-o fa-fw"></i>
                                {{ trans('general.license') }}
@@ -212,14 +214,14 @@
                        </li>
                        @endcan
                        @can('create', \App\Models\Accessory::class)
-                       <li {!! (Request::is('accessories/create') ? 'class="active"' : '') !!}>
+                       <li {!! (Request::is('accessories/create') ? 'class="active"' : '') !!} class="hide" id="hideAccessoriesCreate">
                            <a href="{{ route('accessories.create') }}">
                                <i class="fa fa-keyboard-o fa-fw"></i>
                                {{ trans('general.accessory') }}</a>
                        </li>
                        @endcan
                        @can('create', \App\Models\Consumable::class)
-                       <li {!! (Request::is('consunmables/create') ? 'class="active"' : '') !!}>
+                       <li {!! (Request::is('consunmables/create') ? 'class="active"' : '') !!} class="hide" id="hideConsumableCreate">
                            <a href="{{ route('consumables.create') }}">
                                <i class="fa fa-tint fa-fw"></i>
                                {{ trans('general.consumable') }}
@@ -227,7 +229,7 @@
                        </li>
                        @endcan
                        @can('create', \App\Models\Component::class)
-                       <li {!! (Request::is('components/create') ? 'class="active"' : '') !!}>
+                       <li {!! (Request::is('components/create') ? 'class="active"' : '') !!} class="hide" id="hideComponentsCreate">
                            <a href="{{ route('components.create') }}">
                            <i class="fa fa-hdd-o fa-fw"></i>
                            {{ trans('general.component') }}
@@ -495,7 +497,7 @@
               </li>
               @endcan
               @can('view', \App\Models\License::class)
-              <li{!! (Request::is('licenses*') ? ' class="active"' : '') !!}>
+              <li{!! (Request::is('licenses*') ? ' class="active"' : '') !!} class="hide" id="hideLicenses">
                   <a href="{{ route('licenses.index') }}">
                     <i class="fa fa-floppy-o"></i>
                     <span>{{ trans('general.licenses') }}</span>
@@ -503,7 +505,7 @@
               </li>
               @endcan
               @can('index', \App\Models\Accessory::class)
-              <li{!! (Request::is('accessories*') ? ' class="active"' : '') !!}>
+              <li{!! (Request::is('accessories*') ? ' class="active"' : '') !!} class="hide" id="hideAccessories">
                 <a href="{{ route('accessories.index') }}">
                   <i class="fa fa-keyboard-o"></i>
                   <span>{{ trans('general.accessories') }}</span>
@@ -511,7 +513,7 @@
               </li>
               @endcan
               @can('view', \App\Models\Consumable::class)
-            <li{!! (Request::is('consumables*') ? ' class="active"' : '') !!}>
+            <li{!! (Request::is('consumables*') ? ' class="active"' : '') !!} class="hide" id="hideConsumable">
                 <a href="{{ url('consumables') }}">
                   <i class="fa fa-tint"></i>
                   <span>{{ trans('general.consumables') }}</span>
@@ -519,7 +521,7 @@
             </li>
              @endcan
              @can('view', \App\Models\Component::class)
-            <li{!! (Request::is('components*') ? ' class="active"' : '') !!}>
+            <li{!! (Request::is('components*') ? ' class="active"' : '') !!} class="hide" id="hideComponents">
                 <a href="{{ route('components.index') }}">
                   <i class="fa fa-hdd-o"></i>
                   <span>{{ trans('general.components') }}</span>
@@ -535,7 +537,7 @@
             </li>
             @endcan
             @can('import')
-                <li{!! (Request::is('import/*') ? ' class="active"' : '') !!}>
+                <li{!! (Request::is('import/*') ? ' class="active"' : '') !!} class="hide" id="hideImport">
                     <a href="{{ route('imports.index') }}">
                         <i class="fa fa-cloud-download"></i>
                         <span>{{ trans('general.import') }}</span>

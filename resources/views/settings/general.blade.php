@@ -40,6 +40,19 @@
                <div class="box-body">
 
                    <div class="col-md-12">
+                    
+                   <!--Menu's Status-->
+                   <div class="form-group ">
+                      <div class="col-md-3">
+                            {{ Form::label('', trans('general.menu_status')) }}
+                        </div>
+                        <div class="col-md-9">
+                           <a class="btn btn-danger" id="btnStatus" onCLick="return hideFunc()">Hide</a>
+                           <p class="help-block">
+                           Licenses, Accessories, Consumables, Components, Import default are invisible
+                            </p>
+                        </div>
+                    </div>
 
                     <!-- Full Multiple Companies Support -->
                     <div class="form-group {{ $errors->has('full_multiple_companies_support') ? 'error' : '' }}">
@@ -391,4 +404,34 @@
 
 
     </script>
+    <script>
+  var hideComponents = document.getElementById('hideComponents').classList;
+  var hideConsumable = document.getElementById('hideConsumable').classList;
+  var hideAccessories = document.getElementById('hideAccessories').classList;
+  var hideLicenses = document.getElementById('hideLicenses').classList;
+  var hideImport = document.getElementById('hideImport').classList;
+  var btnStatus = document.getElementById('btnStatus');
+  var hideAccessoriesCreate = document.getElementById('hideAccessoriesCreate').classList;
+  var hideConsumableCreate = document.getElementById('hideConsumableCreate').classList;
+  var hideComponentsCreate = document.getElementById('hideComponentsCreate').classList;
+  var hideLicenseCreate = document.getElementById('hideLicenseCreate').classList;
+
+
+  function hideFunc() {
+    hideComponents.toggle('hide');
+    hideConsumable.toggle('hide');
+    hideAccessories.toggle('hide');
+    hideLicenses.toggle('hide');
+    hideImport.toggle('hide');
+    hideLicenseCreate.toggle('hide');
+    hideComponentsCreate.toggle('hide');
+    hideConsumableCreate.toggle('hide');
+    hideAccessoriesCreate.toggle('hide');
+    if(btnStatus.innerHTML === "Hide") {
+      btnStatus.innerHTML = "Active";
+    } else {
+      btnStatus.innerHTML = "Hide";
+    }
+  }
+</script>
 @stop

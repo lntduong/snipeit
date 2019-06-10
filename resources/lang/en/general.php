@@ -224,4 +224,5 @@
     'login_enabled'         => 'Login Enabled',
     'audit_due'             => 'Due for Audit',
     'audit_overdue'         => 'Overdue for Audit',
+    'menu_status'           => 'Menu\'s Status',
     ];

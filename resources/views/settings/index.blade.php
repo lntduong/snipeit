@@ -247,4 +247,27 @@
 
 @stop
 
+<script>
+  var hideComponents = document.getElementById('hideComponents').classList;
+  var hideConsumable = document.getElementById('hideConsumable').classList;
+  var hideAccessories = document.getElementById('hideAccessories').classList;
+  var hideLicenses = document.getElementById('hideLicenses').classList;
+  var hideImport = document.getElementById('hideImport').classList;
+  var hideAccessoriesCreate = document.getElementById('hideAccessoriesCreate').classList;
+  var hideConsumableCreate = document.getElementById('hideConsumableCreate').classList;
+  var hideComponentsCreate = document.getElementById('hideComponentsCreate').classList;
+  var hideLicenseCreate = document.getElementById('hideLicenseCreate').classList;
 
+
+  function hideFunc() {
+    hideComponents.toggle('hide');
+    hideConsumable.toggle('hide');
+    hideAccessories.toggle('hide');
+    hideLicenses.toggle('hide');
+    hideImport.toggle('hide');
+    hideLicenseCreate.toggle('hide');
+    hideComponentsCreate.toggle('hide');
+    hideConsumableCreate.toggle('hide');
+    hideAccessoriesCreate.toggle('hide');
+  }
+</script>
