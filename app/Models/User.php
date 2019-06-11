@@ -30,6 +30,7 @@ class User extends SnipeModel implements AuthenticatableContract, CanResetPasswo
     protected $table = 'users';
     protected $injectUniqueIdentifier = true;
     protected $fillable = [
+        'id',
         'activated',
         'address',
         'city',
@@ -191,6 +192,15 @@ class User extends SnipeModel implements AuthenticatableContract, CanResetPasswo
         return $this->endpoint;
     }
 
+    public function getFullNameEmailAttribute()
+    {
+        return  $this->first_name . ' ' . $this->last_name . ' (' .$this->email . ')';
+    }
+
+    public function score()
+    {
+        return $this->hasMany(Score::class, 'user_id');
+    }
 
     /**
      * Get assets assigned to this user

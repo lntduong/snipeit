@@ -225,4 +225,6 @@
     'audit_due'             => 'Due for Audit',
     'audit_overdue'         => 'Overdue for Audit',
     'menu_status'           => 'Menu\'s Status',
+    'score_report'          => 'Score Report',
+    'score_activity'        => 'Score Activity',
     ];

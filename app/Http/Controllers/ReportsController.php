@@ -214,6 +214,12 @@ class ReportsController extends Controller
         return view('reports/activity');
     }
 
+    public function getActivityReportScore()
+    {
+
+        return view('reports/score');
+    }
+
 
     /**
      * Displays license report

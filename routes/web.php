@@ -330,6 +330,12 @@ Route::group(['middleware' => ['auth']], function () {
         [ 'as' => 'reports.activity', 'uses' => 'ReportsController@getActivityReport' ]
     );
 
+    Route::get(
+        'reports/score',
+        [ 'as' => 'score.activity', 'uses' => 'ReportsController@getActivityReportScore' ]
+    );
+
+
 
     Route::get(
         'reports/unaccepted_assets',
@@ -467,5 +473,5 @@ Route::group(['middleware' => 'web'], function () {
 
 Auth::routes();
 
-
+Route::resource('score','ScoreController');
 

@@ -33,7 +33,7 @@ class DatabaseSeeder extends Seeder
         $this->call(ConsumableSeeder::class);
         $this->call(ActionlogSeeder::class);
         $this->call(CustomFieldSeeder::class);
-
+        $this->call(ScoreTableSeeder::class);
         // Only create default settings if they do not exist in the db.
         if(!Setting::first()) {
             factory(Setting::class)->create();

@@ -6,19 +6,12 @@
 @parent
 @stop
 
-<style>
-background: #62c8d0;
-&.selected {
-  background-color: #333;
-}
-</style>
 {{-- Page content --}}
 @section('content')
-
+<!-- 
 <div class="row">
     <div class="col-md-12">
         <div class="box">
-            <!-- /.box-header -->
             <div class="box-body">
                 <div class="row">
                     <div class="col-md-12">
@@ -30,6 +23,7 @@ background: #62c8d0;
         </div>
     </div>
 </div>
+ -->
 @if ($snipeSettings->dashboard_message!='')
 
 <div class="row">
@@ -50,7 +44,7 @@ background: #62c8d0;
 
 <div class="row">
   <!-- panel -->
-  <div class="col-lg-3 col-xs-6">
+  <div class="col-lg-12 col-xs-12">
     <!-- small box -->
     <div class="small-box bg-teal">
       <div class="inner">
@@ -66,54 +60,6 @@ background: #62c8d0;
     </div>
   </div><!-- ./col -->
 
-  <div class="col-lg-3 col-xs-6">
-    <!-- small box -->
-    <div class="small-box bg-maroon">
-      <div class="inner">
-        <h3>{{ number_format($counts['license']) }}</h3>
-        <p>{{ trans('general.total_licenses') }}</p>
-      </div>
-      <div class="icon">
-        <i class="fa fa-floppy-o"></i>
-      </div>
-        @can('view', \App\Models\License::class)
-          <a href="{{ route('licenses.index') }}" class="small-box-footer">{{ trans('general.moreinfo') }} <i class="fa fa-arrow-circle-right"></i></a>
-        @endcan
-    </div>
-  </div><!-- ./col -->
-
-
-  <div class="col-lg-3 col-xs-6">
-    <!-- small box -->
-    <div class="small-box bg-orange">
-      <div class="inner">
-        <h3> {{ number_format($counts['accessory']) }}</h3>
-          <p>{{ trans('general.total_accessories') }}</p>
-      </div>
-      <div class="icon">
-        <i class="fa fa-keyboard-o"></i>
-      </div>
-      @can('index', \App\Models\Accessory::class)
-          <a href="{{ route('accessories.index') }}" class="small-box-footer">{{ trans('general.moreinfo') }} <i class="fa fa-arrow-circle-right"></i></a>
-      @endcan
-    </div>
-  </div><!-- ./col -->
-
-  <div class="col-lg-3 col-xs-6">
-    <!-- small box -->
-    <div class="small-box bg-purple">
-      <div class="inner">
-        <h3> {{ number_format($counts['consumable']) }}</h3>
-          <p>{{ trans('general.total_consumables') }}</p>
-      </div>
-      <div class="icon">
-        <i class="fa fa-tint"></i>
-      </div>
-      @can('index', \App\Models\Consumable::class)
-        <a href="{{ route('consumables.index') }}" class="small-box-footer">{{ trans('general.moreinfo') }} <i class="fa fa-arrow-circle-right"></i></a>
-      @endcan
-    </div>
-  </div><!-- ./col -->
 </div>
 
 @if ($counts['grand_total'] == 0)
@@ -219,6 +165,60 @@ background: #62c8d0;
   </div>
 
 </div> <!--/row-->
+
+
+<!-- recent activity -->
+<div class="row">
+  <div class="col-md-12">
+    <div class="box">
+      <div class="box-header with-border">
+        <h3 class="box-title">{{ trans('general.score_activity') }}</h3>
+        <div class="box-tools pull-right">
+            <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
+            </button>
+        </div>
+      </div><!-- /.box-header -->
+      <div class="box-body">
+        <div class="row">
+          <div class="col-md-12">
+            <div class="table-responsive">
+
+            <table
+                    data-cookie-id-table="dashActivityReport"
+                    data-height="400"
+                    data-side-pagination="server"
+                    data-sort-order="desc"
+                    data-sort-name="created_at"
+                    id="dashActivityReport"
+                    class="table table-striped snipe-table"
+                    data-url="{{ route('api.score.index', ['limit' => 25]) }}">
+
+                    <thead>
+                        <tr>
+                            <th class="col-sm-1" data-field="id">ID</th>
+                            <th class="col-sm-2" data-field="name" >Name</th>
+                            <th class="col-sm-2" data-field="email" >Email</th>
+                            <th class="col-sm-2" data-field="contact_number" >Contact Number</th>
+                            <th class="col-sm-3" data-searchable="false" data-field="created_at" data-formatter="dateDisplayFormatter">{{ trans('general.date') }}</th>
+                        </tr>
+                    </thead>
+                </table>
+
+
+
+            </div><!-- /.responsive -->
+          </div><!-- /.col -->
+          <div class="col-md-12 text-center" style="padding-top: 10px;">
+            <a href="{{ route('score.activity') }}" class="btn btn-primary btn-sm" style="width: 100%">View All</a>
+          </div>
+        </div><!-- /.row -->
+      </div><!-- ./box-body -->
+    </div><!-- /.box -->
+  </div>
+
+</div> <!--/row-->
+
+
 <div class="row">
     <div class="col-md-6">
         <div class="box box-default">
@@ -387,7 +387,7 @@ background: #62c8d0;
 
 
 </script>
-
+<!-- 
 <script>
   var hideComponents = document.getElementById('hideComponents').classList;
   var hideConsumable = document.getElementById('hideConsumable').classList;
@@ -411,7 +411,7 @@ background: #62c8d0;
     hideComponentsCreate.toggle('hide');
     hideConsumableCreate.toggle('hide');
     hideAccessoriesCreate.toggle('hide');
-    
+
     if(btnStatus.innerHTML === "Hide") {
       btnStatus.innerHTML = "Active";
     } else {
@@ -419,4 +419,5 @@ background: #62c8d0;
     }
   }
 </script>
+ -->
 @stop
