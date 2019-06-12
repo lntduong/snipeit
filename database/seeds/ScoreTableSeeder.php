@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Database\Seeder;
-
+use App\Models\User;
 class ScoreTableSeeder extends Seeder
 {
     /**
@@ -17,10 +17,8 @@ class ScoreTableSeeder extends Seeder
 
         for ($i = 0; $i < $limit; $i++) {
             DB::table('scores')->insert([
-                'name' => $faker->name,
-                'email' => $faker->unique()->email,
-                'contact_number' => $faker->phoneNumber,
-                'created_at' => date("Y-m-d H:i:s"),
+                'score' =>$faker->unique()->numberBetween($min = 1, $max = 10),
+                'user_id' => User::all()->random()->id,
             ]);
         }
     }

@@ -194,6 +194,14 @@
                       <b class="caret"></b>
                     </a>
                    <ul class="dropdown-menu">
+                   @can('create', \App\Models\Score::class)
+                      <li {!! (Request::is('score/create') ? 'class="active>"' : '') !!}>
+                              <a href="{{ route('score.create') }}">
+                                  <i class="fa fa-id-card-o fa-fw"></i>
+                                  {{ trans('general.score') }}
+                              </a>
+                      </li>
+                       @endcan
                      @can('create', \App\Models\Asset::class)
                       <li {!! (Request::is('hardware/create') ? 'class="active>"' : '') !!}>
                               <a href="{{ route('hardware.create') }}">

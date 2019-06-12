@@ -199,7 +199,7 @@ class User extends SnipeModel implements AuthenticatableContract, CanResetPasswo
 
     public function score()
     {
-        return $this->hasMany(Score::class, 'user_id');
+        return $this->hasMany('\App\Models\Score', 'id');
     }
 
     /**

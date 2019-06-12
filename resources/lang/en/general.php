@@ -227,4 +227,5 @@
     'menu_status'           => 'Menu\'s Status',
     'score_report'          => 'Score Report',
     'score_activity'        => 'Score Activity',
+    'score'                 => 'Score',
     ];

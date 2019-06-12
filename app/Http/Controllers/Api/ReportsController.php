@@ -50,7 +50,8 @@ class ReportsController extends Controller
             'target_id',
             'user_id',
             'action_type',
-            'note'
+            'note',
+            'score_id'
         ];
         
         $sort = in_array($request->input('sort'), $allowed_columns) ? e($request->input('sort')) : 'created_at';

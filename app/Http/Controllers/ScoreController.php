@@ -41,8 +41,17 @@ class ScoreController extends Controller
      */
     public function store(Request $request)
     {
-        $score = Score::create($request->all());
-        return redirect()->route('score.activity');
+        // $score = Score::create($request->all());
+        // return redirect()->route('score.activity');
+
+        $input = request() -> validate([
+            'user_id' => 'required',
+            'score' => 'required|numeric|min:0|max:10',
+        ]);
+        $input = request()->all();
+        $score = Score::create($input);
+        return redirect()->route('score.activity')
+        ->with('Score created successfully!');
     }
      
 

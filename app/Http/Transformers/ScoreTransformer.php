@@ -14,7 +14,6 @@ class ScoreTransformer
     public function transformScores (Collection $scores, $total)
     {
         $array = array();
-        //$user = User::getFullNameEmailAttribute();
         foreach ($scores as $score) {
             $array[] = self::transformScore($score);
         }
@@ -31,9 +30,9 @@ class ScoreTransformer
             'contact_number' => $score->contact_number,
             'created_at'    => Helper::getFormattedDateObject($score->created_at, 'datetime'),
             'score'         => $score->score,
-            'username' => ($score->users) ? [
-                'id' => (int) $score->users->id,
-                'name'=> e($score->users->username)
+            'username' => ($score->user) ? [
+                'id' => (int) $score->user->id,
+                'name'=> e($score->user->getFullNameAttribute())
             ] : null,
 
             

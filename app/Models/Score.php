@@ -21,15 +21,15 @@ class Score extends SnipeModel
      * 
      * @var array
      */
-    protected $searchableAttributes = [ 'id', 'name', 'email','contact_number', 'created_at'];
+    protected $searchableAttributes = [ 'id', 'name', 'email','contact_number', 'created_at', 'user_id', 'score'];
 
     public function setUserIdAttribute($input)
 {
     $this->attributes['user_id'] = $input ? $input : null;
 }
-public function users()
+public function user()
 {
-    return $this->belongsTo('\App\Models\User', 'id')->withTrashed();
+    return $this->belongsTo('\App\Models\User', 'user_id');
 }
 
 private static function isFullMultipleScoreSupportEnabled()

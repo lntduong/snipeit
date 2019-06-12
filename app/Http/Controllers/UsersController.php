@@ -15,6 +15,7 @@ use App\Models\LicenseSeat;
 use App\Models\Location;
 use App\Models\Setting;
 use App\Models\User;
+use App\Models\Score;
 use App\Notifications\WelcomeNotification;
 use Artisan;
 use Auth;
@@ -512,7 +513,6 @@ class UsersController extends Controller
                 $licenses = DB::table('license_seats')->whereIn('assigned_to', $user_raw_array)->get();
                 $license_array = array();
                 $accessory_array = array();
-
                 foreach ($assets as $asset) {
 
                     $asset_array[] = $asset->id;

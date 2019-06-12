@@ -5,6 +5,14 @@
         <i class="fa fa-exclamation-circle faa-pulse animated"></i>
         <strong>Error: </strong>
          Please check the form below for errors
+         @if ($errors->any())
+                <ul>
+                    @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            <br />
+        @endif
     </div>
 </div>
 

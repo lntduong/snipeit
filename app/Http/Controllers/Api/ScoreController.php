@@ -20,12 +20,12 @@ class ScoreController extends Controller
     public function index(Request $request)
     {
 
-     $score = Score::join('users', 'scores.user_id', '=', 'users.id')
-     ->select('scores.id', 'scores.created_at', 'score', 'user_id' , 'users.username', 'scores.name', 'scores.email','scores.contact_number' )
-     ->getQuery();
-        // $score = Score::select([
-        //     'id', 'name', 'email','contact_number', 'created_at', 'score'
-        //  ]);
+    //  $score = Score::join('users', 'scores.user_id', '=', 'users.id')
+    //  ->select('scores.id', 'scores.created_at', 'score', 'user_id' , 'users.username', 'scores.name', 'scores.email','scores.contact_number' )
+    //  ->getQuery();
+        $score = Score::select([
+            'id', 'name', 'email','contact_number', 'created_at', 'score', 'user_id'
+         ]);
          
          if ($request->filled('search')) {
             $score = $score->TextSearch(e($request->input('search')));
@@ -49,7 +49,7 @@ class ScoreController extends Controller
         //     $actionlogs = $actionlogs->whereNotNull('filename')->orderBy('created_at', 'desc');
         // }
         $allowed_columns = [
-            'name', 'email','contact_number'
+            'name', 'email','contact_number', 'user_id'
         ];
         $sort = in_array($request->input('sort'), $allowed_columns) ? e($request->input('sort')) : 'created_at';
         $order = ($request->input('order') == 'asc') ? 'asc' : 'desc';

@@ -196,9 +196,8 @@
                     <thead>
                         <tr>
                             <th class="col-sm-1" data-field="id">ID</th>
-                            <th class="col-sm-2" data-field="name" >Name</th>
-                            <th class="col-sm-2" data-field="email" >Email</th>
-                            <th class="col-sm-2" data-field="contact_number" >Contact Number</th>
+                            <th class="col-sm-2" data-field="score" >Score</th>
+                            <th class="col-sm-2" data-field="username"  data-formatter="usersLinkObjFormatter">User Name</th>
                             <th class="col-sm-3" data-searchable="false" data-field="created_at" data-formatter="dateDisplayFormatter">{{ trans('general.date') }}</th>
                         </tr>
                     </thead>

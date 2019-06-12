@@ -41,8 +41,8 @@
                             <th class="col-sm-2" data-field="name" data-sortable="true" >Name</th>
                             <th class="col-sm-2" data-field="email" data-sortable="true" >Email</th>
                             <th class="col-sm-2" data-field="contact_number" data-sortable="true" >Contact Number</th>
-                            <th class="col-sm-2" data-field="username->name" data-sortable="true" >User Name</th>
-                            <th class="col-sm-2" data-field="score" data-sortable="true" >Score</th>
+                            <th class="col-sm-2" data-searchable="true" data-formatter="usersLinkObjFormatter" data-field="username" data-sortable="true" >User Name</th>
+                            <th class="col-sm-2" data-searchable="true" data-field="score" data-sortable="true" >Score</th>
                             <th class="col-sm-3" data-searchable="false" data-sortable="true" data-field="created_at" data-formatter="dateDisplayFormatter">{{ trans('general.date') }}</th>
                         </tr>
                     </thead>
