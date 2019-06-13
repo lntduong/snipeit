@@ -25,9 +25,6 @@ class ScoreTransformer
 
         $array = [
             'id'          => (int) $score->id,
-            'name'          => $score->name,
-            'email'        => $score->email, 
-            'contact_number' => $score->contact_number,
             'created_at'    => Helper::getFormattedDateObject($score->created_at, 'datetime'),
             'score'         => $score->score,
             'username' => ($score->user) ? [

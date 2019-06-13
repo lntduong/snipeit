@@ -13,10 +13,12 @@ class ScoreTable extends Migration
      */
     public function up()
     {
-        Schema::table('scores', function (Blueprint $table) {
+        Schema::create('scores', function (Blueprint $table) {
+            $table->increments('id');
                 $table->integer('user_id')->unsigned()->nullable;
-                //$table->foreign('user_id','41907_59314bb611908')->references('id')->on('users')->onDelete('cascade');
+                $table->foreign('user_id','41907_59314bb611908')->references('id')->on('users')->onDelete('cascade');
                 $table->integer('score')->nullable();
+                $table->timestamps();
         });
     }
 

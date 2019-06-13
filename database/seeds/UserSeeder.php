@@ -12,7 +12,7 @@ class UserSeeder extends Seeder
      */
     public function run()
     {
-        User::truncate();
+        //User::truncate();
         factory(User::class, 1)->states('first-admin')->create();
         factory(User::class, 1)->states('snipe-admin')->create();
         factory(User::class, 3)->states('superuser')->create();

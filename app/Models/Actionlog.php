@@ -128,6 +128,12 @@ class Actionlog extends SnipeModel
                     ->withTrashed();
     }
 
+    public function score()
+    {
+        return $this->belongsTo(Score::class, 'user_id')
+                    ->withTrashed();
+    }
+
     public function target()
     {
         return $this->morphTo('target')->withTrashed();

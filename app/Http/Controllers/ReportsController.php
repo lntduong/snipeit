@@ -714,7 +714,6 @@ class ReportsController extends Controller
 
         return $response;
 
-
     }
 
 
