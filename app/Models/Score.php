@@ -31,6 +31,13 @@ public function user()
 {
     return $this->belongsTo('\App\Models\User', 'user_id');
 }
+public function assetlog()
+    {
+        return $this->hasMany('\App\Models\Actionlog', 'user_id')
+                  ->where('user_id', '=', Score::class)
+                  ->orderBy('created_at', 'desc')
+                  ->withTrashed();
+    }
 
 private static function isFullMultipleScoreSupportEnabled()
     {

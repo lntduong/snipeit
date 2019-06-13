@@ -128,10 +128,9 @@ class Actionlog extends SnipeModel
                     ->withTrashed();
     }
 
-    public function score()
+    public function scores()
     {
-        return $this->belongsTo(Score::class, 'user_id')
-                    ->withTrashed();
+        return $this->belongsTo(Score::class, 'user_id');
     }
 
     public function target()
