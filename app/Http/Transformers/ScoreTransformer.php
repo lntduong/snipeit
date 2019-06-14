@@ -36,6 +36,13 @@ class ScoreTransformer
 
         ];
 
+        $permissions_array['available_actions'] = [
+            'update' => Gate::allows('update', Score::class) ? true : false,
+            'delete' => Gate::allows('delete', Score::class) ? true : false,
+        ];
+
+        $array += $permissions_array;
+
         return $array;
     }
     public function transformScoreDatatable ($scores) {

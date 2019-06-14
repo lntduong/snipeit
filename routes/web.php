@@ -72,6 +72,13 @@ Route::group(['middleware' => 'auth'], function () {
         'parameters' => ['department' => 'department_id']
     ]);
 
+    /*
+    * Companies
+    */
+    Route::resource('score', 'ScoreController', [
+        'parameters' => ['score' => 'score_id']
+    ]);
+
 
 });
 
@@ -472,6 +479,4 @@ Route::group(['middleware' => 'web'], function () {
 });
 
 Auth::routes();
-
-Route::resource('score','ScoreController');
 

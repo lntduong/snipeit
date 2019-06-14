@@ -31,84 +31,54 @@ public function user()
 {
     return $this->belongsTo('\App\Models\User', 'user_id');
 }
-public function assetlog()
+    public function assetlog()
     {
-        return $this->hasMany('\App\Models\Actionlog', 'user_id')
-                  ->where('user_id', '=', Score::class)
-                  ->orderBy('created_at', 'desc')
-                  ->withTrashed();
+        return $this->hasMany('\App\Models\Actionlog', 'item_id')
+            ->where('item_type', '=', Score::class)
+            ->orderBy('created_at', 'desc');
     }
-
-private static function isFullMultipleScoreSupportEnabled()
+       /**
+    * Get uploads for this asset
+    */
+    public function uploads()
     {
-        $settings = Setting::getSettings();
-
-        // NOTE: this can happen when seeding the database
-        if (is_null($settings)) {
-            return false;
-        } else {
-            return $settings->full_multiple_scores_support == 1;
-        }
+        return $this->hasMany('\App\Models\Actionlog', 'item_id')
+            ->where('item_type', '=', Score::class)
+            ->where('action_type', '=', 'uploaded')
+            ->whereNotNull('filename')
+            ->orderBy('created_at', 'desc');
     }
-
-    private static function scopeScoreablesDirectly($query, $column = 'user_id', $table_name = null )
+    public static function adjustScore($score, $oldSeats, $newSeats)
     {
-        if (Auth::user()) {
-            $company_id = Auth::user()->user_id;
-        } else {
-            $user_id = null;
+        // If the seats haven't changed, continue on happily.
+        if ($oldSeats==$newSeats) {
+            return true;
         }
-
-        $table = ($table_name) ? DB::getTablePrefix().$table_name."." : '';
-        return $query->where($table.$column, '=', $user_id); 
-    }
-
-public static function scopeScoreables($query, $column = 'user_id', $table_name = null )
-    {
-        // If not logged in and hitting this, assume we are on the command line and don't scope?'
-        if (!static::isFullMultipleScoreSupportEnabled() || (Auth::check() && Auth::user()->isSuperUser()) || (!Auth::check())) {
-            return $query;
-        } else {
-            return static::scopeCompanyablesDirectly($query, $column, $table_name);
+        // On Create, we just make one for each of the seats.
+        $change = abs($oldSeats - $newSeats);
+        if ($oldSeats > $newSeats) {
+            // Log Deletion of seats.
+            $logAction = new Actionlog;
+            $logAction->item_type = Score::class;
+            $logAction->item_id = $score->id;
+            $logAction->user_id = Auth::id() ?: 1; // We don't have an id while running the importer from CLI.
+            $logAction->note = "deleted ${change} scores";
+            $logAction->target_id =  null;
+            $logAction->logaction('delete scores');
+            return true;
         }
-    }
-    public static function getIdFromInput($unescaped_input)
-    {
-        $escaped_input = e($unescaped_input);
-
-        if ($escaped_input == '0') {
-            return null;
-        } else {
-            return $escaped_input;
+        // On initail create, we shouldn't log the addition of seats.
+        if ($score->id) {
+            //Log the addition of license to the log.
+            $logAction = new Actionlog();
+            $logAction->item_type = Score::class;
+            $logAction->item_id = $score->id;
+            $logAction->user_id = Auth::id() ?: 1; // Importer.
+            $logAction->note = "added ${change} scores";
+            $logAction->target_id =  null;
+            $logAction->logaction('add scores');
         }
-    }
-    public static function getIdForCurrentUser($unescaped_input)
-    {
-        if (!static::isFullMultipleScoreSupportEnabled()) {
-            return static::getIdFromInput($unescaped_input);
-        } else {
-            $current_user = Auth::user();
-
-            // Super users should be able to set a company to whatever they need
-            if ($current_user->isSuperUser()) {
-                return static::getIdFromInput($unescaped_input);
-            } else {
-                if ($current_user->user_id != null) {
-                    return $current_user->user_id;
-                } else {
-                    return static::getIdFromInput($unescaped_input);
-                }
-            }
-
-        }
-    }
-    public static function getIdForUser($unescaped_input)
-    {
-        if (!static::isFullMultipleScoreSupportEnabled() || Auth::user()->isSuperUser()) {
-            return static::getIdFromInput($unescaped_input);
-        } else {
-            return static::getIdForCurrentUser($unescaped_input);
-        }
+        return true;
     }
 
 }

@@ -10,12 +10,13 @@ use App\Observers\LicenseObserver;
 use App\Observers\AccessoryObserver;
 use App\Observers\ConsumableObserver;
 use App\Observers\ComponentObserver;
+use App\Observers\ScoreObserver;
 use App\Models\Asset;
 use App\Models\License;
 use App\Models\Accessory;
 use App\Models\Consumable;
 use App\Models\Component;
-
+use App\Models\Score;
 
 /**
  * This service provider handles setting the observers on models
@@ -41,6 +42,7 @@ class AppServiceProvider extends ServiceProvider
         Component::observe(ComponentObserver::class);
         Consumable::observe(ConsumableObserver::class);
         License::observe(LicenseObserver::class);
+        Score::observe(ScoreObserver::class);
 
 
     }

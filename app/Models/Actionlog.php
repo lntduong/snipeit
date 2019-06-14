@@ -98,6 +98,8 @@ class Actionlog extends SnipeModel
             $itemroute = 'consumables';
         } elseif ($this->itemType()=="license") {
             $itemroute = 'licenses';
+        } elseif ($this->itemType()=="score") {
+            $itemroute = 'score';
         } elseif ($this->itemType()=="component") {
             $itemroute = 'components';
         } else {
@@ -130,7 +132,7 @@ class Actionlog extends SnipeModel
 
     public function scores()
     {
-        return $this->belongsTo(Score::class, 'user_id');
+        return $this->hasMany(Score::class, 'user_id');
     }
 
     public function target()

@@ -238,6 +238,14 @@ class ReportsController extends Controller
         return view('reports/licenses', compact('licenses'));
     }
 
+    public function getScoreReport()
+    {
+
+        $score = Score::with('users')->orderBy('created_at', 'DESC')->get();
+
+        return view('reports/score', compact('scores'));
+    }
+
     /**
     * Exports the licenses to CSV
     *
