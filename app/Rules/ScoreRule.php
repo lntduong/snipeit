@@ -25,8 +25,10 @@ class ScoreRule implements Rule
      */
     public function passes($attribute, $value)
     {
-        if($value*10%5 == 0) {
+        $check = (double)$value * 10;
+        if($check % 5 == 0 && strlen($check) <= 2) {
             return true;
+            echo strlen($check);
         }
         return false;
     }
@@ -38,6 +40,6 @@ class ScoreRule implements Rule
      */
     public function message()
     {
-        return 'The :attribute should be .5';
+        return 'The :attribute should be 0 | 0.5 | 1 | 1.5 | ... | 9.5 | 10';
     }
 }
