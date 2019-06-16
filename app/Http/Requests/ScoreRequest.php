@@ -4,17 +4,21 @@ namespace App\Http\Requests;
 use App\Helpers\Helper;
 
 use Illuminate\Foundation\Http\FormRequest;
-
-abstract class Request extends FormRequest
+use App\Rules\ScoreRule;
+class ScoreRequest extends FormRequest
 {
-    protected $rules = [
-        'user_id' => 'required',
-        'score' => 'required|numberic|min:0|max:10',
-    ];
+
+    // protected $rules = [
+    //     'user_id' => 'required',
+    //     'score' => 'required|numeric|min:0|max:10',
+    // ];
 
     public function rules()
     {
-        return $this->rules;
+        return $rules = [
+            'user_id' => 'required',
+            'score' => ['required','numeric','min:0','max:10', new ScoreRule],
+        ];
     }
     public function authorize()
     {

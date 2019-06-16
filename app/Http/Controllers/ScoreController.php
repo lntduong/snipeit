@@ -6,7 +6,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use App\Models\User;
 use App\Models\Score;
-
+use App\Http\Requests\ScoreRequest;
+use App\Rules\ScoreRule;
 class ScoreController extends Controller
 {
     /**
@@ -40,15 +41,15 @@ class ScoreController extends Controller
      * @return \Illuminate\Http\Response
      *  
      */
-    public function store(Request $request)
+    public function store(ScoreRequest $request)
     {
         // $score = Score::create($request->all());
         // return redirect()->route('score.activity');
 
-        $input = request() -> validate([
-            'user_id' => 'required',
-            'score' => 'required|numeric|min:0|max:10',
-        ]);
+        // $input = request() -> validate([
+        //     'user_id' => 'required',
+        //     'score' => 'required|numeric|min:0|max:10',
+        // ]);
         $input = request()->all();
         $score = Score::create($input);
         return redirect()->route('score.index')
@@ -89,6 +90,7 @@ class ScoreController extends Controller
 
         $this->authorize('update', $item);
         $user = User::get()->pluck('full_name_email', 'id');
+        //$selected = Input::old('user_id', $item->user_id);
         return view('score/edit', compact('user','score'))->with('item', $item)
         ->with('user', $user);
     }
@@ -100,7 +102,7 @@ class ScoreController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $scoreId)
+    public function update(ScoreRequest $request, $scoreId)
     {
         if (is_null($score = Score::find($scoreId))) {
             return redirect()->route('score.index')->with('error', trans('admin/companies/message.does_not_exist'));
@@ -109,7 +111,8 @@ class ScoreController extends Controller
         $this->authorize('update', $score);
 
         $score->score = $request->input('score');
-
+        $score->user_id = $request->input('user_id');
+        //$score = Score::create($request->all());
         if ($score->save()) {
             return redirect()->route('score.index')
                 ->with('success', trans('admin/companies/message.update.success'));
