@@ -11,13 +11,46 @@
 <a href="{{ route('fields.index') }}" class="btn btn-primary pull-right">
   {{ trans('general.back') }}</a>
 @stop
+<style>
+/* component */
 
+.star-rating {
+  border: 0;
+  display: flex;
+
+  font-size: 20px;
+  justify-content: auto;
+  text-align: center;
+  width: 5em;
+}
+
+.star-rating input {
+  display: none;
+}
+
+.star-rating label {
+  color: rgb(233, 222, 16);
+  cursor: pointer;
+}
+
+.star-rating :checked ~ label {
+  color: rgb(255, 212, 59);
+}
+
+.star-rating :hover ~ label {
+  color: rgb(250, 176, 5);
+}
+
+body {
+  background-color: rgb(50, 50, 50);
+}
+</style>
 
 {{-- Page content --}}
 @section('content')
 
-<div class="row">
-  <div class="col-md-9">
+<label class="row">
+  <label class="col-md-9">
     <!-- Horizontal Form -->
         @if ($field->id)
           {{ Form::open(['route' => ['fields.update', $field->id], 'class'=>'form-horizontal']) }}
@@ -25,9 +58,8 @@
         @else
           {{ Form::open(['route' => 'fields.store', 'class'=>'form-horizontal']) }}
         @endif
-
-    <div class="box box-default">
-      <div class="box-body">
+    <label class="box box-default">
+      <label class="box-body">
           <!-- Name -->
           <div class="form-group {{ $errors->has('name') ? ' has-error' : '' }}">
             <label for="name" class="col-md-4 control-label">
@@ -38,7 +70,7 @@
                 {!! $errors->first('name', '<span class="alert-msg"><i class="fa fa-times"></i> :message</span>') !!}
             </div>
           </div>
-
+          
           <!-- Element Type -->
           <div class="form-group {{ $errors->has('element') ? ' has-error' : '' }}">
             <label for="element" class="col-md-4 control-label">
@@ -49,10 +81,32 @@
             {!! Form::customfield_elements('element', Input::old('element', $field->element), 'field_element select2 form-control') !!}
             {!! $errors->first('element', '<span class="alert-msg"><i class="fa fa-times"></i> :message</span>') !!}
             </div>
-          </div>
-
+          </div>       
           <!-- Element values -->
+          @if($field->element == 'rating')
           <div class="form-group {{ $errors->has('element') ? ' has-error' : '' }}" id="field_values_text" style="display:none;">
+            <label for="field_values" class="col-md-4 control-label">
+              {{ trans('admin/custom_fields/general.field_values') }}
+            </label>
+            <div class="col-md-6 required">
+            <div class="star-rating">
+              <input type="radio" id="5-stars" name="{{ $field->db_column_name() }}" value="1" />
+              <label for="5-stars" class="star">&bigstar;</label>
+              <input type="radio" id="5-stars" name="{{ $field->db_column_name() }}" value="2" />
+              <label for="5-stars" class="star">&bigstar;</label>
+              <input type="radio" id="5-stars" name="{{ $field->db_column_name() }}" value="3" />
+              <label for="5-stars" class="star">&bigstar;</label>
+              <input type="radio" id="5-stars" name="{{ $field->db_column_name() }}" value="4" />
+              <label for="5-stars" class="star">&bigstar;</label>
+              <input type="radio" id="5-stars" name="{{ $field->db_column_name() }}" value="5" />
+              <label for="5-stars" class="star">&bigstar;</label>
+            </div>
+              {!! $errors->first('field_values', '<span class="alert-msg"><i class="fa fa-times"></i> :message</span>') !!}
+            </div>
+          </div>
+          @else 
+          @endif
+          <!-- <div class="form-group {{ $errors->has('element') ? ' has-error' : '' }}" id="field_values_text" style="display:none;">
             <label for="field_values" class="col-md-4 control-label">
               {{ trans('admin/custom_fields/general.field_values') }}
             </label>
@@ -61,7 +115,7 @@
               {!! $errors->first('field_values', '<span class="alert-msg"><i class="fa fa-times"></i> :message</span>') !!}
               <p class="help-block">{{ trans('admin/custom_fields/general.field_values_help') }}</p>
             </div>
-          </div>
+          </div> -->
           <!-- Format -->
           <div class="form-group {{ $errors->has('format') ? ' has-error' : '' }}">
             <label for="format" class="col-md-4 control-label">
@@ -134,18 +188,18 @@
           @endif
 
 
-      </div> <!-- /.box-body-->
+      </label> <!-- /.box-body-->
       <div class="box-footer text-right">
         <button type="submit" class="btn btn-success"> {{ trans('general.save') }}</button>
       </div>
-    </div> <!--.box.box-default-->
+    </label> <!--.box.box-default-->
       {{ Form::close() }}
-  </div> <!--/.col-md-9-->
+  </label> <!--/.col-md-9-->
   <div class="col-md-3">
     <h4>About Custom Fields</h4>
     <p>Custom fields allow you to add arbitrary attributes to assets.</p>
   </div>
-</div>
+</label>
 @stop
 
 @section('moar_scripts')

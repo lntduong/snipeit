@@ -86,6 +86,10 @@ class CustomFieldsController extends Controller
             "user_id" => Auth::user()->id
         ]);
 
+        if($field->element == 'rating') {
+            $field->field_values = "1\r\n2\r\n3\r\n4\r\n5";
+        }
+
 
         if ($request->has("custom_format")) {
             $field->format = e($request->get("custom_format"));

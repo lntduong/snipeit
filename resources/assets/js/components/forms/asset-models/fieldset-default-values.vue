@@ -25,6 +25,12 @@
         }
     }
 
+#sel-start {
+    color: #91d410!important;
+}
+.opt-start {
+    color: #91d410;
+}
 
 </style>
 
@@ -47,9 +53,18 @@
                                 <textarea v-if="field.type == 'textarea'" class="form-control" :value="getValue(field)" :id="'default-value' + field.id" :name="'default_values[' + field.id + ']'"></textarea><br>
 
                                 <select v-if="field.type == 'listbox'" class="form-control m-b-xs" :name="'default_values[' + field.id + ']'">
-                                    <option value=""></option>
+                                    <option value=""></option>field_value
                                     <option v-for="field_value in field.field_values_array" :value="field_value" :selected="getValue(field) == field_value">{{ field_value }}</option>
                                 </select>
+                                  <select v-if="field.type == 'rating'" class="form-control m-b-xs" :name="'default_values[' + field.id + ']'" id="sel-start">
+                                    <option disabled selected value="">Select default start</option>
+                                    <option v-for="field_value in field.field_values_array" :value="field_value" :selected="getValue(field) == field_value" class="opt-start">{{"&bigstar;".repeat( field_value )}}</option>
+                                    <!-- <option selected="getValue(field) == field_value" value="1">&bigstar;</option>
+                                    <option selected="getValue(field) == field_value" value="2">&bigstar;&bigstar;</option>
+                                    <option selected="getValue(field) == field_value" value="3">&bigstar;&bigstar;&bigstar;</option>
+                                    <option selected="getValue(field) == field_value" value="4">&bigstar;&bigstar;&bigstar;&bigstar;</option>
+                                    <option selected="getValue(field) == field_value" value="5">&bigstar;&bigstar;&bigstar;&bigstar;&bigstar;</option> -->
+                                   </select>
                             </div>
                         </div>
                     </div>
