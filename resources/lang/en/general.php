@@ -228,4 +228,5 @@
     'score_report'          => 'Score Report',
     'score_activity'        => 'Score Activity',
     'score'                 => 'Score',
+    'store'                 => 'Store',
     ];

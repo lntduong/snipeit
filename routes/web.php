@@ -73,10 +73,17 @@ Route::group(['middleware' => 'auth'], function () {
     ]);
 
     /*
-    * Companies
+    * Score
     */
     Route::resource('score', 'ScoreController', [
         'parameters' => ['score' => 'score_id']
+    ]);
+
+    /*
+    * Store
+    */
+    Route::resource('store', 'StoreController', [
+        'parameters' => ['store' => 'store_id']
     ]);
 
 
