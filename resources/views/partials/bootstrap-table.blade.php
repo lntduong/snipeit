@@ -344,7 +344,8 @@
         'depreciations',
         'fieldsets',
         'groups',
-        'score'
+        'score',
+        'store'
     ];
 
     for (var i in formatters) {

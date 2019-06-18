@@ -760,6 +760,11 @@ Route::group(['prefix' => 'v1','namespace' => 'Api', 'middleware' => 'api'], fun
         [ 'as' => 'api.score.index', 'uses' => 'ScoreController@index' ]
     );
 
+    Route::get(
+        'reports/store',
+        [ 'as' => 'api.store.index', 'uses' => 'StoreController@index' ]
+    );
+
 
 
 });

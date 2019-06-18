@@ -9,6 +9,7 @@ use App\Models\Company;
 use App\Models\Store;
 use App\Http\Requests\StoreRequest;
 use App\Rules\StoreRule;
+use Auth;
 class StoreController extends Controller
 {
     /**
@@ -32,7 +33,7 @@ class StoreController extends Controller
         $this->authorize('create', Store::class);
         $location = Location::get()->pluck('name','id')->prepend('Please select', '');
         $company = Company::get()->pluck('name','id')->prepend('Please select', '');
-        return view('store/create')->with('item', new Store);
+        return view('store/edit')->with('item', new Store);
     }
 
 
@@ -48,6 +49,50 @@ class StoreController extends Controller
         $this->authorize(Store::class);
 
         $store = new Store();
+        $store->name = $request->input('name');
+        $store->company_id = $request->input('company_id');
+        $store->location_id = $request->input('location_id');
+        $store->user_id = Auth::id();
+       // Create the image (if one was chosen.)
+       if ($request->filled('image')) {
+        $image = $request->input('image');
+
+        // After modification, the image is prefixed by mime info like the following:
+        // data:image/jpeg;base64,; This causes the image library to be unhappy, so we need to remove it.
+        $header = explode(';', $image, 2)[0];
+        // Grab the image type from the header while we're at it.
+        $extension = substr($header, strpos($header, '/')+1);
+        // Start reading the image after the first comma, postceding the base64.
+        $image = substr($image, strpos($image, ',')+1);
+
+        $file_name = str_random(25).".".$extension;
+
+        $directory= public_path('uploads/stores/');
+        // Check if the uploads directory exists.  If not, try to create it.
+        if (!file_exists($directory)) {
+            mkdir($directory, 0755, true);
+        }
+        $path = public_path('uploads/stores/'.$file_name);
+        try {
+            Image::make($image)->resize(800, 800, function ($constraint) {
+                $constraint->aspectRatio();
+                $constraint->upsize();
+            })->save($path);
+            $store->image = $file_name;
+        } catch (\Exception $e) {
+            \Input::flash();
+            $messageBag = new \Illuminate\Support\MessageBag();
+            $messageBag->add('image', $e->getMessage());
+            \Session()->flash('errors', \Session::get('errors', new \Illuminate\Support\ViewErrorBag)
+                ->put('default', $messageBag));
+            return response()->json(['image' => $e->getMessage()], 422);
+        }
+        $store->image = $file_name;
+    }
+        if ($store->save()) {
+            return redirect()->route('store.index');
+        }
+        return response()->json(['errors' => $store->getErrors()], 500);
     }
      
 
@@ -59,13 +104,13 @@ class StoreController extends Controller
      */
     public function show($id)
     {
-        $this->authorize('view', Score::class);
+        $this->authorize('view', Store::class);
 
-        if (is_null($score = Score::find($id))) {
-            return redirect()->route('score.index')
+        if (is_null($store = Store::find($id))) {
+            return redirect()->route('store.index')
                 ->with('error', trans('admin/companies/message.not_found'));
         } else {
-            return view('score/view')->with('score',$score);
+            return view('store/view')->with('store',$store);
         }
     }
 
@@ -75,18 +120,18 @@ class StoreController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit($scoreId)
+    public function edit($storeId)
     {
-        if (is_null($item = Score::find($scoreId))) {
-            return redirect()->route('score.index')
+        if (is_null($item = Store::find($storeId))) {
+            return redirect()->route('store.index')
                 ->with('error', trans('admin/companies/message.does_not_exist'));
         }
 
         $this->authorize('update', $item);
-        $user = User::get()->pluck('full_name_email', 'id');
-        //$selected = Input::old('user_id', $item->user_id);
-        return view('score/edit', compact('user','score'))->with('item', $item)
-        ->with('user', $user);
+        $location = Location::get()->pluck('name','id');
+        $company = Company::get()->pluck('name','id');
+        return view('store/edit', compact('location','store','company'))->with('item', $item)
+        ->with('location', $location)->with('company',$company);
     }
 
     /**
@@ -96,22 +141,66 @@ class StoreController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(ScoreRequest $request, $scoreId)
+    public function update(StoreRequest $request, $storeId)
     {
-        if (is_null($score = Score::find($scoreId))) {
-            return redirect()->route('score.index')->with('error', trans('admin/companies/message.does_not_exist'));
+        if (is_null($store = Store::find($storeId))) {
+            return redirect()->route('store.index')->with('error', trans('admin/companies/message.does_not_exist'));
         }
 
-        $this->authorize('update', $score);
+        $this->authorize('update', $store);
 
-        $score->score = $request->input('score');
-        $score->user_id = $request->input('user_id');
-        //$score = Score::create($request->all());
-        if ($score->save()) {
-            return redirect()->route('score.index')
+        $store->name = $request->input('name');
+        $store->company_id = $request->input('company_id');
+        $store->location_id = $request->input('location_id');
+        //$store = Store::create($request->all());
+        if ($request->filled('image_delete')) {
+            try {
+                unlink(public_path().'/uploads/stores/'.$store->image);
+                $store->image = '';
+            } catch (\Exception $e) {
+                \Log::info($e);
+            }
+
+        }
+
+        // Update the image
+        if ($request->filled('image')) {
+            $image = $request->input('image');
+            // See postCreate for more explaination of the following.
+            $header = explode(';', $image, 2)[0];
+            $extension = substr($header, strpos($header, '/')+1);
+            $image = substr($image, strpos($image, ',')+1);
+
+            $directory= public_path('uploads/stores/');
+            // Check if the uploads directory exists.  If not, try to create it.
+            if (!file_exists($directory)) {
+                mkdir($directory, 0755, true);
+            }
+
+            $file_name = str_random(25).".".$extension;
+            $path = public_path('uploads/stores/'.$file_name);
+            try {
+                Image::make($image)->resize(800, 800, function ($constraint) {
+                    $constraint->aspectRatio();
+                    $constraint->upsize();
+                })->save($path);
+                $store->image = $file_name;
+            } catch (\Exception $e) {
+                \Input::flash();
+                $messageBag = new \Illuminate\Support\MessageBag();
+                $messageBag->add('image', $e->getMessage());
+                \Session()->flash('errors', \Session::get('errors', new \Illuminate\Support\ViewErrorBag)
+                    ->put('default', $messageBag));
+                return response()->json(['image' => $e->getMessage()], 422);
+            }
+            $store->image = $file_name;
+        }
+
+        if ($store->save()) {
+            return redirect()->route('store.index')
                 ->with('success', trans('admin/companies/message.update.success'));
         }
-        return redirect()->route('score.edit', ['score' => $scoreId])
+        return redirect()->route('store.edit', ['store' => $storeId])
             ->with('error', trans('admin/companies/message.update.error'));
 
     }
@@ -122,18 +211,18 @@ class StoreController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($scoreId)
+    public function destroy($storeId)
     {
-        if (is_null($score = Score::find($scoreId))) {
-            return redirect()->route('score.index')
+        if (is_null($store = Store::find($storeId))) {
+            return redirect()->route('store.index')
                 ->with('error', trans('admin/companies/message.not_found'));
         } else {
 
-            $this->authorize('delete', $score);
+            $this->authorize('delete', $store);
 
             try {
-                $score->delete();
-                return redirect()->route('score.index')
+                $store->delete();
+                return redirect()->route('store.index')
                     ->with('success', trans('admin/companies/message.delete.success'));
             } catch (\Illuminate\Database\QueryException $exception) {
             /*
@@ -141,7 +230,7 @@ class StoreController extends Controller
                  * For example when rows in other tables are referencing this company
                  */
                 if ($exception->getCode() == 23000) {
-                    return redirect()->route('score.index')
+                    return redirect()->route('store.index')
                         ->with('error', trans('admin/companies/message.assoc_users'));
                 } else {
                     throw $exception;

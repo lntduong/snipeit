@@ -31,7 +31,7 @@
               data-sort-order="asc"
               id="storeTable"
               class="table table-striped snipe-table"
-              data-url="{{ route('api.score.index') }}" //TODO: fix yet
+              data-url="{{ route('api.store.index') }}" //TODO: fix yet
               data-export-options='{
                         "fileName": "export-store-{{ date('Y-m-d') }}",
                         "ignoreColumn": ["actions","image","change","checkbox","checkincheckout","icon"]

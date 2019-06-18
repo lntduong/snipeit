@@ -24,26 +24,36 @@ class StorePresenter extends Presenter
                 "visible" => false
             ],
             [
-                "field" => "username",
+                "field" => "name",
                 "searchable" => true,
                 "sortable" => true,
                 "switchable" => true,
-                "title" => trans('User Name'),
+                "title" => trans('Store Name'),
                 "visible" => true,
-                'formatter' => 'usersLinkObjFormatter',
             ],[
-                "field" => "score",
+                "field" => "company",
                 "searchable" => true,
                 "sortable" => true,
                 "switchable" => true,
-                "title" => trans('admin/score/table.score'),
+                "title" => trans('Company'),
                 "visible" => true,
+                'formatter' => 'companiesLinkObjFormatter',
+            ],
+            [
+                "field" => "location",
+                "searchable" => true,
+                "sortable" => true,
+                "switchable" => true,
+                "title" => trans('Location'),
+                "visible" => true,
+                'formatter' => 'locationsLinkObjFormatter',
             ],[
                 "field" => "updated_at",
                 "searchable" => false,
                 "sortable" => true,
                 "visible" => false,
                 "title" => trans('general.updated_at'),
+                'formatter' => 'dateDisplayFormatter'
             ],[
                 "field" => "created_at",
                 "searchable" => false,
@@ -58,7 +68,7 @@ class StorePresenter extends Presenter
                 "switchable" => false,
                 "title" => trans('table.actions'),
                 "visible" => true,
-                "formatter" => "scoreActionsFormatter",
+                "formatter" => "storeActionsFormatter",
             ]
         ];
 

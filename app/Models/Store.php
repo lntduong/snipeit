@@ -23,9 +23,14 @@ class Store extends SnipeModel
      */
     //protected $searchableAttributes = [ 'id', 'name', 'email','contact_number', 'created_at', 'user_id', 'score'];
 
-public function user()
+public function company()
 {
-    return $this->belongsTo('\App\Models\User', 'user_id');
+    return $this->belongsTo('\App\Models\Company', 'company_id');
+}
+
+public function location()
+{
+    return $this->belongsTo('\App\Models\Location', 'location_id');
 }
     public function assetlog()
     {
