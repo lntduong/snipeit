@@ -18,7 +18,7 @@ class CreateStoreTable extends Migration
             $table->integer('company_id')->unsigned();
             //$table->foreign('company_id')->references('id')->on('companies');
             $table->string('name');
-            $table->integer('location_id');
+            $table->integer('location_id')->nullable();
             $table->timestamps();
             $table->softDeletes();
             $table->string('image');
