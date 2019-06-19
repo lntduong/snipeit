@@ -66,6 +66,15 @@ class SettingsServiceProvider extends ServiceProvider
             return url('/').'/uploads/locations/';
         });
 
+        // Store
+        \App::singleton('store_upload_path', function(){
+            return public_path('/uploads/store/');
+        });
+
+        \App::singleton('store_upload_url', function(){
+            return url('/').'/uploads/store/';
+        });
+
         // Users
         \App::singleton('users_upload_path', function(){
             return public_path('/uploads/users/');

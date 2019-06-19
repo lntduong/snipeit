@@ -401,14 +401,6 @@
               </a>
             </li>
             @endcan
-            @can('view', \App\Models\Store::class)
-              <li{!! (Request::is('store*') ? ' class="active"' : '') !!}  id="hideStore">
-                  <a href="{{ route('store.index') }}">
-                    <i class="fa fa-archive"></i>
-                    <span>{{ trans('general.store') }}</span>
-                  </a>
-              </li>
-              @endcan
             @can('index', \App\Models\Asset::class)
             <li class="treeview{{ (Request::is('hardware*') ? ' active' : '') }}">
                 <a href="#"><i class="fa fa-barcode"></i>
@@ -575,6 +567,13 @@
                     </a>
 
                     <ul class="treeview-menu">
+                        @if(Gate::allows('view', App\Models\Store::class) || Gate::allows('view', App\Models\Store::class))
+                            <li {!! (Request::is('store*') ? ' class="active"' : '') !!}>
+                                <a href="{{ route('store.index') }}">
+                                {{ trans('admin/store/general.store') }}
+                                </a>
+                            </li>
+                        @endif
                         @if(Gate::allows('view', App\Models\CustomField::class) || Gate::allows('view', App\Models\CustomFieldset::class))
                             <li {!! (Request::is('fields*') ? ' class="active"' : '') !!}>
                                 <a href="{{ route('fields.index') }}">

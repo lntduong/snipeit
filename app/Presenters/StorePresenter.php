@@ -61,6 +61,15 @@ class StorePresenter extends Presenter
                 "visible" => false,
                 "title" => trans('general.created_at'),
                 'formatter' => 'dateDisplayFormatter'
+            ],
+            [
+                "field" => "image",
+                "searchable" => false,
+                "sortable" => true,
+                "switchable" => true,
+                "title" => trans('general.image'),
+                "visible" => false,
+                "formatter" => "imageFormatter"
             ],[
                 "field" => "actions",
                 "searchable" => false,

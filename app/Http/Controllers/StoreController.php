@@ -10,6 +10,7 @@ use App\Models\Store;
 use App\Http\Requests\StoreRequest;
 use App\Rules\StoreRule;
 use Auth;
+use Image;
 class StoreController extends Controller
 {
     /**
@@ -53,42 +54,16 @@ class StoreController extends Controller
         $store->company_id = $request->input('company_id');
         $store->location_id = $request->input('location_id');
         $store->user_id = Auth::id();
-       // Create the image (if one was chosen.)
-       if ($request->filled('image')) {
-        $image = $request->input('image');
-
-        // After modification, the image is prefixed by mime info like the following:
-        // data:image/jpeg;base64,; This causes the image library to be unhappy, so we need to remove it.
-        $header = explode(';', $image, 2)[0];
-        // Grab the image type from the header while we're at it.
-        $extension = substr($header, strpos($header, '/')+1);
-        // Start reading the image after the first comma, postceding the base64.
-        $image = substr($image, strpos($image, ',')+1);
-
-        $file_name = str_random(25).".".$extension;
-
-        $directory= public_path('uploads/stores/');
-        // Check if the uploads directory exists.  If not, try to create it.
-        if (!file_exists($directory)) {
-            mkdir($directory, 0755, true);
-        }
-        $path = public_path('uploads/stores/'.$file_name);
-        try {
-            Image::make($image)->resize(800, 800, function ($constraint) {
+        if ($request->file('image')) {
+            $image = $request->file('image');
+            $file_name = str_random(25).".".$image->getClientOriginalExtension();
+            $path = public_path('uploads/store/'.$file_name);
+            Image::make($image->getRealPath())->resize(800, null, function ($constraint) {
                 $constraint->aspectRatio();
                 $constraint->upsize();
             })->save($path);
             $store->image = $file_name;
-        } catch (\Exception $e) {
-            \Input::flash();
-            $messageBag = new \Illuminate\Support\MessageBag();
-            $messageBag->add('image', $e->getMessage());
-            \Session()->flash('errors', \Session::get('errors', new \Illuminate\Support\ViewErrorBag)
-                ->put('default', $messageBag));
-            return response()->json(['image' => $e->getMessage()], 422);
         }
-        $store->image = $file_name;
-    }
         if ($store->save()) {
             return redirect()->route('store.index');
         }
@@ -153,47 +128,35 @@ class StoreController extends Controller
         $store->company_id = $request->input('company_id');
         $store->location_id = $request->input('location_id');
         //$store = Store::create($request->all());
-        if ($request->filled('image_delete')) {
-            try {
-                unlink(public_path().'/uploads/stores/'.$store->image);
-                $store->image = '';
-            } catch (\Exception $e) {
-                \Log::info($e);
+        $old_image = $store->image;
+
+        // Set the model's image property to null if the image is being deleted
+        if ($request->input('image_delete') == 1) {
+            $store->image = null;
+        }
+
+        if ($request->file('image')) {
+            $image = $request->file('image');
+            $file_name = $store->id.'-'.str_slug($image->getClientOriginalName()) . "." . $image->getClientOriginalExtension();
+
+            if ($image->getClientOriginalExtension()!='svg') {
+                Image::make($image->getRealPath())->resize(800, null, function ($constraint) {
+                    $constraint->aspectRatio();
+                    $constraint->upsize();
+                })->save(app('store_upload_path').$file_name);
+            } else {
+                $image->move(app('store_upload_path'), $file_name);
             }
+            $store->image = $file_name;
 
         }
 
-        // Update the image
-        if ($request->filled('image')) {
-            $image = $request->input('image');
-            // See postCreate for more explaination of the following.
-            $header = explode(';', $image, 2)[0];
-            $extension = substr($header, strpos($header, '/')+1);
-            $image = substr($image, strpos($image, ',')+1);
-
-            $directory= public_path('uploads/stores/');
-            // Check if the uploads directory exists.  If not, try to create it.
-            if (!file_exists($directory)) {
-                mkdir($directory, 0755, true);
-            }
-
-            $file_name = str_random(25).".".$extension;
-            $path = public_path('uploads/stores/'.$file_name);
-            try {
-                Image::make($image)->resize(800, 800, function ($constraint) {
-                    $constraint->aspectRatio();
-                    $constraint->upsize();
-                })->save($path);
-                $store->image = $file_name;
+        if ((($request->file('image')) && (isset($old_image)) && ($old_image!='')) || ($request->input('image_delete') == 1)) {
+            try  {
+                unlink(app('store_upload_path').$old_image);
             } catch (\Exception $e) {
-                \Input::flash();
-                $messageBag = new \Illuminate\Support\MessageBag();
-                $messageBag->add('image', $e->getMessage());
-                \Session()->flash('errors', \Session::get('errors', new \Illuminate\Support\ViewErrorBag)
-                    ->put('default', $messageBag));
-                return response()->json(['image' => $e->getMessage()], 422);
+                \Log::info($e);
             }
-            $store->image = $file_name;
         }
 
         if ($store->save()) {

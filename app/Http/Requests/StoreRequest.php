@@ -16,6 +16,7 @@ class StoreRequest extends FormRequest
     {
         return $rules = [
             'name' => 'required',
+            'image' => 'mimes:png,gif,jpg,jpeg,svg',
         ];
     }
     public function authorize()

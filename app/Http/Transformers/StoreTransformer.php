@@ -36,7 +36,7 @@ class StoreTransformer
                 'id' => (int) $store->location->id,
                 'name'=> e($store->location->name)
             ] : null,
-
+            'image' =>   ($store->image) ? app('store_upload_url').e($store->image) : null,
             
 
         ];
