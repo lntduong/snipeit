@@ -3,7 +3,10 @@
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
   <title>Labels</title>
-
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
 </head>
 <body>
 
@@ -20,7 +23,7 @@
 
   body {
     font-family: arial, helvetica, sans-serif;
-    width: {{ $settings->labels_pagewidth }}in;
+    /* width: {{ $settings->labels_pagewidth }}in; */
     height: {{ $settings->labels_pageheight }}in;
     margin: {{ $settings->labels_pmargin_top }}in {{ $settings->labels_pmargin_right }}in {{ $settings->labels_pmargin_bottom }}in {{ $settings->labels_pmargin_left }}in;
     font-size: {{ $settings->labels_fontsize }}pt;
@@ -106,62 +109,99 @@
     {{ $snipeSettings->show_custom_css() }}
   @endif
 
-  </style>
+  .card.text-white.mb-3 {
+    border-radius: 20px;
+    background-color: #50B1F0;
+  }
 
+  .vinx-card-header {
+    padding: .75rem 1.25rem;
+    margin-bottom: 0;
+    margin: 0 -15px -10px;
+}
+img#vinx-cart-title {
+    float: left;
+}
+h5#vinx-card-title {
+    float: left;
+    margin-top: 10px;
+    font-weight: 800;
+    font-size: 17px;
+}
+span.id {
+    font-size: 12px;
+}
+h5#vinx-card-name1 {
+    background-color: white;
+    color: black;
+    height: 45px;
+    text-align: center;
+    margin: -15px;
+    line-height: 45px;
+}
+
+h5#vinx-card-name2 {
+    background-color: white;
+    color: black;
+    height: 45px;
+    text-align: center;
+    margin: -15px;
+    line-height: 45px;
+    margin-top: 20px;
+}
+.col-4 {
+    background-color: white;
+    margin: -15px;
+    right: -18px;
+}
+.img-qrcode {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+.vinx-card-footer {
+  padding: 6.75px 0.25rem;
+  background-color: white;
+  margin: 0px 3px 15px;
+  color: black;
+}
+h6.vinx-card-footer-title {
+    color: #52B4F2;
+    font-weight: 800;
+}
+  </style>
+  <div class="row">
 @foreach ($assets as $asset)
 	<?php $count++; ?>
-  <div class="label"> 
-
-      @if ($settings->qr_code=='1')
-    <div class="qr_img">
-      <img src="./{{ $asset->id }}/qr_code" class="qr_img">
+  
+  <div class="col-sm-12 col-xs-6 col-md-6 col-lg-4">
+    <div class="card text-white mb-3" >
+      <div class="vinx-card-header">
+        <img src="https://www.vinx.co.jp/resource/images_eng/skin/img-logo.jpg" alt="VINX" id="vinx-cart-title">
+        <h5 id="vinx-card-title">VINX Malaysia Sdn. Bhd <span class="id">(988697-D)</span></h5>
+      </div>
+      <div class="card-body">
+      <div class="row">
+        <div class="col-8">
+          <h5 class="card-title" id="vinx-card-name1">AMY-9000 </h5>
+          <h5 class="card-title" id="vinx-card-name2">PCU1907DTP00001</h5>
+        </div>
+        <div class="col-4">
+          @if ($settings->qr_code=='1')
+            <img src="./{{ $asset->id }}/qr_code" class="img-qrcode">
+          @endif
+        </div>
+      </div>
+      </div>
+      <div class="vinx-card-footer">
+        <h6 class="vinx-card-footer-title">HELP DESK CONTACT</h6>
+        <h6 class="vinx-card-tel">TEL: 180018 23 66</h6>
+        <h6 class="vinx-card-email">EMAIL: sr@eaonretail.com.my</h6>
+      </div>
     </div>
-      @endif
-
-    <div class="qr_text">
-        @if ($settings->qr_text!='')
-        <div class="pull-left">
-            <strong>{{ $settings->qr_text }}</strong>
-            <br>
-        </div>
-        @endif
-        @if (($settings->labels_display_company_name=='1') && ($asset->company))
-        <div class="pull-left">
-        	C: {{ $asset->company->name }}
-        </div>
-        @endif
-        @if (($settings->labels_display_name=='1') && ($asset->name!=''))
-        <div class="pull-left">
-            N: {{ $asset->name }}
-        </div>
-        @endif
-        @if (($settings->labels_display_tag=='1') && ($asset->asset_tag!=''))
-	<div class="pull-left">
-            T: {{ $asset->asset_tag }}
-        </div>
-        @endif
-        @if (($settings->labels_display_serial=='1') && ($asset->serial!=''))
-        <div class="pull-left">
-            S: {{ $asset->serial }}
-        </div>
-	@endif
-	@if (($settings->labels_display_model=='1') && ($asset->model->name!=''))
-	<div class="pull-left">
-            M: {{ $asset->model->name }} {{ $asset->model->model_number }}
-	</div>
-	@endif
-
-    </div>
-
-    @if ((($settings->alt_barcode_enabled=='1') && $settings->alt_barcode!=''))
-        <div class="barcode_container">
-            <img src="./{{ $asset->id }}/barcode" class="barcode">
-        </div>
-    @endif
+  </div>
 
 
-
-</div>
 
 @if ($count % $settings->labels_per_page == 0)
 <div class="page-break"></div>
@@ -169,7 +209,6 @@
 @endif
 
 @endforeach
-
-
+</div>
 </body>
 </html>

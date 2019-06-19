@@ -194,6 +194,14 @@
                       <b class="caret"></b>
                     </a>
                    <ul class="dropdown-menu">
+                   @can('create', \App\Models\Store::class)
+                      <li {!! (Request::is('store/create') ? 'class="active>"' : '') !!}>
+                              <a href="{{ route('store.create') }}">
+                                  <i class="fa fa-archive fa-fw"></i>
+                                  {{ trans('general.store') }}
+                              </a>
+                      </li>
+                       @endcan
                    @can('create', \App\Models\Score::class)
                       <li {!! (Request::is('score/create') ? 'class="active>"' : '') !!}>
                               <a href="{{ route('score.create') }}">
@@ -393,6 +401,14 @@
               </a>
             </li>
             @endcan
+            @can('view', \App\Models\Store::class)
+              <li{!! (Request::is('store*') ? ' class="active"' : '') !!}  id="hideStore">
+                  <a href="{{ route('store.index') }}">
+                    <i class="fa fa-archive"></i>
+                    <span>{{ trans('general.store') }}</span>
+                  </a>
+              </li>
+              @endcan
             @can('index', \App\Models\Asset::class)
             <li class="treeview{{ (Request::is('hardware*') ? ' active' : '') }}">
                 <a href="#"><i class="fa fa-barcode"></i>
