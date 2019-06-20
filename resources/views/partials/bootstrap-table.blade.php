@@ -345,7 +345,8 @@
         'fieldsets',
         'groups',
         'score',
-        'store'
+        'store',
+        'contract'
     ];
 
     for (var i in formatters) {

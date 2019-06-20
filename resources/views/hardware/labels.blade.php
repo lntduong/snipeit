@@ -29,86 +29,6 @@
     font-size: {{ $settings->labels_fontsize }}pt;
   }
 
-  .label {
-    width: {{ $settings->labels_width }}in;
-    height: {{ $settings->labels_height }}in;
-    padding: 0in;
-    margin-right: {{ $settings->labels_display_sgutter }}in; /* the gutter */
-    margin-bottom: {{ $settings->labels_display_bgutter }}in;
-    display: inline-block;
-    overflow: hidden;
-  }
-
-  .page-break  {
-    page-break-after:always;
-  }
-
-  div.qr_img {
-    width: {{ $qr_size }}in;
-    height: {{ $qr_size }}in;
-    float: left;
-    display: inline-block;
-    padding-right: .04in;
-  }
-  img.qr_img {
-    width: 100%;
-    height: 100%;
-  }
-  img.barcode {
-    display: block;
-    margin-left: auto;
-    margin-right: auto;
-  }
-
- .qr_text {
-    width: {{ $qr_txt_size }}in;
-    height: {{ $qr_size }}in;
-    padding-top: .10in;
-    font-family: arial, helvetica, sans-serif;
-    padding-right: .01in;
-    overflow: hidden !important;
-    display: inline-block;
-    word-wrap: break-word;
-    word-break: break-all;
-  }
-
-  div.barcode_container {
-      float: left;
-      width: 100%;
-      display: inline;
-      height: 50px;
-  }
-  
-  .next-padding {
-      margin: {{ $settings->labels_pmargin_top }}in {{ $settings->labels_pmargin_right }}in {{ $settings->labels_pmargin_bottom }}in {{ $settings->labels_pmargin_left }}in;
-  }
-
-
-
-  @media print {
-    .noprint {
-      display: none !important;
-    }
-    .next-padding {
-      margin: {{ $settings->labels_pmargin_top }}in {{ $settings->labels_pmargin_right }}in {{ $settings->labels_pmargin_bottom }}in {{ $settings->labels_pmargin_left }}in;
-      font-size: 0;
-    }
-  }
-
-  @media screen {
-    .label {
-      outline: .02in black solid; /* outline doesn't occupy space like border does */
-    }
-    .noprint {
-      font-size: 13px;
-      padding-bottom: 15px;
-    }
-  }
-
-  @if ($snipeSettings->custom_css)
-    {{ $snipeSettings->show_custom_css() }}
-  @endif
-
   .card.text-white.mb-3 {
     border-radius: 20px;
     background-color: #50B1F0;
@@ -169,12 +89,69 @@ h6.vinx-card-footer-title {
     color: #52B4F2;
     font-weight: 800;
 }
+@media (width: 1200px) {
+  h5#vinx-card-title {
+    font-size: 16px;
+}
+}
+@media (min-width: 768px) and (max-width: 805px) { 
+  h5#vinx-card-title {
+    font-size: 15px;
+}
+  }
+
+@media (min-width: 320px) and (max-width: 350px) { 
+  img#vinx-cart-title {
+    width: 25%;
+}
+  h5#vinx-card-title {
+    font-size: 11px;
+}
+  .img-qrcode {
+    margin-left: -15px;
+}
+h5#vinx-card-name2,
+h5#vinx-card-name1 {
+  font-size: 15px;
+}
+h6.vinx-card-footer-title,
+h6.vinx-card-tel,
+h6.vinx-card-email {
+    font-size: 13px;
+}
+}
+
+
+@media (min-width: 351px) and (max-width: 408px) {
+  img#vinx-cart-title {
+    width: 25%;
+}
+h5#vinx-card-title {
+    font-size: 12px;
+}
+span.id {
+    font-size: 7px;
+}
+h5#vinx-card-name1,
+h5#vinx-card-name2 {
+    font-size: 15px;
+}
+.img-qrcode {
+    width: 90px;
+    margin-left: -10px;
+}
+h6.vinx-card-footer-title,
+h6.vinx-card-tel,
+h6.vinx-card-email {
+    font-size: 13px;
+}
+}
   </style>
   <div class="row">
 @foreach ($assets as $asset)
 	<?php $count++; ?>
   
-  <div class="col-sm-12 col-xs-6 col-md-6 col-lg-4">
+  <div class="col-12 col-sm-12 col-md-6 col-lg-6 col-xl-4">
     <div class="card text-white mb-3" >
       <div class="vinx-card-header">
         <img src="https://www.vinx.co.jp/resource/images_eng/skin/img-logo.jpg" alt="VINX" id="vinx-cart-title">

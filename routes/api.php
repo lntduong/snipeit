@@ -96,6 +96,13 @@ Route::group(['prefix' => 'v1','namespace' => 'Api', 'middleware' => 'api'], fun
         'uses' => 'CompaniesController@selectlist'
     ]);
 
+    /*--- Store API ---*/
+
+    Route::get( 'store/selectlist',  [
+        'as' => 'store.selectlist',
+        'uses' => 'StoreController@selectlist'
+    ]);
+
 
     Route::resource('companies', 'CompaniesController',
         [
@@ -765,6 +772,10 @@ Route::group(['prefix' => 'v1','namespace' => 'Api', 'middleware' => 'api'], fun
         [ 'as' => 'api.store.index', 'uses' => 'StoreController@index' ]
     );
 
+    Route::get(
+        'reports/contract',
+        [ 'as' => 'api.contract.index', 'uses' => 'ContractController@index' ]
+    );
 
 
 });

@@ -85,7 +85,12 @@ Route::group(['middleware' => 'auth'], function () {
     Route::resource('store', 'StoreController', [
         'parameters' => ['store' => 'store_id']
     ]);
-
+    /*
+    * Contract
+    */
+    Route::resource('contract', 'ContractController', [
+        'parameters' => ['contract' => 'contract_id']
+    ]);
 
 });
 
