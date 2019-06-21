@@ -103,6 +103,21 @@ Route::group(['prefix' => 'v1','namespace' => 'Api', 'middleware' => 'api'], fun
         'uses' => 'StoreController@selectlist'
     ]);
 
+    /*--- User Contact 1 API ---*/
+
+    Route::get( 'contact_one/selectlist',  [
+        'as' => 'contact_one.selectlist',
+        'uses' => 'ContactOneController@selectlist'
+    ]);
+
+    /*--- User Contact 2 API ---*/
+
+    Route::get( 'contact_two/selectlist',  [
+        'as' => 'contact_two.selectlist',
+        'uses' => 'ContactTwoController@selectlist'
+    ]);
+
+
 
     Route::resource('companies', 'CompaniesController',
         [
@@ -715,7 +730,7 @@ Route::group(['prefix' => 'v1','namespace' => 'Api', 'middleware' => 'api'], fun
         Route::get('selectlist',
             [
                 'as' => 'api.users.selectlist',
-                'uses' => 'UsersController@selectList'
+                'uses' => 'UsersController@selectlist'
             ]
         );
 

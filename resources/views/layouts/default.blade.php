@@ -201,7 +201,15 @@
                                   {{ trans('general.store') }}
                               </a>
                       </li>
-                       @endcan
+                   @endcan
+                   @can('create', \App\Models\Contract::class)
+                      <li {!! (Request::is('contract/create') ? 'class="active>"' : '') !!}>
+                              <a href="{{ route('contract.create') }}">
+                                  <i class="fa fa-file-o fa-fw"></i>
+                                  {{ trans('general.contract') }}
+                              </a>
+                      </li>
+                   @endcan
                    @can('create', \App\Models\Score::class)
                       <li {!! (Request::is('score/create') ? 'class="active>"' : '') !!}>
                               <a href="{{ route('score.create') }}">
@@ -571,6 +579,13 @@
                             <li {!! (Request::is('store*') ? ' class="active"' : '') !!}>
                                 <a href="{{ route('store.index') }}">
                                 {{ trans('admin/store/general.store') }}
+                                </a>
+                            </li>
+                        @endif
+                        @if(Gate::allows('view', App\Models\Contract::class) || Gate::allows('view', App\Models\Contract::class))
+                            <li {!! (Request::is('contract*') ? ' class="active"' : '') !!}>
+                                <a href="{{ route('contract.index') }}">
+                                {{ trans('admin/contracts/general.contract') }}
                                 </a>
                             </li>
                         @endif

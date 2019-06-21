@@ -26,6 +26,9 @@ class ContractController extends Controller
          if ($request->filled('search')) {
             $contract = $contract->TextSearch(e($request->input('search')));
         }
+        if ($request->filled('location_id')) {
+            $contract->where('contract.location_id', '=', $request->input('location_id'));
+        }
         $allowed_columns = [
             'user_id'
         ];

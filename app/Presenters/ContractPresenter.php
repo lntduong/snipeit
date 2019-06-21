@@ -55,7 +55,7 @@ class ContractPresenter extends Presenter
                 "switchable" => true,
                 "title" => trans('Contact Person 1'),
                 "visible" => true,
-                "formatter" => "usersLinkObjFormatter"
+                'formatter' => 'usersLinkObjFormatter'
             ],
             [
                 "field" => "contact_id_2",

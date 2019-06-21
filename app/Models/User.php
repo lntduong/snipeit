@@ -202,6 +202,11 @@ class User extends SnipeModel implements AuthenticatableContract, CanResetPasswo
         return $this->hasMany('\App\Models\Score', 'id');
     }
 
+    public function contract()
+    {
+        return $this->hasMany('\App\Models\Contract', 'id');
+    }
+
     /**
      * Get assets assigned to this user
      */

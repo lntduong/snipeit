@@ -237,4 +237,5 @@
     'end_date'              => 'End Date',
     'billing_date'          => 'Billing Date',
     'payment_date'          => 'Payment Date',
+    'contract'              => 'Contract'
     ];

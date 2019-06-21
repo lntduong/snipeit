@@ -33,7 +33,7 @@
               class="table table-striped snipe-table"
               data-url="{{ route('api.contract.index') }}"
               data-export-options='{
-                        "fileName": "export-store-{{ date('Y-m-d') }}",
+                        "fileName": "export-contract-{{ date('Y-m-d') }}",
                         "ignoreColumn": ["actions","image","change","checkbox","checkincheckout","icon"]
                         }'>
 

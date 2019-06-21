@@ -17,9 +17,14 @@ public function store()
     return $this->belongsTo('\App\Models\Store', 'store_id');
 }
 
-public function user()
+public function contact_one()
 {
-    return $this->belongsTo('\App\Models\User', 'user_id');
+    return $this->belongsTo('\App\Models\User', 'contact_id_1');
+}
+
+public function contact_two()
+{
+    return $this->belongsTo('\App\Models\User', 'contact_id_2');
 }
 
 public function location()

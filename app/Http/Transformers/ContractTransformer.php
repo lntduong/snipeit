@@ -36,13 +36,13 @@ class ContractTransformer
                 'id' => (int) $contract->location->id,
                 'name'=> e($contract->location->name)
             ] : null,
-            'contact_id_1'  => ($contract->user) ? [
-                'id' => (int) $contract->user->id,
-                'name'=> e($contract->user->username)
+            'contact_id_1'  => ($contract->contact_one) ? [
+                'id' => (int) $contract->contact_one->id,
+                'name'=> e($contract->contact_one->getFullNameAttribute())
             ] : null,
-            'contact_id_2'  => ($contract->user) ? [
-                'id' => (int) $contract->user->id,
-                'name'=> e($contract->user->username)
+            'contact_id_2'  => ($contract->contact_two) ? [
+                'id' => (int) $contract->contact_two->id,
+                'name'=> e($contract->contact_two->getFullNameAttribute())
             ] : null,
             'start_date'=> Helper::getFormattedDateObject($contract->start_date, 'datetime'),
             'end_date'=> Helper::getFormattedDateObject($contract->end_date, 'datetime'),
