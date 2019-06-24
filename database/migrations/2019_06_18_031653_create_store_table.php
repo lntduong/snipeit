@@ -19,11 +19,11 @@ class CreateStoreTable extends Migration
             //$table->foreign('company_id')->references('id')->on('companies');
             $table->string('name');
             $table->integer('location_id')->nullable();
-            $table->timestamps();
-            $table->softDeletes();
-            $table->string('image');
+            $table->string('image')->nullable();
             $table->integer('user_id')->unsigned();
             //$table->foreign('user_id')->references('id')->on('action_logs');
+            $table->timestamps();
+            $table->softDeletes();
         });
     }
 

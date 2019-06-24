@@ -46,5 +46,6 @@
 @stop
 
 @section('moar_scripts')
-  @include ('partials.bootstrap-table')
+@include ('partials.bootstrap-table', ['exportFile' => 'contracts-export', 'search' => true, 'showFooter' => true, 'columns' => \App\Presenters\ContractPresenter::dataTableLayout()])
+
 @stop
