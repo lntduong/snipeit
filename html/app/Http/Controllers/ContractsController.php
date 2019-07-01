@@ -45,6 +45,7 @@ class ContractsController extends Controller
     public function store(ImageUploadRequest $request)
     {
         $contract = new Contract();
+        $contract_id = 0;
         $contract_assets = new ContractAssets();
         $contract->name                  = $this->nullToBlank($request->input('name'));
         $contract->store_id              = $this->nullToBlank($request->input('store_id'));
@@ -61,6 +62,7 @@ class ContractsController extends Controller
         $contract_assets->contract_id    = $this->nullToBlank($request->input('asset_id'));
      
         if ($contract->save() && $contract_assets->save()) {
+            $contract_id = 1;
             return redirect()->route('contracts.index')->with('success', trans('admin/contracts/message.create.success'));
         }
 

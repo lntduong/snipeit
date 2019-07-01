@@ -33,6 +33,10 @@ Route::group(['prefix' => 'v1','namespace' => 'Api', 'middleware' => 'api'], fun
 
     });
 
+
+
+   
+
     /*--- Accessories API ---*/
     Route::resource('accessories', 'AccessoriesController',
         ['names' =>
@@ -441,7 +445,7 @@ Route::group(['prefix' => 'v1','namespace' => 'Api', 'middleware' => 'api'], fun
         ]
     ); // Contracts resource
 
-   
+    
 
 
     /*--- Imports API ---*/
@@ -844,6 +848,19 @@ Route::group(['prefix' => 'v1','namespace' => 'Api', 'middleware' => 'api'], fun
     ]
     ); // Store resource
     /*--- Store API ---*/
-
+    Route::resource('contractasset', 'ContractAssetController',
+    [
+        'names' =>
+            [
+                'index' => 'api.contractasset.index', 
+                'show' => 'api.contractasset.show',
+                'store' => 'api.contractasset.store',
+                'update' => 'api.contractasset.update',
+                'destroy' => 'api.contractasset.destroy'
+            ],
+        'except' => ['create', 'edit'],
+        'parameters' => ['asset' => 'asset_id']
+    ]
+); // Contracts resource
 
 });

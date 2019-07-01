@@ -67,20 +67,52 @@
 
 <!-- note -->
 @include ('partials.forms.edit.notes')
+
+@if($contract_id = 1)
 <!-- Contract Assets -->
 <h4 class="box-title">Contract Assets</h4>
 @include ('partials.forms.edit.contract-asset-select', ['translated_name' => trans('admin/asset_maintenances/table.asset_name'), 'fieldname' => 'asset_id', 'required' => 'true'])
-
+@endif
 
 @stop
 
 {{-- @if (!$item->id) --}}
 @section('moar_scripts')
 
-<script>
-    function addContractAsset() {
-        alert(asset_id);
+
+<script type="text/javascript">
+    var $table = $('#table_contract_assets')
+    var $add_asset = $('#add_asset')
+    $(function() {
+        $add_asset.click(function () {
+         var asset_id = $("#asset_id").val();
+         console.log($("#select2-asset_id-container"));
+        $table.bootstrapTable('insertRow', {
+            index: 1,
+            row: {
+                id: asset_id,
+                name: "",
+                price: '',
+                action: '<button id="remove" class="btn btn-danger btn-sm" onclick="removeAsset(this)"> <i class="fa fa-trash"></i> </button>' 
+            }
+        })
+    
+        //   var temp = {
+        //     url: '{{ route('api.contractasset.index',['asset_id' => '']) }}' + asset_id
+        //   };
+        //   console.log(temp);
+        //   $table.bootstrapTable('refresh', temp);
+        //})
+        })
+    });
+
+    function removeAsset(btn) {
+    var row = btn.parentNode.parentNode;
+    row.parentNode.removeChild(row);
     }
+</script>
+@include('partials.bootstrap-table')
+<script>
     $('#company_select').change(function(){
         $('#store_select').html('');
         $('#user_select_id').html('');
