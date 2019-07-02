@@ -25,7 +25,7 @@
 <div id="assigned_asset" class="form-group{{ $errors->has($fieldname) ? ' has-error' : '' }}"{!!  (isset($style)) ? ' style="'.e($style).'"' : ''  !!}>
     <div class="col-md-3 control-label"></div>
     <div class="col-md-7">
-        <select multiple="multiple" onchange="selectedValue()" class="js-data-ajax select2" data-endpoint="hardware" data-placeholder="{{ trans('general.select_asset') }}" name="{{ $fieldname }}[]" style="width: 100%" id="asset_id">
+        <select  onchange="selectedValue()" class="js-data-ajax select2" data-endpoint="hardware" data-placeholder="{{ trans('general.select_asset') }}" name="{{ $fieldname }}" style="width: 100%" id="asset_id">
 
             @if ((!isset($unselect)) && ($asset_id = Input::old($fieldname, (isset($asset) ? $asset->id  : (isset($item) ? $item->{$fieldname} : '')))))
                 <option value="{{ $asset_id }}" selected="selected">

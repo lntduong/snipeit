@@ -67,15 +67,51 @@
 
 <!-- note -->
 @include ('partials.forms.edit.notes')
+<div id="hideForm" style="display:none;">
 <!-- Contract Assets -->
 <h4 class="box-title">Contract Assets</h4>
 @include ('partials.forms.edit.contract-asset-select', ['translated_name' => trans('admin/asset_maintenances/table.asset_name'), 'fieldname' => 'asset_id', 'required' => 'true'])
 <!-- @include ('contractassets.index') -->
+</div>
 @stop
 
 {{-- @if (!$item->id) --}}
 @section('moar_scripts')
-
+<script type="text/javascript">
+  $(document).ready(function(){
+    $('#add_asset').click(function(e){
+         e.preventDefault(); 
+         var form_data = $(this).serialize();
+        $.ajax({
+            url: '/store_asset',
+            type: "post",
+            data: form_data,
+            dataType: 'JSON',
+            success: function (data) {
+            console.log(data); // this is good
+            }
+      });
+    });
+  });
+</script>
+<script>
+    $(document).ready(function() {
+        $('form').submit(function(e){
+        e.preventDefault();
+        document.getElementById('hideForm').style.display = null;
+        var form_data = $(this).serialize();
+        $.ajax({
+            url:'{{ route('contracts.store') }}',
+            method: "POST",
+            data: form_data,
+            dataType: "json",
+            success: function(data) {
+                console.log(data);
+            }
+        })
+        });
+    });
+</script>
 
 <script type="text/javascript">
 

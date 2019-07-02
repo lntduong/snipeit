@@ -438,7 +438,8 @@ Route::group(['prefix' => 'v1','namespace' => 'Api', 'middleware' => 'api'], fun
                     'show' => 'api.contracts.show',
                     'store' => 'api.contracts.store',
                     'update' => 'api.contracts.update',
-                    'destroy' => 'api.contracts.destroy'
+                    'destroy' => 'api.contracts.destroy',
+                    'storeAsset' => 'api.contracts.storeAsset'
                 ],
             'except' => ['create', 'edit'],
             'parameters' => ['asset' => 'asset_id']
