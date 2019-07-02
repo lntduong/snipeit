@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 use App\Models\Company;
 use App\Models\Contract;
 use App\Models\ContractAssets;
+use App\Models\Asset;
 use App\Http\Requests\ImageUploadRequest;
 
 /**
@@ -45,8 +46,6 @@ class ContractsController extends Controller
     public function store(ImageUploadRequest $request)
     {
         $contract = new Contract();
-        $contract_id = 0;
-        $contract_assets = new ContractAssets();
         $contract->name                  = $this->nullToBlank($request->input('name'));
         $contract->store_id              = $this->nullToBlank($request->input('store_id'));
         $contract->location_id           = $this->nullToZero($request->input('location_id'));
@@ -58,12 +57,18 @@ class ContractsController extends Controller
         $contract->payment_date          = $this->nullToBlank($request->input('payment_date'));
         $contract->terms_and_conditions  = $this->nullToBlank($request->input('terms_and_conditions'));
         $contract->notes                 = $this->nullToBlank($request->input('notes'));
-        $contract_assets->asset_id       = $this->nullToBlank($request->input('asset_id'));
-        $contract_assets->contract_id    = $this->nullToBlank($request->input('asset_id'));
-     
-        if ($contract->save() && $contract_assets->save()) {
-            $contract_id = 1;
-            return redirect()->route('contracts.index')->with('success', trans('admin/contracts/message.create.success'));
+        $asset_ids                       = $request->input('asset_id');
+            
+        if ($contract->save()) {
+            foreach($asset_ids as $asset_id) {
+                $contract_assets = new ContractAssets();
+                $contract_assets->contract_id = $contract->id;
+                $contract_assets->asset_id = $asset_id;
+                $contract_assets->save();
+            }
+            if($contract_assets->save()) {
+                return redirect()->route('contracts.index', compact('item'))->with('success', trans('admin/contracts/message.create.success'));
+            }
         }
 
         return redirect()->back()->withInput()->withErrors($contract->getErrors());
@@ -78,11 +83,11 @@ class ContractsController extends Controller
     public function edit($contractId = null)
     {
         if ($item = Contract::find($contractId)) {
-            $this->authorize($item);
-           
-            return view('contracts/edit', compact('item'));
+            $this->authorize($item);   
+            $contract_assets = ContractAssets::select('asset_id')->where('contract_id',$contractId);
+            print_r($contract_assets);
+            return view('contracts/edit', compact('item'))->with('asset_id', $contract_assets);
         }
-
         return redirect()->route('contracts.index')->with('error', trans('admin/contracts/essage.does_not_exist'));
     }
 

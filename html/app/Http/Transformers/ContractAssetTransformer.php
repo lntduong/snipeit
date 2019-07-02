@@ -2,7 +2,7 @@
 namespace App\Http\Transformers;
 
 use Gate;
-use App\Models\Contract;
+use App\Models\ContractAssets;
 use Illuminate\Support\Collection;
 
 class ContractAssetTransformer
@@ -17,21 +17,19 @@ class ContractAssetTransformer
         return (new DatatablesTransformer)->transformDatatables($array, $total);
     }
 
-    public function transformContract (Contract $contract)
+    public function transformContract (ContractAssets $contract)
     {
         $array = [
             'id' => (Int) $contract->id,
-            'name' => $contract->name,
            
-            'asset_id' => ($contract->asset_id) ? [
-                'id' => (int) $contract->asset->id,
-                'name'=> e($contract->asset->name)
-            ]  : null,
+            'asset_id' => $contract->asset_id,
 
-            'contract_id' => ($contract->contract_id) ? [
-                'id' => (int) $contract->contract->id,
-                'name'=> e($contract->contract->name)
-            ]  : null,
+            // 'asset' => ($contract->asset) ? [
+            //     'id' => (int) $contract->asset->id,
+            //     'name'=> ($contract->asset->name) ? e($contract->asset->name) : null,
+            //     'image'=> e($contract->asset->image)
+
+            // ]  : null,
            
         ];
         $permissions_array['available_actions'] = [

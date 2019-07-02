@@ -353,7 +353,8 @@
         'fieldsets',
         'groups',
         'store',
-        'contracts'
+        'contracts',
+        'contractAssets'
     ];
 
     for (var i in formatters) {

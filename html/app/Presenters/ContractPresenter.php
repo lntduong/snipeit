@@ -85,6 +85,8 @@ class ContractPresenter extends Presenter
                 "switchable" => true,
                 "title" =>  trans('admin/contracts/table.billing_date'),
                 "visible" => true,
+                "id" => "billing_date",
+                "class" => "billing_date"
                 
             ],
             [

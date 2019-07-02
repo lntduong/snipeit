@@ -69,8 +69,11 @@
         filter = input.value.toUpperCase();
         table = document.getElementById("contractsTable");
         tr = table.getElementsByTagName("tr");
+        //xx = document.getElementsByClassName("biiling_date").length;
         for (i = 0; i < tr.length; i++) {
+            
             td = tr[i].getElementsByTagName("td")[7];
+            console.log(xx);
             if (td) {
                 txtValue = td.textContent || td.innerText;
             if (txtValue.toUpperCase().indexOf(filter) > -1) {

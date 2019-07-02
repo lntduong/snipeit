@@ -14,7 +14,7 @@ final class Contract extends SnipeModel
         'store_id' => 'required',
         'start_date' => 'required',
         'end_date'  => 'required',
-        'contact_id_1' => 'required'        
+        //'contact_id_1' => 'required'        
     ];
 
     protected $presenter = 'App\Presenters\ContractPresenter';

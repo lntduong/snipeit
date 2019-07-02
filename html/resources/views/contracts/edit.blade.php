@@ -67,13 +67,10 @@
 
 <!-- note -->
 @include ('partials.forms.edit.notes')
-
-@if($contract_id = 1)
 <!-- Contract Assets -->
 <h4 class="box-title">Contract Assets</h4>
 @include ('partials.forms.edit.contract-asset-select', ['translated_name' => trans('admin/asset_maintenances/table.asset_name'), 'fieldname' => 'asset_id', 'required' => 'true'])
-@endif
-
+<!-- @include ('contractassets.index') -->
 @stop
 
 {{-- @if (!$item->id) --}}
@@ -81,30 +78,43 @@
 
 
 <script type="text/javascript">
-    var $table = $('#table_contract_assets')
-    var $add_asset = $('#add_asset')
-    $(function() {
-        $add_asset.click(function () {
-         var asset_id = $("#asset_id").val();
-         console.log($("#select2-asset_id-container"));
+
+    function selectedValue() {
+        var x = document.getElementById("asset_id").value;
+        console.log(x);
         $table.bootstrapTable('insertRow', {
             index: 1,
             row: {
-                id: asset_id,
+                id: x,
                 name: "",
-                price: '',
+                image: '',
                 action: '<button id="remove" class="btn btn-danger btn-sm" onclick="removeAsset(this)"> <i class="fa fa-trash"></i> </button>' 
             }
         })
+    }
+    var $table = $('#table_contract_assets')
+    var $add_asset = $('#add_asset')
+    // $(function() {
+    //     $add_asset.click(function () {
+    //      var asset_id = $("#asset_id").val();
     
-        //   var temp = {
-        //     url: '{{ route('api.contractasset.index',['asset_id' => '']) }}' + asset_id
-        //   };
-        //   console.log(temp);
-        //   $table.bootstrapTable('refresh', temp);
-        //})
-        })
-    });
+    //       var temp = {
+    //         url: '{{ route('api.contractasset.index',['asset_id' => '']) }}' + asset_id
+    //       };
+
+    //       console.log(temp);
+    //       $table.bootstrapTable('insertRow', {
+    //         index: 1,
+    //         row: {
+    //             id: asset_id,
+    //             name: "",
+    //             image: '',
+    //             action: '<button id="remove" class="btn btn-danger btn-sm" onclick="removeAsset(this)"> <i class="fa fa-trash"></i> </button>' 
+    //         }
+    //     })
+    //       $table.bootstrapTable('refresh', temp);
+    //     })
+    //     })
 
     function removeAsset(btn) {
     var row = btn.parentNode.parentNode;

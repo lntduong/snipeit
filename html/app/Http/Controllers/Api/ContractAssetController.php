@@ -5,6 +5,7 @@ use App\Http\Transformers\ContractAssetTransformer;
 use App\Http\Transformers\SelectlistTransformer;
 use Illuminate\Http\Request;
 use App\Models\ContractAssets;
+use App\Models\Contract;
 use App\Models\Asset;
 /**
  * @version    v1.0
@@ -15,12 +16,11 @@ class ContractAssetController extends Controller
     public function index(Request $request)
     {
           $contract = ContractAssets::select([
-                'contracts.id',
-                'contracts.contract_id',
-                'contracts.asset_id',
+                'contract_id',
+                'asset_id',
           ]);
 
-          if($request->input('asset_id')){
+        if($request->input('asset_id')){
             $asset = Asset::find($request->input('asset_id'));
             $contract->where('asset_id','=',$asset->asset_id);
         }
