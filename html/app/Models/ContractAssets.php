@@ -17,7 +17,7 @@ final class ContractAssets extends SnipeModel
 
     use ValidatingTrait;
     use Searchable;
-    protected $fillable = ['contract_id' , 'asset_id' ];
+    protected $fillable = ['contract_id' , 'asset_id' , 'user_id'];
     public function asset()
     {
         return $this->belongsToMany(Asset::class);

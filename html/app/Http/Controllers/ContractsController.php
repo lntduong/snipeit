@@ -40,15 +40,6 @@ class ContractsController extends Controller
         return view('contracts/edit')->with('item', new Contract);
     }
 
-    public function store_asset(Request $request) 
-    {
-            $contract_assets = new ContractAssets([
-                'contract_id' => $contract->id,
-                'asset_id' => $request->get('asset_id')
-            ]);
-            $contract_assets->save();
-            
-    }
     /**
     * @since [v1.0]
     * @return \Illuminate\Http\RedirectResponse
@@ -69,7 +60,8 @@ class ContractsController extends Controller
             'notes' => $request->get('notes'),
         ]);
         $contract->save();
-        $success_output = '<div>Ok</div>';
+        return response()->json(['contract_obj'=> $contract ], 200);
+        // $success_output = '<div>Ok</div>';
 
         // $contract = new Contract();
         // $contract->name                  = $this->nullToBlank($request->input('name'));
@@ -86,13 +78,13 @@ class ContractsController extends Controller
         // $asset_ids                       = $request->input('asset_id');
             
         // if ($contract->save()) {
-        //     // foreach($asset_ids as $asset_id) {
-        //     //     $contract_assets = new ContractAssets();
-        //     //     $contract_assets->contract_id = $contract->id;
-        //     //     $contract_assets->asset_id = $asset_id;
-        //     //     $contract_assets->save();
-        //     // }
-        //     // if($contract_assets->save()) {
+            // foreach($asset_ids as $asset_id) {
+            //     $contract_assets = new ContractAssets();
+            //     $contract_assets->contract_id = $contract->id;
+            //     $contract_assets->asset_id = $asset_id;
+            //     $contract_assets->save();
+            // }
+            // if($contract_assets->save()) {
         //         return redirect()->route('contracts.create', compact('item'))->with('success', trans('admin/contracts/message.create.success'));
         //     //}
         // }
@@ -109,10 +101,8 @@ class ContractsController extends Controller
     public function edit($contractId = null)
     {
         if ($item = Contract::find($contractId)) {
-            $this->authorize($item);   
-            $contract_assets = ContractAssets::select('asset_id')->where('contract_id',$contractId);
-            print_r($contract_assets);
-            return view('contracts/edit', compact('item'))->with('asset_id', $contract_assets);
+           
+            return view('contracts/edit',compact('item'));
         }
         return redirect()->route('contracts.index')->with('error', trans('admin/contracts/essage.does_not_exist'));
     }

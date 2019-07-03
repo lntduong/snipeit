@@ -19,20 +19,27 @@ class ContractAssetsPresenter extends Presenter
     {
         $layout = [
             [
-                "field" => "asset_id",
-                "searchable" => true,
+                "field" => "id",
+                "searchable" => false,
                 "sortable" => true,
                 "switchable" => true,
-                "title" => trans('Device Name'),
-                "visible" => true,
+                "title" => trans('general.id'),
+                "visible" => false
             ], [
                 "field" => "name",
+                "searchable" => true,
+                "sortable" => true,
+                "title" => trans('admin/hardware/form.name'),
+                "visible" => true,
+                "formatter" => "hardwareLinkFormatter"
+            ], [
+                "field" => "image",
                 "searchable" => false,
                 "sortable" => true,
                 "switchable" => true,
                 "title" => trans('admin/hardware/table.image'),
                 "visible" => true,
-                //"formatter" => "imageFormatter"
+                // "formatter" => "imageFormatter"
             ]
         ];
 
@@ -65,7 +72,7 @@ class ContractAssetsPresenter extends Presenter
             "sortable" => false,
             "switchable" => false,
             "title" => trans('table.actions'),
-            "formatter" => "contractAssetsActionsFormatter",
+            //"formatter" => "contractAssetsActionsFormatter",
         ];
 
         return json_encode($layout);

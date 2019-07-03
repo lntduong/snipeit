@@ -439,7 +439,6 @@ Route::group(['prefix' => 'v1','namespace' => 'Api', 'middleware' => 'api'], fun
                     'store' => 'api.contracts.store',
                     'update' => 'api.contracts.update',
                     'destroy' => 'api.contracts.destroy',
-                    'storeAsset' => 'api.contracts.storeAsset'
                 ],
             'except' => ['create', 'edit'],
             'parameters' => ['asset' => 'asset_id']
@@ -737,6 +736,33 @@ Route::group(['prefix' => 'v1','namespace' => 'Api', 'middleware' => 'api'], fun
             ]
         );
     }); // Suppliers group
+
+    /*--- ContractAsset API ---*/
+    Route::group(['prefix' => 'contractAsset'], function () {
+
+        Route::post('storeAsset',
+            [
+                'as'=>'contractAsset.storeAsset',
+                'uses'=>'ContractAssetController@storeAsset'
+            ]
+        );
+
+        Route::post('deleteAssetContracts',
+            [
+                'as'=>'contractAsset.deleteAssetContracts',
+                'uses'=>'ContractAssetController@deleteAssetContracts'
+            ]
+        );
+
+        Route::get('getAssetContractByIdContract',
+            [
+                'as'=>'contractAsset.getAssetContractByIdContract',
+                'uses'=>'ContractAssetController@getAssetContractByIdContract'
+            ]
+        );
+
+       
+    }); // ContractAsset group
 
 
     Route::resource('suppliers', 'SuppliersController',

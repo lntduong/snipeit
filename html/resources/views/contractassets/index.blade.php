@@ -9,7 +9,7 @@
     data-toolbar="#toolbar"
     id="table_contract_assets"
     class="table table-striped snipe-table"
-    data-url="{{ route('api.contractasset.index') }}" 
+    data-url="{{ route('contractAsset.storeAsset') }}" 
     >
 </table>
 

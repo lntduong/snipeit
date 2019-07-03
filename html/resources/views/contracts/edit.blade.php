@@ -67,35 +67,50 @@
 
 <!-- note -->
 @include ('partials.forms.edit.notes')
-<div id="hideForm" style="display:none;">
+<div id="hideForm" style="visibility:hidden">
 <!-- Contract Assets -->
 <h4 class="box-title">Contract Assets</h4>
 @include ('partials.forms.edit.contract-asset-select', ['translated_name' => trans('admin/asset_maintenances/table.asset_name'), 'fieldname' => 'asset_id', 'required' => 'true'])
-<!-- @include ('contractassets.index') -->
+@include ('contractassets.index')
+<input type="hidden" value="" id="result-contract-id">
 </div>
 @stop
 
 {{-- @if (!$item->id) --}}
 @section('moar_scripts')
+
+ @if ($item->id)
+ <script type="text/javascript">
+    $("#hideForm").css("visibility", "visible"); 
+ </script>
+ @endif
 <script type="text/javascript">
-  $(document).ready(function(){
-    $('#add_asset').click(function(e){
-         e.preventDefault(); 
-         var form_data = $(this).serialize();
-        $.ajax({
-            url: '/store_asset',
-            type: "post",
-            data: form_data,
-            dataType: 'JSON',
-            success: function (data) {
-            console.log(data); // this is good
-            }
-      });
-    });
-  });
+
+
+// $("#add_asset").click(function(){
+//     $.ajax({
+//         url: baseUrl + 'api/v1/contractAsset/storeAsset',
+//         type: 'POST',
+//         headers: {
+//             "X-Requested-With": 'XMLHttpRequest',
+//             "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr('content')
+//         },
+//         data:{
+//             item : "12",
+//             inventory_id : "132123"
+//         },
+//         dataType: 'json',
+//         success: function(data, status, xhr) {
+//             alert("sucss")
+//         }
+//     });
+// });
+    
+
 </script>
 <script>
     $(document).ready(function() {
+        
         $('form').submit(function(e){
         e.preventDefault();
         document.getElementById('hideForm').style.display = null;
@@ -106,28 +121,50 @@
             data: form_data,
             dataType: "json",
             success: function(data) {
-                console.log(data);
+                $("#hideForm").css("visibility", "visible"); 
+                $("#result-contract-id").val(data.contract_obj.id);
             }
         })
+        });
+    });
+    $(document).ready(function() {
+        $('#add_asset').click(function(e){
+        e.preventDefault();
+       
+        $.ajax({
+            url: baseUrl + 'api/v1/contractAsset/storeAsset',
+            headers: {
+            "X-Requested-With": 'XMLHttpRequest',
+            "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr('content')
+            },
+            method: "POST",
+            data: {
+                contract_id: $("#result-contract-id").val(),
+                asset_id: $("#asset_id").val()
+            },
+            dataType: "json",
+            success: function(data) {
+                // $('#table_contract_assets > tbl').empty();
+                $table.bootstrapTable('removeAll');
+                for(var i =0 ; i<data.length ;i++){
+                $table.bootstrapTable('insertRow', {
+            index: 1,
+            row: {
+                name:  data[i].name + "(" +data[i].asset_tag + ")",
+                image: "<img src='http://127.0.0.1:8000/uploads/assets/" + data[i].image + "' width='100' height='100' />",
+               actions: "<a href='javascript:void(0);' style='display:block' class='btn btn-danger btn-sm' onclick='removeAsset(" + data[i].id+ ")'> <i class='fa fa-trash'></i> </a>"
+            }
+        })
+                }
+              
+            }
+        })
+       
         });
     });
 </script>
 
 <script type="text/javascript">
-
-    function selectedValue() {
-        var x = document.getElementById("asset_id").value;
-        console.log(x);
-        $table.bootstrapTable('insertRow', {
-            index: 1,
-            row: {
-                id: x,
-                name: "",
-                image: '',
-                action: '<button id="remove" class="btn btn-danger btn-sm" onclick="removeAsset(this)"> <i class="fa fa-trash"></i> </button>' 
-            }
-        })
-    }
     var $table = $('#table_contract_assets')
     var $add_asset = $('#add_asset')
     // $(function() {
@@ -152,10 +189,37 @@
     //     })
     //     })
 
-    function removeAsset(btn) {
-    var row = btn.parentNode.parentNode;
-    row.parentNode.removeChild(row);
-    }
+    function removeAsset(idAsset) {
+        $.ajax({
+            url: baseUrl + 'api/v1/contractAsset/deleteAssetContracts',
+            headers: {
+            "X-Requested-With": 'XMLHttpRequest',
+            "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr('content')
+            },
+            method: "POST",
+            data: {
+                contract_id: $("#result-contract-id").val(),
+                asset_id: idAsset
+            },
+            dataType: "json",
+            success: function(data) {
+                $table.bootstrapTable('removeAll');
+                for(var i =0 ; i<data.length ;i++){
+                $table.bootstrapTable('insertRow', {
+            index: 1,
+            row: {
+                name:  data[i].name + "(" +data[i].asset_tag + ")",
+                image: "<img src='http://127.0.0.1:8000/uploads/assets/" + data[i].image + "' width='100' height='100' />",
+                actions: "<a href='javascript:void(0);' style='display:block' class='btn btn-danger btn-sm' onclick='removeAsset(" + data[i].id+ ")'> <i class='fa fa-trash'></i> </a>"
+            }
+        })
+                }
+               
+                }
+              
+            })
+        }
+    
 </script>
 @include('partials.bootstrap-table')
 <script>
