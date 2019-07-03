@@ -31,8 +31,7 @@ Route::group(['middleware' => 'auth'], function () {
         'parameters' => ['contracts' => 'contracts_id']
     ]);
     Route::get('contracts/billing', 'ContractsController@getBillingIndex')->name('getBillingIndex');
-    //Route::post('store_asset', 'ContractsController@store_asset')->name('store_asset.store');
-    Route::post('store_asset','ContractsController@store_asset');
+
     /*
     * Manufacturers
     */

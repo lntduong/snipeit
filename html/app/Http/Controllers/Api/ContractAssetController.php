@@ -84,9 +84,6 @@ class ContractAssetController extends Controller
 
     public function getAssetContractByIdContract(Request $request) 
     {
-
-    
-
                 $listAssets = ContractAssets::select([
                     'assets.id',
                     'assets.image',

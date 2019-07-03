@@ -60,36 +60,7 @@ class ContractsController extends Controller
             'notes' => $request->get('notes'),
         ]);
         $contract->save();
-        return response()->json(['contract_obj'=> $contract ], 200);
-        // $success_output = '<div>Ok</div>';
-
-        // $contract = new Contract();
-        // $contract->name                  = $this->nullToBlank($request->input('name'));
-        // $contract->store_id              = $this->nullToBlank($request->input('store_id'));
-        // $contract->location_id           = $this->nullToZero($request->input('location_id'));
-        // $contract->contact_id_1          = $this->nullToBlank($request->input('contact_id_1'));
-        // $contract->contact_id_2          = $this->nullToBlank($request->input('contact_id_2'));
-        // $contract->start_date            = $this->nullToBlank($request->input('start_date'));
-        // $contract->end_date              = $this->nullToBlank($request->input('end_date'));
-        // $contract->billing_date          = $this->nullToBlank($request->input('billing_date'));
-        // $contract->payment_date          = $this->nullToBlank($request->input('payment_date'));
-        // $contract->terms_and_conditions  = $this->nullToBlank($request->input('terms_and_conditions'));
-        // $contract->notes                 = $this->nullToBlank($request->input('notes'));
-        // $asset_ids                       = $request->input('asset_id');
-            
-        // if ($contract->save()) {
-            // foreach($asset_ids as $asset_id) {
-            //     $contract_assets = new ContractAssets();
-            //     $contract_assets->contract_id = $contract->id;
-            //     $contract_assets->asset_id = $asset_id;
-            //     $contract_assets->save();
-            // }
-            // if($contract_assets->save()) {
-        //         return redirect()->route('contracts.create', compact('item'))->with('success', trans('admin/contracts/message.create.success'));
-        //     //}
-        // }
-
-        // return redirect()->back()->withInput()->withErrors($contract->getErrors());
+        return response()->json(['success'=> trans('admin/contracts/message.create.success')], 200);
 
     }
 
