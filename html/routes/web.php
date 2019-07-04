@@ -342,6 +342,11 @@ Route::group(['middleware' => ['auth']], function () {
         [ 'as' => 'reports.activity', 'uses' => 'ReportsController@getActivityReport' ]
     );
 
+    Route::get(
+        'reports/contracts',
+        [ 'as' => 'reports.contracts', 'uses' => 'ReportsController@getContractsReport' ]
+    );
+
 
     Route::get(
         'reports/unaccepted_assets',

@@ -17,7 +17,9 @@ use Input;
 use League\Csv\Reader;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Illuminate\Http\Request;
-
+use App\Models\Company;
+use App\Models\Store;
+use App\Models\Contract;
 /**
  * This controller handles all actions related to Reports for
  * the Snipe-IT Asset Management application.
@@ -214,6 +216,16 @@ class ReportsController extends Controller
         return view('reports/activity');
     }
 
+    public function getContractsReport()
+    {
+        $listCompany =Company::all();
+        $listStore = Store::all();
+        $listContract = Contract::all();
+        return view('reports/contracts')
+        ->with('listCompany',$listCompany)
+        ->with('listStore',$listStore)
+        ->with('listContract',$listContract);
+    }
 
     /**
      * Displays license report

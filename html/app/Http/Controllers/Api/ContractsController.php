@@ -29,6 +29,12 @@ class ContractsController extends Controller
         if($request->input('company')){
             $contractList = $contractList->where('stores.company_id','=',$request->input('company'));
         }
+        if($request->input('store')){
+            $contractList = $contractList->where('contracts.store_id','=',$request->input('store'));
+        }
+        if($request->input('contract')){
+            $contractList = $contractList->where('contracts.id','=',$request->input('contract'));
+        }
         if ($request->has('search')) {
             $contractList = $contractList->TextSearch(e($request->input('search')));
         }

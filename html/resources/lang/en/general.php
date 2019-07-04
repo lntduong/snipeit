@@ -54,6 +54,7 @@
 	'complete'				=> 'Complete',
     'consumable'			=> 'Consumable',
     'consumables'			=> 'Consumables',
+    'contract_reports'      => 'Contract Reports',
     'country'  				=> 'Country',
     'create'				=> 'Create New',
     'create_store'          => 'Create Store',
