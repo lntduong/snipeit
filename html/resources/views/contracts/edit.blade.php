@@ -1,12 +1,25 @@
+<!-- **
+ * @author [Duong.LNT]
+ * @email: duong.lnt@vn.vinx.asia 
+ * -->
 @extends('layouts/edit-form', [
     'createText' => trans('admin/contracts/table.create') ,
     'updateText' => trans('admin/contracts/table.update'),
-    'formAction' => ($item) ? route('contracts.update', ['contracts' => $item->id]) : route('contracts.store'),
+    'formAction' => ($item) ? route('contracts.update', ['contracts_id' => $item->id]) : route('contracts.store'),
 ])
-
+<style>
+.box-footer {
+    clear: both;
+}
+#table_contract_assets {
+    font-size: 13px;
+}
+#add_asset {
+    width: 60px;
+}
+</style>
 {{-- Page content --}}
 @section('inputFields')
-<div id=msg></div>
 <!-- contract name-->
 @include ('partials.forms.edit.name', ['translated_name' => trans('admin/contracts/table.contract_name')])
 
@@ -69,11 +82,13 @@
 @include ('partials.forms.edit.notes')
 
 <!-- Contract Assets -->
-<div id="hideForm" style="visibility:hidden">
+<div id="hideForm" style="visibility:hidden ;height: 0">
     <h4 class="box-title">Contract Assets</h4>
     @include ('partials.forms.edit.contract-asset-select', ['translated_name' => trans('admin/asset_maintenances/table.asset_name'), 'fieldname' => 'asset_id', 'required' => 'true'])
+    <div>
     @include ('contractassets.index')
-    <input type="hidden" value="" id="result-contract-id">
+    </div>
+    <input type="hidden" value="{{$item->id}}" id="result-contract-id">
 </div>
 
 @stop
@@ -84,10 +99,11 @@
  @if ($item->id)
  <script type="text/javascript">
     $("#hideForm").css("visibility", "visible"); 
+    $("#hideForm").css("height", "auto"); 
  </script>
- @endif
+ @else
 
-<script>
+ <script>
     // contract save action
     $(document).ready(function() {   
         $('form').submit(function(e){
@@ -100,13 +116,17 @@
                 dataType: "json",
                 success: function(data) {
                     $("#hideForm").css("visibility", "visible"); 
-                    //$("#result-contract-id").val(data.contract_obj.id);
-                    $("#msg").addClass("alert alert-success fade in");
-                    $("#msg").text(data.success);
+                    $("#hideForm").css("height", "auto"); 
+                    $("#result-contract-id").val(data.contract_obj);
                 }
             })
         });
     });
+    </script>
+
+ @endif
+
+<script>
 
     //add contract assets action
     $(document).ready(function() {
@@ -132,8 +152,8 @@
                             index: 1,
                             row: {
                                 name:  data[i].name + "(" +data[i].asset_tag + ")",
-                                image: "<img src='http://127.0.0.1:8000/uploads/assets/" + data[i].image + "' width='100' height='100' />",
-                                actions: "<a href='javascript:void(0);' style='display:block' class='btn btn-danger btn-sm' onclick='removeAsset(" + data[i].id+ ")'> <i class='fa fa-trash'></i> </a>"
+                                image: "<img src='/uploads/assets/" + data[i].image + "' width='50' height='50' />",
+                                actions: "<a href='javascript:void(0);' class='btn btn-danger btn-sm' onclick='removeAsset(" + data[i].id+ ")'> <i class='fa fa-trash'></i> </a>"
                             }
                         })
                     }    
@@ -158,12 +178,13 @@
             dataType: "json",
             success: function(data) {
                 for(var i =0 ; i<data.length ;i++){
+                    $imagePath = data[i].image;
                     $table.bootstrapTable('insertRow', {
                         index: 1,
                         row: {
                             name:  data[i].name + "(" +data[i].asset_tag + ")",
-                            image: "<img src='http://127.0.0.1:8000/uploads/assets/" + data[i].image + "' width='100' height='100' />",
-                            actions: "<a href='javascript:void(0);' style='display:block' class='btn btn-danger btn-sm' onclick='removeAsset(" + data[i].id+ ")'> <i class='fa fa-trash'></i> </a>"
+                            image: "<img src='/uploads/assets/" + data[i].image + "' width='50' height='50' />",
+                            actions: "<a href='javascript:void(0);' class='btn btn-danger btn-sm' onclick='removeAsset(" + data[i].id+ ")'> <i class='fa fa-trash'></i> </a>"
                         }
                     })
                 }
@@ -192,8 +213,8 @@
                         index: 1,
                         row: {
                             name:  data[i].name + "(" +data[i].asset_tag + ")",
-                            image: "<img src='http://127.0.0.1:8000/uploads/assets/" + data[i].image + "' width='100' height='100' />",
-                            actions: "<a href='javascript:void(0);' style='display:block' class='btn btn-danger btn-sm' onclick='removeAsset(" + data[i].id+ ")'> <i class='fa fa-trash'></i> </a>"
+                            image: "<img src='/uploads/assets/" + data[i].image + "' width='50' height='50' />",
+                            actions: "<a href='javascript:void(0);' class='btn btn-danger btn-sm' onclick='removeAsset(" + data[i].id+ ")'> <i class='fa fa-trash'></i> </a>"
                         }
                     })
                 }
@@ -307,3 +328,7 @@ templateSelection: formatDataSelection
 </script>
 @stop
 {{-- @endif --}}
+
+
+<!-- test -->
+

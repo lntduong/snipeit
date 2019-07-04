@@ -4,7 +4,10 @@ namespace App\Http\Transformers;
 use Gate;
 use App\Models\ContractAssets;
 use Illuminate\Support\Collection;
-
+/**
+ * @author [Duong.LNT]
+ * @email: duong.lnt@vn.vinx.asia 
+ */
 class ContractAssetTransformer
 {
     public function transformContractList(Collection $contractList, $total)
@@ -20,16 +23,8 @@ class ContractAssetTransformer
     public function transformContract (ContractAssets $contract)
     {
         $array = [
-            'id' => (Int) $contract->id,
-           
+            'id' => (Int) $contract->id,      
             'asset_id' => $contract->asset_id,
-
-            // 'asset' => ($contract->asset) ? [
-            //     'id' => (int) $contract->asset->id,
-            //     'name'=> ($contract->asset->name) ? e($contract->asset->name) : null,
-            //     'image'=> e($contract->asset->image)
-
-            // ]  : null,
            
         ];
         $permissions_array['available_actions'] = [

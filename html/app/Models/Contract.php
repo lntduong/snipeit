@@ -14,7 +14,7 @@ final class Contract extends SnipeModel
         'store_id' => 'required',
         'start_date' => 'required',
         'end_date'  => 'required',
-        //'contact_id_1' => 'required'        
+        'contact_id_1' => 'required'        
     ];
 
     protected $presenter = 'App\Presenters\ContractPresenter';
@@ -23,19 +23,19 @@ final class Contract extends SnipeModel
     use Searchable;
     protected $searchableAttributes = ['name', 'created_at', 'updated_at']; 
     protected $fillable = [
-                            'id',
-                            'store_id' , 
-                            'name' ,
-                            'location_id' ,
-                            'contact_id_1' ,
-                            'contact_id_2' ,
-                            'start_date' ,
-                            'end_date' ,
-                            'billing_date' ,
-                            'payment_date' ,
-                            'terms_and_conditions' ,
-                            'notes'
-                        ];
+        'id',
+        'store_id' , 
+        'name' ,
+        'location_id' ,
+        'contact_id_1' ,
+        'contact_id_2' ,
+        'start_date' ,
+        'end_date' ,
+        'billing_date' ,
+        'payment_date' ,
+        'terms_and_conditions' ,
+        'notes'
+    ];
 
     public function user()
     {

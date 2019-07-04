@@ -28,8 +28,11 @@ Route::group(['middleware' => 'auth'], function () {
     * Contracts
     */
     Route::resource('contracts', 'ContractsController', [
-        'parameters' => ['contracts' => 'contracts_id']
+        
+        'parameters' => ['contracts_id' => 'contracts_id']
     ]);
+    
+
     Route::get('contracts/billing', 'ContractsController@getBillingIndex')->name('getBillingIndex');
 
     /*
@@ -477,6 +480,7 @@ Route::resource('store', 'StoreController', [
     'middleware' => ['auth'],
     'parameters' => ['store' => 'store_id']
 ]);
+
 Auth::routes();
 
 

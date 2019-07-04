@@ -1,3 +1,7 @@
+<!-- **
+ * @author [Duong.LNT]
+ * @email: duong.lnt@vn.vinx.asia 
+ * -->
 @extends('layouts/default')
 
 @section('title')
@@ -69,7 +73,6 @@
         filter = input.value.toUpperCase();
         table = document.getElementById("contractsTable");
         tr = table.getElementsByTagName("tr");
-        //xx = document.getElementsByClassName("biiling_date").length;
         for (i = 0; i < tr.length; i++) {
             
             td = tr[i].getElementsByTagName("td")[7];

@@ -25,7 +25,6 @@
     <link rel="shortcut icon" type="image/ico" href="{{ url(asset('favicon.ico')) }}">
 
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <meta name="baseUrl" content="{{ url('/') }}/">
 
     <script nonce="{{ csrf_token() }}">
       window.Laravel = { csrfToken: '{{ csrf_token() }}' };
@@ -242,15 +241,6 @@
                                  </a>
                              </li>
                          @endcan
-                         @can('create', \App\Models\User::class)
-                         <li {!! (Request::is('contracts/create') ? 'class="active"' : '') !!}>
-                             <a href="{{ route('contracts.create') }}">
-                                 <i class="fa fa-file-text-o">  </i>
-                                 {{ trans('general.contract') }}
-                             </a>
-                         </li>
-                     @endcan
-                     
                    </ul>
                 </li>
                @endcan
@@ -704,15 +694,6 @@
                 </ul>
             </li>
             @endcan
-            @can('view', \App\Models\Contract::class)
-            <li{!! (Request::is('contracts*') ? ' class="active"' : '') !!}>
-                  <a href="{{ route('contracts.index') }}">
-                        <i class=" 	fa fa-file-text-o"></i>
-                      <span> {{ trans('general.contract') }}</span>
-                  </a>
-            </li>
-            @endcan
-
 
             @can('viewRequestable', \App\Models\Asset::class)
             <li{!! (Request::is('account/requestable-assets') ? ' class="active"' : '') !!}>
@@ -843,7 +824,6 @@
 
 
     <script src="{{ url(mix('js/dist/all.js')) }}" nonce="{{ csrf_token() }}"></script>
-    {{-- <script src="{{ url(mix('js/dist/instascan.min.js')) }}"  ></script> --}}
 
     @section('moar_scripts')
     @show

@@ -15,9 +15,9 @@
             @endif
         </select>
     </div>
-    
-    {!! $errors->first($fieldname, '<div class="col-md-8 col-md-offset-3"><span class="alert-msg"><i class="fa fa-times"></i> :message</span></div>') !!}
-    <div class="col-md-1 col-sm-1 text-left" id="toolbar">
+    <div class="col-md-1 col-sm-1 text-left">
         <a class="btn btn-sm btn-warning" id="add_asset">Add</a>
-    </div>    
+    </div>   
+    {!! $errors->first($fieldname, '<div class="col-md-8 col-md-offset-3"><span class="alert-msg"><i class="fa fa-times"></i> :message</span></div>') !!}
+    
 </div>

@@ -4,18 +4,16 @@ namespace App\Models;
 use App\Models\SnipeModel;
 use Watson\Validating\ValidatingTrait;
 use App\Models\Traits\Searchable;
-
+/**
+ * @author [Duong.LNT]
+ * @email: duong.lnt@vn.vinx.asia 
+ */
 final class ContractAssets extends SnipeModel
 {
     protected $table = 'contract_assets';
 
-    protected $rules = [
-                
-    ];
-
     protected $presenter = 'App\Presenters\ContractPresenter';
-
-    use ValidatingTrait;
+    
     use Searchable;
     protected $fillable = ['contract_id' , 'asset_id' , 'user_id'];
     public function asset()
