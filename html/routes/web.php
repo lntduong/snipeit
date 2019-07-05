@@ -28,13 +28,17 @@ Route::group(['middleware' => 'auth'], function () {
     * Contracts
     */
     Route::resource('contracts', 'ContractsController', [
-        
-        'parameters' => ['contracts_id' => 'contracts_id']
+        'parameters' => ['contracts' => 'contracts_id']
     ]);
-    
+
+     /*
+    * Inventory
+    */
+    Route::resource('inventorys', 'InventorysController', [
+        'parameters' => ['inventory' => 'inventory_id']
+    ]);
 
     Route::get('contracts/billing', 'ContractsController@getBillingIndex')->name('getBillingIndex');
-
     /*
     * Manufacturers
     */
@@ -487,6 +491,5 @@ Route::resource('store', 'StoreController', [
 ]);
 
 Auth::routes();
-
 
 

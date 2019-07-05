@@ -8,6 +8,7 @@ use App\Http\Transformers\StoreTransformer;
 use App\Http\Transformers\SelectlistTransformer;
 use App\Models\Store;
 
+
 /** 
 * @author [Dang.HT]
 * @since [v1.0]
@@ -56,12 +57,13 @@ class StoreController extends Controller
     public function selectlist(Request $request)
     {
 
+        $company_id=$request->company_id;
         $stores = Store::select([
             'stores.id',
             'stores.name',
             'stores.image',
         ]);
-
+        $store = $stores->where('company_id', $company_id)->orderBy('name', 'ASC')->paginate(50);
         if ($request->get('search')) {
             $stores = $stores->where('stores.name', 'LIKE', '%'.$request->get('search').'%');
         }

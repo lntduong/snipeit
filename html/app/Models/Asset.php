@@ -1381,5 +1381,10 @@ class Asset extends Depreciable
 
     }
 
+    public function contracts()
+    {
+        return $this->belongsToMany(Contract::class);
+    }
+
 
 }

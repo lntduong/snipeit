@@ -20,6 +20,7 @@ use Illuminate\Http\Request;
 use App\Models\Company;
 use App\Models\Store;
 use App\Models\Contract;
+
 /**
  * This controller handles all actions related to Reports for
  * the Snipe-IT Asset Management application.

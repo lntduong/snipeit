@@ -33,10 +33,6 @@ Route::group(['prefix' => 'v1','namespace' => 'Api', 'middleware' => 'api'], fun
 
     });
 
-
-
-   
-
     /*--- Accessories API ---*/
     Route::resource('accessories', 'AccessoriesController',
         ['names' =>
@@ -475,9 +471,6 @@ Route::group(['prefix' => 'v1','namespace' => 'Api', 'middleware' => 'api'], fun
         );
     }); // Imports group
 
-
-
-
     /*--- Licenses API ---*/
 
     Route::group(['prefix' => 'licenses'], function () {
@@ -534,17 +527,7 @@ Route::group(['prefix' => 'v1','namespace' => 'Api', 'middleware' => 'api'], fun
             'uses' => 'LocationsController@selectlist'
         ]);
        
-    }); // Locations group
-
-    // Route::group(['prefix' => 'contracts'], function () {
-
-    //     Route::get( 'selectlist',  [
-    //         'as' => 'contracts.selectlist',
-    //         'uses' => 'ContractsController@selectlist'
-    //     ]);
-    // }); // Locations group
-
-
+    }); 
 
     Route::resource('locations', 'LocationsController',
         [
@@ -561,9 +544,6 @@ Route::group(['prefix' => 'v1','namespace' => 'Api', 'middleware' => 'api'], fun
         ]
     ); // Locations resource
 
-
-
-
     /*--- Manufacturers API ---*/
 
     Route::group(['prefix' => 'manufacturers'], function () {
@@ -573,9 +553,6 @@ Route::group(['prefix' => 'v1','namespace' => 'Api', 'middleware' => 'api'], fun
             'uses' => 'ManufacturersController@selectlist'
         ]);
     }); // Locations group
-
-    
-
 
     Route::resource('manufacturers', 'ManufacturersController',
         [
@@ -627,9 +604,6 @@ Route::group(['prefix' => 'v1','namespace' => 'Api', 'middleware' => 'api'], fun
         ]
     ); // Models resource
 
-
-
-
     /*--- Settings API ---*/
     Route::get('settings/ldaptest', [
         'as' => 'api.settings.ldaptest',
@@ -653,7 +627,6 @@ Route::group(['prefix' => 'v1','namespace' => 'Api', 'middleware' => 'api'], fun
             'uses' => 'SettingsController@ajaxTestEmail' ]
     );
 
-
     Route::resource('settings', 'SettingsController',
         [
             'names' =>
@@ -668,11 +641,7 @@ Route::group(['prefix' => 'v1','namespace' => 'Api', 'middleware' => 'api'], fun
         ]
     ); // Settings resource
 
-
-
-
     /*--- Status Labels API ---*/
-
 
     Route::group(['prefix' => 'statuslabels'], function () {
 
@@ -697,7 +666,6 @@ Route::group(['prefix' => 'v1','namespace' => 'Api', 'middleware' => 'api'], fun
                 'uses' => 'StatuslabelsController@checkIfDeployable'
             ]
         );
-
 
     });
 
@@ -780,12 +748,8 @@ Route::group(['prefix' => 'v1','namespace' => 'Api', 'middleware' => 'api'], fun
         ]
     ); // Suppliers resource
 
-
-
-
     /*--- Users API ---*/
 
-    
     Route::group([ 'prefix' => 'users' ], function () {
 
         Route::post('two_factor_reset',
@@ -874,7 +838,7 @@ Route::group(['prefix' => 'v1','namespace' => 'Api', 'middleware' => 'api'], fun
         'parameters' => ['store' => 'store_id']
     ]
     ); // Store resource
-    /*--- Store API ---*/
+    /*--- Contract Assets API ---*/
     Route::resource('contractasset', 'ContractAssetController',
     [
         'names' =>

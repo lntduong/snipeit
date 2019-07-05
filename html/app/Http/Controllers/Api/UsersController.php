@@ -58,31 +58,31 @@ class UsersController extends Controller
             'users.zip',
 
         ])->with('manager', 'groups', 'userloc', 'company', 'department','assets','licenses','accessories','consumables')
-            ->withCount('assets','licenses','accessories','consumables');
+            ->withCount('assets as assets_count','licenses as licenses_count','accessories as accessories_count','consumables as consumables_count');
         $users = Company::scopeCompanyables($users);
 
 
-        if (($request->has('deleted')) && ($request->input('deleted')=='true')) {
+        if (($request->filled('deleted')) && ($request->input('deleted')=='true')) {
             $users = $users->GetDeleted();
         }
 
-        if ($request->has('company_id')) {
+        if ($request->filled('company_id')) {
             $users = $users->where('users.company_id', '=', $request->input('company_id'));
         }
 
-        if ($request->has('location_id')) {
+        if ($request->filled('location_id')) {
             $users = $users->where('users.location_id', '=', $request->input('location_id'));
         }
 
-        if ($request->has('group_id')) {
+        if ($request->filled('group_id')) {
             $users = $users->ByGroup($request->get('group_id'));
         }
 
-        if ($request->has('department_id')) {
+        if ($request->filled('department_id')) {
             $users = $users->where('users.department_id','=',$request->input('department_id'));
         }
 
-        if ($request->has('search')) {
+        if ($request->filled('search')) {
             $users = $users->TextSearch($request->input('search'));
         }
 
@@ -99,6 +99,9 @@ class UsersController extends Controller
                 break;
             case 'department':
                 $users = $users->OrderDepartment($order);
+                break;
+            case 'company':
+                $users = $users->OrderCompany($order);
                 break;
             default:
                 $allowed_columns =
@@ -132,7 +135,7 @@ class UsersController extends Controller
      */
     public function selectlist(Request $request)
     {
-
+        $company_id = $request->company_id;
         $users = User::select(
             [
                 'users.id',
@@ -144,15 +147,16 @@ class UsersController extends Controller
                 'users.avatar',
                 'users.email',
             ]
-            )->where('show_in_list', '=', '1');
+            )->where('show_in_list', '=', '1')->where('company_id',$company_id);
 
         $users = Company::scopeCompanyables($users);
-
-        if ($request->has('search')) {
-            $users = $users->SimpleNameSearch($request->get('search'))
-                ->orWhere('username', 'LIKE', '%'.$request->get('search').'%')
-                ->orWhere('employee_num', 'LIKE', '%'.$request->get('search').'%');
-        }
+        if($company_id == null){
+            if ($request->filled('search')) {
+                $users = $users->SimpleNameSearch($request->get('search'))
+                    ->orWhere('username', 'LIKE', '%'.$request->get('search').'%')
+                    ->orWhere('employee_num', 'LIKE', '%'.$request->get('search').'%');
+            }
+    }
 
         $users = $users->orderBy('last_name', 'asc')->orderBy('first_name', 'asc');
         $users = $users->paginate(50);
@@ -180,7 +184,7 @@ class UsersController extends Controller
 
     }
 
-
+   
 
     /**
      * Store a newly created resource in storage.
@@ -201,7 +205,7 @@ class UsersController extends Controller
         $user->password = bcrypt($request->get('password', $tmp_pass));
 
         if ($user->save()) {
-            if ($request->has('groups')) {
+            if ($request->filled('groups')) {
                 $user->groups()->sync($request->input('groups'));
             } else {
                 $user->groups()->sync(array());
@@ -247,7 +251,7 @@ class UsersController extends Controller
             return response()->json(Helper::formatStandardApiResponse('error', null, 'You cannot be your own manager'));
         }
 
-        if ($request->has('password')) {
+        if ($request->filled('password')) {
             $user->password = bcrypt($request->input('password'));
         }
 
@@ -257,7 +261,7 @@ class UsersController extends Controller
 
         if ($user->save()) {
 
-            if ($request->has('groups')) {
+            if ($request->filled('groups')) {
                 $user->groups()->sync($request->input('groups'));
             } else {
                 $user->groups()->sync(array());
@@ -340,7 +344,7 @@ class UsersController extends Controller
 
         $this->authorize('update', User::class);
 
-        if ($request->has('id')) {
+        if ($request->filled('id')) {
             try {
                 $user = User::find($request->get('id'));
                 $user->two_factor_secret = null;

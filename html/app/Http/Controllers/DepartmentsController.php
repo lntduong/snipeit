@@ -26,14 +26,10 @@ class DepartmentsController extends Controller
      * @since [v4.0]
      * @return View
      */
-    public function index(Request $request)
+    public function index()
     {
         $this->authorize('index', Department::class);
-        $company = null;
-        if ($request->has('company_id')) {
-            $company = Company::find($request->input('company_id'));
-        }
-        return view('departments/index')->with('company', $company);
+        return view('departments/index');
     }
 
 

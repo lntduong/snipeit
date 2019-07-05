@@ -1,0 +1,92 @@
+.form-scan {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    padding-top: 10px !important;
+}
+
+.form-inline {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+}
+
+.button-scan {
+    background-color: #BCA9F5;
+    border-color: #BCA9F5;
+    width: 80px;
+    height: 30px;
+}
+
+#camera {
+    visibility: hidden;
+    width: 0px;
+    height: 0px;
+}
+
+#input-scan {
+    background-color: #9FF781;
+    border: 1px solid black;
+    height: 35px;
+    font-size: 15px;
+    font-weight: 500px;
+    visibility: hidden;
+}
+
+#scan-result {
+    background-color: #9FF781;
+    border: 1px solid black;
+    color: black;
+    height: 70px;
+    font-size: 15px;
+    font-weight: 500px;
+    visibility: hidden;
+}
+
+#online {
+    color: red;
+    background-color: #CECEF6;
+}
+
+#offline {
+    color: darkgray;
+    background-color: dimgray;
+}
+
+#batch-submit {
+    visibility: hidden;
+    background-color: #BCA9F5;
+    width: 100%;
+    height: 40px;
+    color: yellow;
+    font-weight: 500;
+    font-size: 15px;
+}
+
+#batch-submit-result {
+    visibility: hidden;
+    background-color: #9FF781;
+    width: 94%;
+    padding-left: 20px;
+    padding-right: 20px;
+    height: auto;
+    margin-left: 15px;
+}
+
+#body-asset {
+    text-align: center;
+}
+
+#body-asset thead th {
+    text-align: center;
+}
+
+#container-mode {
+    padding-right: 0;
+}
+
+.box-body {
+    /* display: none; */
+}
+
+#div-table-asset {
+    display: none;
+}

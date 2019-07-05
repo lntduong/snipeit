@@ -113,7 +113,8 @@ tr {
                         { id: 'consumable', text: 'Consumables' },
                         { id: 'component', text: 'Components' },
                         { id: 'license', text: 'Licenses' },
-                        { id: 'user', text: 'Users' }
+                        { id: 'user', text: 'Users' },
+                        { id: 'contract', text: 'Contracts' },
                     ],
                     statusText: null,
                 },
@@ -172,6 +173,17 @@ tr {
                         {id: 'activated', text: 'Activated' },
 
                     ],
+                    contracts: [
+                        {id: 'contract_name', text: 'Contract Name' },
+                        {id: 'store', text: 'Store' },
+                        {id: 'contact_1', text: 'Contact Person 1' },
+                        {id: 'contact_2', text: 'Contact Person 2' },
+                        {id: 'start_date', text: 'Start Date' },
+                        {id: 'end_date', text: 'End Date' },
+                        {id: 'billing_date', text: 'Billing Date' },
+                        {id: 'payment_date', text: 'Payment Date' },
+                        {id: 'terms_and_conditions', text: 'Terms and Conditions' }
+                    ],
                     customFields: this.customFields,
                 },
                 columnMappings: this.file.field_map || {},
@@ -207,6 +219,8 @@ tr {
                         return this.columnOptions.general.concat(this.columnOptions.licenses).sort(sorter);
                     case 'user':
                         return this.columnOptions.general.concat(this.columnOptions.users).sort(sorter);
+                    case 'contract':
+                        return this.columnOptions.general.concat(this.columnOptions.contracts).sort(sorter);
                 }
                 return this.columnOptions.general;
             },

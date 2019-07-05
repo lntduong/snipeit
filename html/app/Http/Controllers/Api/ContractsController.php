@@ -29,7 +29,7 @@ class ContractsController extends Controller
         if($request->input('company')){
             $contractList = $contractList->where('stores.company_id','=',$request->input('company'));
         }
-        if($request->input('store')){
+        if ($request->has('store_id')) {
             $contractList = $contractList->where('contracts.store_id','=',$request->input('store'));
         }
         if($request->input('contract')){
@@ -50,10 +50,12 @@ class ContractsController extends Controller
 
     }
 
-    public function selectList(Request $request)
+    public function selectlist(Request $request)
     {
-        $listContract = Contract::where('contracts.store_id', '=', $request->store_id)
-                    ->where('contracts.start_date', '=' , $request->date_contract);
+        $listContract = Contract::where('contracts.store_id', '=', $request->store_id);
+        if($request->date_contract != null){
+            $listContract->where('contracts.start_date', '=' , $request->date_contract);
+        }
         $listContract = $listContract->orderBy('name', 'ASC')->paginate(50);
         return (new SelectlistTransformer)->transformSelectList($listContract);
     }   

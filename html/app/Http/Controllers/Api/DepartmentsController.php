@@ -37,9 +37,7 @@ class DepartmentsController extends Controller
         ])->with('users')->with('location')->with('manager')->with('store')->withCount('users');
         
         if ($request->has('store_id')) {
-            $store = Store::find($request->input('store_id'));
-            $departments->where('location_id','=',$store->location_id);
-            $departments->where('store_id','=',$store->store_id);
+            $departments=$departments->where('store_id',$request->input('store_id'));
         }
         if ($request->has('search')) {
             $departments = $departments->TextSearch($request->input('search'));
