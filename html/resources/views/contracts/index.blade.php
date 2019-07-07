@@ -2,7 +2,7 @@
 
 @section('title')
 
-  {{ trans('admin/contracts/table.contract') }}
+  {{ trans('admin/contracts/table.list_contract') }}
 
 @parent
 @yield('title0')  @parent
@@ -10,7 +10,7 @@
 
 @section('header_right')
   <a href="{{ route('contracts.create') }}" class="btn btn-primary pull-right"></i> {{ trans('general.create') }}</a>
-  <a href="{{ route('getBillingIndex')  }}" class="btn btn-info pull-right"></i> {{ trans('general.billing') }}</a>
+  <a href="{{ route('getBillingIndex')  }}" class="btn btn-info pull-right" style="margin-right: 10px;"></i> {{ trans('general.billing_list') }}</a>
 @stop
 
 {{-- Page content --}}
@@ -24,17 +24,18 @@
           <div class="row">
             <div class="col-md-12">
               
-                 <div class="col-md-1" style="padding-top: 5px"><label> {{ trans('admin/contracts/table.contracts_company') }} </label> </div>
-                <div class="col-md-2">
-                 <select name="company" class="form-control select2" id="company">
+                <div class="col-md-1" style="padding-top: 5px"><label> {{ trans('admin/contracts/table.contracts_company') }} </label> </div>
+                <div class="col-md-3">
+                <select class="js-data-ajax" data-endpoint="companies" data-placeholder="{{ trans('general.select_company') }}" name="company" style="width: 100%" id="company">                      
                     @foreach ($listCompany as $company)
                     <option value="{{$company->id}}">{{$company->name}}</option>
                     @endforeach
                 </select>
+                  
                 </div>
+                <button type="submit" style="margin-right: -3px;" class="btn btn-primary" onclick="filterCompany()" id="filterCompany">Go</button>
               
               <table
-                data-advanced-search="true"
                 data-click-to-select="true"
                 data-columns="{{ \App\Presenters\ContractPresenter::dataTableLayout() }}"
                 data-cookie-id-table="contractsTable"
@@ -63,15 +64,19 @@
 
 @section('moar_scripts')
 <script nonce="{{ csrf_token() }}">
-    var $table = $('#contractsTable')
-    $(function() {
-      $table.bootstrapTable()
-      $('#company').change(function () {
+var $table = $('#contractsTable');
+    function filterCompany() {
+      if($('#company').val() == null) {
         $table.bootstrapTable('refresh', {
-            url: '{{url('/') }}/api/v1/contracts?company='+ $('#company').val()
+          url: '{{url('/') }}/api/v1/contracts'
         });
-      })
-    })
+      }
+      else {
+        $table.bootstrapTable('refresh', {
+          url: '{{url('/') }}/api/v1/contracts?company='+ $('#company').val()
+        });
+      }
+    }
 </script>
 
 @include ('partials.bootstrap-table', ['exportFile' => 'components-export', 'search' => true, 'showFooter' => true, 'columns' => \App\Presenters\ContractPresenter::dataTableLayout()])

@@ -2,15 +2,13 @@
  * @author [Duong.LNT]
  * @email: duong.lnt@vn.vinx.asia 
  * -->
-@extends('layouts/edit-form', [
+@extends('layouts/edit-form-contract', [
     'createText' => trans('admin/contracts/table.create') ,
     'updateText' => trans('admin/contracts/table.update'),
     'formAction' => ($item) ? route('contracts.update', ['contracts_id' => $item->id]) : route('contracts.store'),
 ])
 <style>
-.box-footer {
-    clear: both;
-}
+
 #table_contract_assets {
     font-size: 13px;
 }
@@ -30,7 +28,7 @@
 @include ('partials.forms.edit.store-select', ['translated_name' => trans('admin/contracts/table.store'), 'fieldname' => 'store_id'])
 
 <!-- Location-->
-@include ('partials.forms.edit.location-select', ['translated_name' => trans('admin/contracts/table.location'), 'fieldname' => 'location_id', 'new' => 'no'])
+@include ('partials.forms.edit.location-select-contract', ['translated_name' => trans('admin/contracts/table.location'), 'fieldname' => 'location_id', 'new' => 'no'])
 
 <!-- Contact Person 1-->
 @include ('partials.forms.edit.user2-select', ['translated_name' => trans('admin/contracts/table.contact_person1'), 'fieldname' => 'contact_id_1', 'classname' => 'user_select_id'])
@@ -81,16 +79,6 @@
 <!-- note -->
 @include ('partials.forms.edit.notes')
 
-<!-- Contract Assets -->
-<div id="hideForm" style="visibility:hidden ;height: 0">
-    <h4 class="box-title">Contract Assets</h4>
-    @include ('partials.forms.edit.contract-asset-select', ['translated_name' => trans('admin/asset_maintenances/table.asset_name'), 'fieldname' => 'asset_id', 'required' => 'true'])
-    <div>
-    @include ('contractassets.index')
-    </div>
-    <input type="hidden" value="{{$item->id}}" id="result-contract-id">
-</div>
-
 @stop
 
 {{-- @if (!$item->id) --}}
@@ -98,12 +86,12 @@
 
  @if ($item->id)
  <script type="text/javascript">
-    $("#hideForm").css("visibility", "visible"); 
-    $("#hideForm").css("height", "auto"); 
+    $("#hideForm").css("display","block"); 
  </script>
  @else
 
  <script>
+
     // contract save action
     $(document).ready(function() {   
         $('form').submit(function(e){
@@ -115,10 +103,13 @@
                 data: form_data,
                 dataType: "json",
                 success: function(data) {
-                    $("#hideForm").css("visibility", "visible"); 
-                    $("#hideForm").css("height", "auto"); 
+                    $("#mgsContract").css("display","block");
+                    $("#hideForm").css("display","block"); 
                     $("#result-contract-id").val(data.contract_obj);
-                }
+                },
+                error: function(data) {
+                    document.location.reload();
+                },
             })
         });
     });
@@ -146,6 +137,9 @@
                 },
                 dataType: "json",
                 success: function(data) {
+                    $("#mgsContractAssets").css("display","block");
+                    $("#mgsContractAssetsFailed").css("display","none");
+                    $("#mgsContractAssetsDel").css("display","none");
                     $table.bootstrapTable('removeAll');
                     for(var i =0 ; i<data.length ;i++){
                         $table.bootstrapTable('insertRow', {
@@ -153,10 +147,15 @@
                             row: {
                                 name:  data[i].name + "(" +data[i].asset_tag + ")",
                                 image: "<img src='/uploads/assets/" + data[i].image + "' width='50' height='50' />",
-                                actions: "<a href='javascript:void(0);' class='btn btn-danger btn-sm' onclick='removeAsset(" + data[i].id+ ")'> <i class='fa fa-trash'></i> </a>"
+                                actions: "<a href='#' class='btn btn-danger btn-sm' onclick='removeAsset(" + data[i].id+ "); return false;'> <i class='fa fa-trash'></i> </a>"
                             }
                         })
                     }    
+                },
+                error: function(data) {
+                    $("#mgsContractAssetsDel").css("display","none");
+                    $("#mgsContractAssets").css("display","none");
+                    $("#mgsContractAssetsFailed").css("display","block");
                 }
             })
         });
@@ -184,7 +183,7 @@
                         row: {
                             name:  data[i].name + "(" +data[i].asset_tag + ")",
                             image: "<img src='/uploads/assets/" + data[i].image + "' width='50' height='50' />",
-                            actions: "<a href='javascript:void(0);' class='btn btn-danger btn-sm' onclick='removeAsset(" + data[i].id+ ")'> <i class='fa fa-trash'></i> </a>"
+                            actions: "<a href='#' class='btn btn-danger btn-sm' onclick='removeAsset(" + data[i].id+ ");return false;'> <i class='fa fa-trash'></i> </a>"
                         }
                     })
                 }
@@ -207,6 +206,9 @@
             },
             dataType: "json",
             success: function(data) {
+                $("#mgsContractAssetsDel").css("display","block");
+                $("#mgsContractAssets").css("display","none");
+                $("#mgsContractAssetsFailed").css("display","none");
                 $table.bootstrapTable('removeAll');
                 for(var i =0 ; i<data.length ;i++){
                     $table.bootstrapTable('insertRow', {
@@ -214,7 +216,7 @@
                         row: {
                             name:  data[i].name + "(" +data[i].asset_tag + ")",
                             image: "<img src='/uploads/assets/" + data[i].image + "' width='50' height='50' />",
-                            actions: "<a href='javascript:void(0);' class='btn btn-danger btn-sm' onclick='removeAsset(" + data[i].id+ ")'> <i class='fa fa-trash'></i> </a>"
+                            actions: "<a href='#' class='btn btn-danger btn-sm' onclick='removeAsset(" + data[i].id+ "); return false;'> <i class='fa fa-trash'></i> </a>"
                         }
                     })
                 }

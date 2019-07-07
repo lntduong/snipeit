@@ -4,7 +4,7 @@
  * -->
 @extends('layouts/default')
 @section('title')
-  {{ trans('admin/contracts/table.contract') }}
+  {{ trans('admin/contracts/table.list_billing') }}
 @parent
 @yield('title0')  @parent
 @stop

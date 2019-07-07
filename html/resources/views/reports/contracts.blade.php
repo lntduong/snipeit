@@ -31,7 +31,7 @@
                         <div class="col-md-1" style="padding-top: 5px"><label> Store </label> </div>
                         <div class="col-md-2">
                         
-                        <select class="store_select js-data-ajax" data-endpoint="store" data-placeholder="Select Store" name="store" style="width: 100%" id="store_select">
+                        <select class="store_select" data-endpoint="store" data-placeholder="Select Store" name="store" style="width: 100%" id="store_select">
                             @foreach ($listStore as $store)
                             <option value="" selected="selected">All</option>
                             <option value="{{$store->id}}">{{$store->name}} </option> 
@@ -46,7 +46,7 @@
                     <div id="search-contract" class="report-contract">
                         <div class="col-md-1" style="padding-top: 5px"><label> Contract </label> </div>
                         <div class="col-md-2">
-                        <select class="contract_select js-data-ajax" data-endpoint="contract" style="width:100%" data-placeholder="Select Store" id="contract_select" name="contract">
+                        <select class="contract_select" data-endpoint="contract" style="width:100%" data-placeholder="Select Store" id="contract_select" name="contract">
                             
                             @foreach ($listContract as $contract)
                             

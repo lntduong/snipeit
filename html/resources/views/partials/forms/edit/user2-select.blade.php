@@ -2,7 +2,7 @@
 
         {{ Form::label($fieldname, $translated_name, array('class' => 'col-md-3 control-label')) }}
     
-        <div class="col-md-7{{  (\App\Helpers\Helper::checkIfRequired($item, $fieldname)) ? ' required' : '' }}">
+        <div class="col-md-7">
             <select class="user_select" data-endpoint="users" data-placeholder="{{ trans('general.select_user') }}" name="{{ $fieldname }}" style="width: 100%" id={{$classname}}>
                 @if ($user_id = Input::old($fieldname, (isset($item)) ? $item->{$fieldname} : ''))
                     <option value="{{ $user_id }}" selected="selected">
@@ -13,15 +13,6 @@
                 @endif
             </select>
         </div>
-        @if($classname === "user_select_id")
-        <div class="col-md-1 col-sm-1 text-left">
-            @can('create', \App\Models\User::class)
-                @if ((!isset($hide_new)) || ($hide_new!='true'))
-                    <a href='{{ route('modal.user') }}' data-toggle="modal"  data-target="#createModal" data-select='assigned_user_select' class="btn btn-sm btn-default">New</a>
-                @endif
-            @endcan
-        </div>
-        @endif
     
         {!! $errors->first($fieldname, '<div class="col-md-8 col-md-offset-3"><span class="alert-msg"><i class="fa fa-times"></i> :message</span></div>') !!}
     

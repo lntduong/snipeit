@@ -9,16 +9,13 @@ final class Contract extends SnipeModel
 {
     protected $table = 'contracts';
 
-    protected $rules = [
-        'name' => 'required',
-        'store_id' => 'required',
-        'start_date' => 'required',
-        'end_date'  => 'required',
-        'contact_id_1' => 'required'        
-    ];
-
     protected $presenter = 'App\Presenters\ContractPresenter';
-
+    public $rules = array(
+            'name' => 'required',
+            'store_id' => 'required',
+            'start_date' => 'required',
+            'end_date'  => 'required',
+    );
     use ValidatingTrait;
     use Searchable;
     protected $searchableAttributes = ['name', 'created_at', 'updated_at']; 

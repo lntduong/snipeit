@@ -18,5 +18,6 @@ return array(
     'update'                => 'Contract Update' ,
     'select_store'          => 'Select a Store' ,
     'contracts_company'     => 'Company' ,
-    'contract'              => 'Contract'
+    'contract'              => 'Contract',
+    'list_billing'          => 'Billing List'
     );
