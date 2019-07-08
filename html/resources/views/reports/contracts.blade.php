@@ -95,10 +95,7 @@
                         </tr>
                     </thead>
                 </table>
-                  <div class="box-footer text-right">
-                     <button ><i class=""></i> Go</button>
-                  </div>
-                  </div>
+            </div>
         </div>
     </div>
 </div>
