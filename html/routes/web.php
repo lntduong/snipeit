@@ -110,6 +110,7 @@ Route::group(['middleware' => 'auth','prefix' => 'modals'], function () {
     Route::get('statuslabel',['as' => 'modal.statuslabel','uses' => 'ModalController@statuslabel']);
     Route::get('supplier',['as' => 'modal.supplier','uses' => 'ModalController@supplier']);
     Route::get('user',['as' => 'modal.user','uses' => 'ModalController@user']);
+    Route::get('inventory-result',['as' => 'modal.inventory-result','uses' => 'ModalController@inventory_result']);
 });
 
 /*
@@ -489,7 +490,19 @@ Route::resource('store', 'StoreController', [
     'middleware' => ['auth'],
     'parameters' => ['store' => 'store_id']
 ]);
-
+Route::resource('inventory', 'InventoryController', [
+    'middleware' => ['auth'],
+    'parameters' => ['inventory' => 'inventory_id']
+]);
+Route::get('inventory/{inventoryId}/result', [
+    'middleware' => ['auth'],
+    'as' => 'result/inventory',
+    'uses' => 'InventoryController@getResult'
+]);
+Route::resource('inventoryresult', 'InventoryResultController', [
+    'middleware' => ['auth'],
+    'parameters' => ['inventoryresult' => 'inventoryresult_id']
+]);
 Auth::routes();
 
 

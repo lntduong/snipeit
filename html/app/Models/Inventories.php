@@ -7,32 +7,48 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Watson\Validating\ValidatingTrait;
 
 /** 
- * Model for Inventories.
+ * Model for Components.
  *
  * @version    v1.0
  */
 class Inventories extends SnipeModel
 {
     protected $presenter = 'App\Presenters\InventoryPresenter';
-    
+    use CompanyableTrait;
+    use Loggable, Presentable;
+    use SoftDeletes;
+
     protected $dates = [
         'created_at',
         'updated_at',
         'deleted_at',
         'inventory_date',
-        'last_checkout',
-        'expected_checkin',
-        'last_audit_date',
-        'next_audit_date'
     ];
     protected $table = 'inventories';
     
+    // /**
+    // * Category validation rules
+    // */
     public $rules = array(
-        'inventory_date'      => 'required'
+        'inventory_date'      => 'required',
+        'contract_id'  => 'required|integer',
     );
 
+    /**
+    * Whether the model should inject it's identifier to the unique
+    * validation rules before attempting validation. If this property
+    * is not set in the model it will default to true.
+    *
+    * @var boolean
+    */
+    protected $injectUniqueIdentifier = true;
     use ValidatingTrait;
 
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array
+     */
     protected $fillable = [
         'contract_id',
         'inventory_date',
@@ -42,6 +58,27 @@ class Inventories extends SnipeModel
     ];
 
     use Searchable;
+    
+    /**
+     * The attributes that should be included when searching the model.
+     * 
+     * @var array
+     */
+     protected $searchableAttributes = ['name','notes'];
+
+    /**
+     * The relations and their attributes that should be included when searching the model.
+     * 
+     * @var array
+     */
+    protected $searchableRelations = [
+        'contract'     => ['name'],
+    ];      
+  
+    // /**
+    // * get contract
+    // */
+  
     public function contract()
     {
     	return $this->belongsTo('\App\Models\Contract','contract_id');

@@ -18,9 +18,10 @@
                     <div id="search-company" class="report-contract">
                         <div class="col-md-1" style="padding-top: 5px"><label> {{ trans('admin/contracts/table.contracts_company') }} </label> </div>
                         <div class="col-md-2">
-                        <select class="js-data-ajax" data-endpoint="companies" data-placeholder="{{ trans('general.select_company') }}" name="company" style="width: 100%" id="company_select">
+                        <select class="company_select" data-endpoint="companies" data-placeholder="{{ trans('general.select_company') }}" name="company" style="width: 100%" id="company_select">
                             
                             @foreach ($listCompany as $company)
+                            <option hidden disabled selected="selected">{{ trans('general.select_company') }}</option>
                             <option value="{{$company->id}}">{{$company->name}}</option>
                             @endforeach
                         </select>
@@ -31,9 +32,9 @@
                         <div class="col-md-1" style="padding-top: 5px"><label> Store </label> </div>
                         <div class="col-md-2">
                         
-                        <select class="store_select" data-endpoint="store" data-placeholder="Select Store" name="store" style="width: 100%" id="store_select">
+                        <select class="store_select" data-endpoint="store" data-placeholder="{{ trans('general.select_store') }}" name="store" style="width: 100%" id="store_select">
                             @foreach ($listStore as $store)
-                            <option value="" selected="selected">All</option>
+                            <option hidden disabled selected="selected">{{ trans('general.select_store') }}</option>
                             <option value="{{$store->id}}">{{$store->name}} </option> 
                             @endforeach
                             
@@ -46,10 +47,10 @@
                     <div id="search-contract" class="report-contract">
                         <div class="col-md-1" style="padding-top: 5px"><label> Contract </label> </div>
                         <div class="col-md-2">
-                        <select class="contract_select" data-endpoint="contract" style="width:100%" data-placeholder="Select Store" id="contract_select" name="contract">
+                        <select class="contract_select" data-endpoint="contract" style="width:100%" data-placeholder="{{ trans('general.select_contract') }}" id="contract_select" name="contract">
                             
                             @foreach ($listContract as $contract)
-                            
+                            <option hidden disabled selected="selected">{{ trans('general.select_contract') }}</option>
                             <option value="{{$contract->id}}">{{$contract->name}}</option>
                             @endforeach
                         </select>
@@ -60,26 +61,40 @@
                 </div>
                 <!-- form search -->
 
-                  <table
-                    data-advanced-search="true"
-                    data-click-to-select="true"
-                    data-columns="{{ \App\Presenters\ContractPresenter::dataTableLayout() }}"
-                    data-cookie-id-table="contractreportTable"
-                    data-pagination="true"
-                    data-id-table="contractreportTable"
-                    data-search="true"
-                    data-side-pagination="server"
-                    data-show-columns="true"
-                    data-show-export="true"
-                    data-show-footer="true"
-                    data-show-refresh="true"
-                    data-sort-order="asc"
-                    data-sort-name="name"
-                    data-toolbar="#toolbar"
-                    id="contractreportTable"
-                    class="table table-striped snipe-table"
-                    data-url="{{ route('api.contracts.index') }}" >
-                    </table>
+                <table
+                        data-cookie-id-table="activityReport"
+                        data-id-table="activityReport"
+                        data-search="true"
+                        data-side-pagination="server"
+                        data-show-columns="true"
+                        data-show-export="true"
+                        data-show-refresh="true"
+                        data-sort-order="desc"
+                        data-sort-name="created_at"
+                        id="activityReport"
+                        data-url="{{ route('api.activity.index') }}"
+                        data-mobile-responsive="true"
+                        data-toggle="table"
+                        class="table table-striped snipe-table"
+                        data-export-options='{
+                        "fileName": "activity-report-{{ date('Y-m-d') }}",
+                        "ignoreColumn": ["actions","image","change","checkbox","checkincheckout","icon"]
+                        }'>
+
+                    <thead>
+                        <tr>
+                            <th data-field="icon" style="width: 40px;" class="hidden-xs" data-formatter="iconFormatter"></th>
+                            <th class="col-sm-3" data-searchable="false" data-sortable="true" data-field="created_at" data-formatter="dateDisplayFormatter">{{ trans('general.date') }}</th>
+                            <th class="col-sm-2" data-field="admin" data-formatter="usersLinkObjFormatter">{{ trans('general.admin') }}</th>
+                            <th class="col-sm-2" data-field="action_type">{{ trans('general.action') }}</th>
+                            <th class="col-sm-1" data-field="type" data-formatter="itemTypeFormatter">{{ trans('general.type') }}</th>
+                            <th class="col-sm-3" data-field="item" data-formatter="polymorphicItemFormatter">{{ trans('general.item') }}</th>
+                            <th class="col-sm-2" data-field="target" data-formatter="polymorphicItemFormatter">To</th>
+                            <th class="col-sm-1" data-field="note">{{ trans('general.notes') }}</th>
+                            <th class="col-sm-2" data-field="log_meta" data-visible="false" data-formatter="changeLogFormatter">Changed</th>
+                        </tr>
+                    </thead>
+                </table>
                   <div class="box-footer text-right">
                      <button ><i class=""></i> Go</button>
                   </div>
@@ -94,9 +109,17 @@
    $table = $('#contractreportTable') 
 
     function searchContractReport() {
-        $table.bootstrapTable('refresh', {
-            url: '{{url('/') }}/api/v1/contracts?contract='+ $(".contract_select").val()
-        });
+
+        if($('#company_select').val() == null && $('#store_select').val() == null && $('#contract_select').val() == null) {
+            $table.bootstrapTable('refresh', {
+                url: '{{url('/') }}/api/v1/contracts'
+            });
+            }
+            else {
+            $table.bootstrapTable('refresh', {
+                url: '{{url('/') }}/api/v1/contracts?contract='+ $(".contract_select").val()
+            });
+        }
     }
 
    $(".store_select").select2({

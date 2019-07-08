@@ -112,7 +112,12 @@
     function genericRowLinkFormatter(destination) {
         return function (value,row) {
             if (value) {
-                return '<a href="{{ url('/') }}/' + destination + '/' + row.id + '"> ' + value + '</a>';
+                if(destination == 'inventoryresult'){
+                    return '<a href="{{ url('/hardware') }}/' + row.deviece + '"> ' + row.name + '</a>';
+                }
+                else{
+                    return '<a href="{{ url('/') }}/' + destination + '/' + row.id + '"> ' + value + '</a>';
+                }
             }
         };
     }
@@ -170,7 +175,21 @@
     function hardwareAuditFormatter(value, row) {
         return '<a href="{{ url('/') }}/hardware/audit/' + row.id + '/" class="btn btn-sm bg-yellow" data-tooltip="true" title="Audit this item">{{ trans('general.audit') }}</a>';
     }
+    function RecognizedFormatter(value) {
+        switch(value)
+        {
+            case '1':
+                return '<div style="color:black">Farmilar</div>';
+                break;
 
+            case '0':
+                return '<div style="color:red">Unknown</div>'
+                break;
+
+            default:
+                return;
+        }
+    }
 
     // Make the edit/delete buttons
     function genericActionsFormatter(destination) {
@@ -194,16 +213,42 @@
             }
             
             if ((row.available_actions) && (row.available_actions.update === true)) {
-                actions += '<a href="{{ url('/') }}/' + dest + '/' + row.id + '/edit" class="btn btn-sm btn-warning" data-tooltip="true" title="Update"><i class="fa fa-pencil"></i></a>&nbsp;';
+                if(destination == 'inventoryresult')
+                {
+                    if(!row.checked)
+                    {
+                        actions += '<a href="{{ url('/') }}/' + dest + '/' + row.id + '_'+ row.deviece + '/edit" class="btn btn-sm btn-warning" data-tooltip="true" title="Update"><i class="fa fa-pencil"></i></a>&nbsp;';
+                    }
+                   
+                }
+                else
+                {
+                    actions += '<a href="{{ url('/') }}/' + dest + '/' + row.id + '/edit" class="btn btn-sm btn-warning" data-tooltip="true" title="Update"><i class="fa fa-pencil"></i></a>&nbsp;';
+                }
             }
 
             if ((row.available_actions) && (row.available_actions.delete === true)) {
-                actions += '<a href="{{ url('/') }}/' + dest + '/' + row.id + '" '
+                if(destination == 'inventoryresult')
+                {
+                    if(row.checked)
+                    {
+                        actions += '<a href="{{ url('/') }}/' + dest + '/' + row.id + '" '
                     + ' class="btn btn-danger btn-sm delete-asset"  data-tooltip="true"  '
                     + ' data-toggle="modal" '
                     + ' data-content="{{ trans('general.sure_to_delete') }} ' + row.name + '?" '
                     + ' data-title="{{  trans('general.delete') }}" onClick="return false;">'
                     + '<i class="fa fa-trash"></i></a>&nbsp;';
+                    }
+                   
+                }
+                else{
+                    actions += '<a href="{{ url('/') }}/' + dest + '/' + row.id + '" '
+                    + ' class="btn btn-danger btn-sm delete-asset"  data-tooltip="true"  '
+                    + ' data-toggle="modal" '
+                    + ' data-content="{{ trans('general.sure_to_delete') }} ' + row.name + '?" '
+                    + ' data-title="{{  trans('general.delete') }}" onClick="return false;">'
+                    + '<i class="fa fa-trash"></i></a>&nbsp;';
+                }
             } else {
                 actions += '<a class="btn btn-danger btn-sm delete-asset disabled" onClick="return false;"><i class="fa fa-trash"></i></a>&nbsp;';
             }
@@ -211,7 +256,9 @@
             if ((row.available_actions) && (row.available_actions.restore === true)) {
                 actions += '<a href="{{ url('/') }}/' + dest + '/' + row.id + '/restore" class="btn btn-sm btn-warning" data-tooltip="true" title="Restore"><i class="fa fa-retweet"></i></a>&nbsp;';
             }
-
+            if ((row.available_actions) && (row.available_actions.result === true)) {
+                actions += '<a href="{{ url('/') }}/' + dest + '/' + row.id + '/result" class="btn btn-sm btn-info" data-tooltip="true" title="Result"><i class="fa fa-copy"></i></a>&nbsp;';
+            }
             actions +='</nobr>';
             return actions;
 
@@ -352,6 +399,8 @@
         'depreciations',
         'fieldsets',
         'groups',
+        'inventory',
+        'inventoryresult',
         'store',
         'contracts',
         'contractAssets'

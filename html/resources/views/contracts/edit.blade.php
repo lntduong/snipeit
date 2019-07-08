@@ -88,33 +88,6 @@
  <script type="text/javascript">
     $("#hideForm").css("display","block"); 
  </script>
- @else
-
- <script>
-
-    // contract save action
-    $(document).ready(function() {   
-        $('form').submit(function(e){
-            e.preventDefault();
-            var form_data = $(this).serialize();
-            $.ajax({
-                url:'{{ route('contracts.store') }}',
-                method: "POST",
-                data: form_data,
-                dataType: "json",
-                success: function(data) {
-                    $("#mgsContract").css("display","block");
-                    $("#hideForm").css("display","block"); 
-                    $("#result-contract-id").val(data.contract_obj);
-                },
-                error: function(data) {
-                    document.location.reload();
-                },
-            })
-        });
-    });
-    </script>
-
  @endif
 
 <script>

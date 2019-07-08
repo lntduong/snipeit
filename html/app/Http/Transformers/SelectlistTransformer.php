@@ -47,5 +47,35 @@ class SelectlistTransformer
         return $results;
 
     }
+    public function transformSelectlistInventory (LengthAwarePaginator $select_items)
+    {
+        $items_array=[];
+
+        // Loop through the paginated collection to set the array values
+        foreach ($select_items as $select_item) {
+            $items_array[]= [
+                'id' => (int) $select_item->id,
+                'text' => ($select_item->use_text) ? e($select_item->use_text) : e($select_item->inventory_date->format('Y/m/d')).' - '.e($select_item->name),
+                'image' => ($select_item->use_image) ?  e($select_item->use_image) : null,
+
+            ];
+
+        }
+
+        $results = [
+            'items' => $items_array,
+            'pagination' =>
+                [
+                    'more' => ($select_items->currentPage() >= $select_items->lastPage()) ? false : true,
+                    'per_page' => $select_items->perPage()
+                ],
+            'total_count' => $select_items->total(),
+            'page' => $select_items->currentPage(),
+            'page_count' => $select_items->lastPage()
+        ];
+
+        return $results;
+
+    }
 
 }

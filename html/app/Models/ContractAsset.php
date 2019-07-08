@@ -7,7 +7,7 @@ use Watson\Validating\ValidatingTrait;
 
 final class ContractAsset extends SnipeModel
 {
-    protected $table = 'contracts_assets';
+    protected $table = 'contract_assets';
 
     protected $rules = [
         'contract_id' => 'required',

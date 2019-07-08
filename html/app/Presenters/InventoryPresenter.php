@@ -6,7 +6,7 @@ namespace App\Presenters;
  * Class ComponentPresenter
  * @package App\Presenters
  */
-class StorePresenter extends Presenter
+class InventoryPresenter extends Presenter
 {
 
     /**
@@ -28,33 +28,53 @@ class StorePresenter extends Presenter
                 "field" => "company",
                 "searchable" => true,
                 "sortable" => true,
-                "switchable" => true,
                 "title" => trans('general.company'),
                 "visible" => true,
                 "formatter" => 'companiesLinkObjFormatter',
             ],
             [
+                "field" => "store",
+                "searchable" => true,
+                "sortable" => true,
+                "switchable" => true,
+                "title" => trans('general.store'),
+                "visible" => true,
+                "formatter" => 'storeLinkObjFormatter',
+            ],
+            [
+                "field" => "contract",
+                "searchable" => true,
+                "sortable" => true,
+                "switchable" => true,
+                "title" => trans('general.contract'),
+                "visible" => true,
+             
+            ],
+            [
+                "field" => "date",
+                "searchable" => true,
+                "sortable" => true,
+                "title" => trans('admin/inventory/table.inventory_date'),
+                "visible" => true,
+                "formatter" => "dateDisplayFormatter"
+              
+            ],
+            [
                 "field" => "name",
                 "searchable" => true,
                 "sortable" => true,
-                "title" => trans('admin/store/table.store_name'),
+                "title" => trans('admin/inventory/table.inventory'),
                 "visible" => true,
-                "formatter" => 'storeLinkFormatter',
-            ], [
-                "field" => "image",
-                "searchable" => false,
-                "sortable" => true,
-                "switchable" => true,
-                "title" => trans('general.image'),
-                "visible" => false,
-                "formatter" => 'imageFormatter',
-            ], [
-                "field" => "location",
+               
+            ],
+            [
+                "field" => "notes",
                 "searchable" => true,
                 "sortable" => true,
-                "title" => trans('general.location'),
-                "formatter" => "locationsLinkObjFormatter"
-            ], 
+                "visible" => false,
+                "title" => trans('general.notes'),
+
+            ],
         ];
         $layout[] = [
             "field" => "actions",
@@ -63,10 +83,10 @@ class StorePresenter extends Presenter
             "switchable" => false,
             "visible" => true,
             "title" => trans('table.actions'),
-            "formatter" => "storeActionsFormatter",
+            "formatter" => "inventoryActionsFormatter",
         ];
+
 
         return json_encode($layout);
     }
-
 }

@@ -43,7 +43,7 @@ class InventorysController extends Controller
         $arrayAssets = ContractAsset::select([
             'assets.asset_tag',
             'assets.id'
-        ])->join('assets','assets.id','=','contracts_assets.asset_id')
+        ])->join('assets','assets.id','=','contract_assets.asset_id')
         ->where("assets.asset_tag", '=' , substr($request->asset_tag,4 ))
         ->get();
 
@@ -86,7 +86,7 @@ class InventorysController extends Controller
             $arrayAssets = ContractAsset::select([
                 'assets.asset_tag',
                 'assets.id'
-            ])->join('assets','assets.id','=','contracts_assets.asset_id')
+            ])->join('assets','assets.id','=','contract_assets.asset_id')
             ->where("assets.asset_tag" , '=', substr($arrayAssetOff[$i]['asset_number'],4))->get();
 
             $inventory = new InventoryResults();

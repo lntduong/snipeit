@@ -2,7 +2,7 @@
 
 {{-- Page title --}}
 @section('title')
-{{ trans('general.store') }}
+{{trans('admin/store/table.list_store')}}
 @parent
 @stop
 

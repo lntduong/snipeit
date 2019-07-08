@@ -8,6 +8,7 @@ use App\Models\Asset;
 use App\Http\Requests\ContractRequest;
 use App\Http\Requests\ImageUploadRequest;
 use Request;
+use DB;
 /**
  * @author [Thinh.NP],[Duong.lnt]
  * @content: Changed store method
@@ -58,8 +59,10 @@ class ContractsController extends Controller
         $contract->payment_date          = $request->input('payment_date');
         $contract->terms_and_conditions  = $request->input('terms_and_conditions');
         $contract->notes                 = $request->input('notes');
-        $contract->save();
-        return response()->json(['contract_obj'=> $contract->id], 200);
+        if ($contract->save()) {
+            return redirect()->route('contracts.index')->with('success', trans('admin/contracts/message.create.success'));
+        }
+        return redirect()->back()->withInput()->withErrors($contract->getErrors());
 
     }
 

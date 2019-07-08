@@ -1,6 +1,6 @@
 @extends('layouts/edit-form', [
-    'createText' => trans('general.create_store') ,
-    'updateText' => trans('general.edit_store'),
+    'createText' => trans('admin/store/table.create_store'),
+    'updateText' => trans('admin/store/table.edit_store'),
     'formAction' => ($item) ? route('store.update', ['store' => $item->id]) : route('store.store'),
 
 ])
@@ -10,7 +10,7 @@
 {{-- Company --}}
 @include ('partials.forms.edit.company-store', ['translated_name' => trans('general.company'), 'fieldname' => 'company_id'])
 {{-- Store-Name --}}
-@include ('partials.forms.edit.store-name', ['translated_name' => trans('general.store_name')])
+@include ('partials.forms.edit.store-name', ['translated_name' => trans('admin/store/table.store_name'),])
 {{-- Location --}}
 @include ('partials.forms.edit.location-store', ['translated_name' => trans('general.location'),'fieldname' => 'location_id'])
 <!-- Image -->

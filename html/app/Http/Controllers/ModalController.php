@@ -35,5 +35,8 @@ class ModalController extends Controller
     function manufacturer() {
         return view('modals.manufacturer');
     }
+    function inventory_result() {
+        return view('modals.inventory-result');
+    }
 
 }

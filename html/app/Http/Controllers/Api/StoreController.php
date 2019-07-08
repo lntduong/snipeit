@@ -71,10 +71,6 @@ class StoreController extends Controller
             $stores = $stores->where('stores.company_id', '=', $request->get('company_id'));
         }
         $stores = $stores->orderBy('name', 'ASC')->paginate(50);
-
-        // Loop through and set some custom properties for the transformer to use.
-        // This lets us have more flexibility in special cases like assets, where
-        // they may not have a ->name value but we want to display something anyway
         foreach ($stores as $store) {
             $store->use_image = ($store->image) ? url('/').'/uploads/store/'.$store->image : null;
         }

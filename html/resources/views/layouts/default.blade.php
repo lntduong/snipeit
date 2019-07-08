@@ -593,6 +593,13 @@
                             </a>
                         </li>
                         @endcan
+                        @can('view', \App\Models\Inventory::class)
+                        <li>
+                            <a href="{{ route('inventory.index') }}">
+                                {{ trans('admin/inventory/table.inventory') }}
+                            </a>
+                        </li>
+                        @endcan
                         @can('view', \App\Models\AssetModel::class)
                             <li>
                                 <a href="{{ route('models.index') }}" {{ (Request::is('/assetmodels') ? ' class="active"' : '') }}>

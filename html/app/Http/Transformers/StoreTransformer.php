@@ -35,8 +35,6 @@ class StoreTransformer
            
         ];
         $permissions_array['available_actions'] = [
-            'checkout' => (bool) Gate::allows('checkout', Store::class),
-            'checkin'  => (bool) Gate::allows('checkin', Store::class),
             'update'   => (bool) Gate::allows('update', Store::class),
             'delete'   => (bool) Gate::allows('delete', Store::class),
         ];
