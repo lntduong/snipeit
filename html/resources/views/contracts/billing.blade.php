@@ -25,15 +25,14 @@
               <div class="col-md-2" style="padding-top: 5px"><label> {{ trans('admin/contracts/table.billing_date') }} </label> </div>
                 <div class="col-md-3">
                   <div id="datepicker" class="input-group date" style="position: absolute; left: -60px;" data-provide="datepicker" data-date-format="yyyy-mm"  data-autoclose="true">
-                    <input type="text" class="form-control" placeholder="{{ trans('general.select_payment_date') }}" name="payment_date" id="payment_date" >
+                    <input type="text" class="form-control" placeholder="{{ trans('general.select_billing_date') }}" name="payment_date" id="payment_date" >
                     <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
                   <button type="submit" style="float: right; margin-right: -3px;" class="btn btn-primary" onclick="filterPaymentDate()">Go</button>
                 </div>        
               </div>
               <table
-                data-advanced-search="true"
                 data-click-to-select="true"
-                data-columns="{{ \App\Presenters\ContractPresenter::dataTableLayout() }}"
+                data-columns="{{ \App\Presenters\BillingPresenter::dataTableLayout() }}"
                 data-cookie-id-table="contractsTable"
                 data-pagination="true"
                 data-id-table="contractsTable"

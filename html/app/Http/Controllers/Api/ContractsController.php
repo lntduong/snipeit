@@ -12,7 +12,7 @@ use App\Models\Contract;
 class ContractsController extends Controller
 {
     public function index(Request $request)
-    {
+    {      
         $contractList = Contract::select([
             'contracts.id',
             'contracts.name',
@@ -38,7 +38,6 @@ class ContractsController extends Controller
         if ($request->has('search')) {
             $contractList = $contractList->TextSearch(e($request->input('search')));
         }
-        
         $sort = 'contracts.created_at';
         $order = ($request->input('order') == 'asc') ? 'asc' : 'desc';
         $offset = request('offset', 0);

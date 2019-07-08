@@ -8,7 +8,6 @@ use App\Models\Asset;
 use App\Http\Requests\ContractRequest;
 use App\Http\Requests\ImageUploadRequest;
 use Request;
-
 /**
  * @author [Thinh.NP],[Duong.lnt]
  * @content: Changed store method
@@ -47,21 +46,7 @@ class ContractsController extends Controller
      */
     public function store(ContractRequest $request)
     {
-        $contract = new Contract(
-        //     [
-        //     'name' => $request->get('name'),
-        //     'store_id' => $request->get('store_id'),
-        //     'location_id' => $request->get('location_id'),
-        //     'contact_id_1' => $request->input('contact_id_1'),
-        //     'contact_id_2' => $request->input('contact_id_2'),
-        //     'start_date' => $request->get('start_date'),
-        //     'end_date' => $request->get('end_date'),
-        //     'billing_date' => $request->get('billing_date'),
-        //     'payment_date' => $request->get('payment_date'),
-        //     'terms_and_conditions' => $request->get('terms_and_conditions'),
-        //     'notes' => $request->get('notes'),
-        // ]
-    );
+        $contract = new Contract();
         $contract->name                  = $request->input('name');
         $contract->store_id              = $request->input('store_id');
         $contract->location_id           = $request->input('location_id');
@@ -119,4 +104,23 @@ class ContractsController extends Controller
         }
         return redirect()->back()->withInput()->withErrors($contract->getErrors());
     }
+
+    public function destroy($contractId)
+    {
+        // Check if the contract exists
+        if (is_null($contract = Contract::find($contractId))) {
+            // Redirect to the asset management page with error
+            return redirect()->route('contracts.index')->with('error', trans('admin/contracts/message.does_not_exist'));
+        }
+
+        $this->authorize('delete', $contract);
+
+        DB::table('contracts')
+            ->where('id', $contract->id);
+
+        $contract->delete();
+
+        return redirect()->route('contracts.index')->with('success', trans('admin/contracts/message.delete.success'));
+    }
+
 }

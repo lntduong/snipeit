@@ -47,6 +47,7 @@ class ContractsTransformer
         ];
         $permissions_array['available_actions'] = [
             'update' => (bool) Gate::allows('update', Contract::class),
+            'delete' => (bool) Gate::allows('delete', Contract::class),
         ];
         $array += $permissions_array;
         return $array;

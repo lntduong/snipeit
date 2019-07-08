@@ -182,7 +182,7 @@
     'select_supplier'		=> 'Select a Supplier',
     'select_user'			=> 'Select a User',
     'select_date'			=> 'Select Date (YYYY-MM-DD)',
-    'select_payment_date'	=> 'Select (YYYY-MM)',
+    'select_billing_date'	=> 'Select (MM/YYYY)',
     'select_statuslabel'	=> 'Select Status',
     'select_company'    	=> 'Select Company',
     'select_asset'    		=> 'Select Asset',
