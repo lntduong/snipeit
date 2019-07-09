@@ -47,6 +47,10 @@ class ContractsController extends Controller
      */
     public function store(ContractRequest $request)
     {
+        $checkName = DB::table('contracts')
+            ->where('name',$request->input('name'))
+            ->where('store_id',$request->input('store_id'))
+            ->first();
         $contract = new Contract();
         $contract->name                  = $request->input('name');
         $contract->store_id              = $request->input('store_id');
@@ -59,11 +63,15 @@ class ContractsController extends Controller
         $contract->payment_date          = $request->input('payment_date');
         $contract->terms_and_conditions  = $request->input('terms_and_conditions');
         $contract->notes                 = $request->input('notes');
-        if ($contract->save()) {
-            return redirect()->route('contracts.index')->with('success', trans('admin/contracts/message.create.success'));
-        }
-        return redirect()->back()->withInput()->withErrors($contract->getErrors());
-
+        if ($checkName) {
+            return redirect()->back()->with('error', trans('admin/contracts/message.create.nameduplicate'));
+         }
+         else {
+            if ($contract->save()) {
+                return redirect()->route('contracts.index')->with('success', trans('admin/contracts/message.create.success'));
+            }
+            return redirect()->back()->withInput()->withErrors($contract->getErrors());
+         }
     }
 
      /**
@@ -74,7 +82,27 @@ class ContractsController extends Controller
     public function edit($contractId = null)
     {
         if ($item = Contract::find($contractId)) {
-           
+            $this->authorize('update', $item);
+            $item = Contract::select(
+                'contracts.id',
+                'contracts.store_id',
+                'stores.company_id',
+                'contracts.name',
+                'contracts.location_id',
+                'contracts.contact_id_1',
+                'contracts.contact_id_2',
+                'contracts.start_date',
+                'contracts.end_date',
+                'contracts.billing_date',
+                'contracts.payment_date',
+                'contracts.terms_and_conditions',
+                'contracts.notes'
+                )
+            ->join('stores', 'stores.id', '=', 'contracts.store_id') 
+            ->where('contracts.id','=',$contractId)
+            ->first();
+            ;
+
             return view('contracts/edit',compact('item'));
         }
         return redirect()->route('contracts.index')->with('error', trans('admin/contracts/essage.does_not_exist'));

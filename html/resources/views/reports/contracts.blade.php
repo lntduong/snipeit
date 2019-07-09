@@ -14,52 +14,51 @@
             <div class="box-body">
                     <a href="{{ route('reports.activity') }}" type="button" class="btn btn-primary">Activity Reports</a>
                     <a href="{{ route('reports.contracts') }}" type="button" class="btn btn-warning">Contract Reports</a>
-                    <div class="form_search">
-                    <div id="search-company" class="report-contract">
+                    <div class="row">
+                        <div class="col-md-6">
+                        
+                    <div class="form-group">
                         <div class="col-md-1" style="padding-top: 5px"><label> {{ trans('admin/contracts/table.contracts_company') }} </label> </div>
-                        <div class="col-md-2">
-                        <select class="company_select" data-endpoint="companies" data-placeholder="{{ trans('general.select_company') }}" name="company" style="width: 100%" id="company_select">
-                            
-                            @foreach ($listCompany as $company)
-                            <option hidden disabled selected="selected">{{ trans('general.select_company') }}</option>
-                            <option value="{{$company->id}}">{{$company->name}}</option>
-                            @endforeach
-                        </select>
+                        <div class="col-md-3 col-sm-12">
+                            <select class="company_select" data-endpoint="companies" data-placeholder="{{ trans('general.select_company') }}" name="company" style="width: 100%" id="company_select">
+                                
+                                @foreach ($listCompany as $company)
+                                <option hidden disabled selected="selected">{{ trans('general.select_company') }}</option>
+                                <option value="{{$company->id}}">{{$company->name}}</option>
+                                @endforeach
+                            </select>
+                            <span class="select2-selection__arrow needsclick" role="presentation"><b role="presentation"></b></span>
                         </div>
                     </div>
-                    <!-- search company -->
-                    <div id="search-store"  class="report-contract">
-                        <div class="col-md-1" style="padding-top: 5px"><label> Store </label> </div>
-                        <div class="col-md-2">
-                        
-                        <select class="store_select" data-endpoint="store" data-placeholder="{{ trans('general.select_store') }}" name="store" style="width: 100%" id="store_select">
-                            @foreach ($listStore as $store)
-                            <option hidden disabled selected="selected">{{ trans('general.select_store') }}</option>
-                            <option value="{{$store->id}}">{{$store->name}} </option> 
-                            @endforeach
-                            
-                        </select>
-                        
+                    <div class="form-group">
+                        <div class="col-md-1" style="padding-top: 5px"><label> {{ trans('general.store') }} </label> </div>
+                        <div class="col-md-3 col-sm-12">
+                            <select class="store_select" data-endpoint="store" data-placeholder="{{ trans('general.select_store') }}" name="store" style="width: 100%" id="store_select">
+                                @foreach ($listStore as $store)
+                                <option hidden disabled selected="selected">{{ trans('general.select_store') }}</option>
+                                <option value="{{$store->id}}">{{$store->name}} </option> 
+                                @endforeach
+                                
+                            </select>
+                            <span class="select2-selection__arrow needsclick" role="presentation"><b role="presentation"></b></span>
                         </div>
-                        
                     </div>
-                    <!-- search store -->
-                    <div id="search-contract" class="report-contract">
-                        <div class="col-md-1" style="padding-top: 5px"><label> Contract </label> </div>
-                        <div class="col-md-2">
-                        <select class="contract_select" data-endpoint="contract" style="width:100%" data-placeholder="{{ trans('general.select_contract') }}" id="contract_select" name="contract">
-                            
-                            @foreach ($listContract as $contract)
-                            <option hidden disabled selected="selected">{{ trans('general.select_contract') }}</option>
-                            <option value="{{$contract->id}}">{{$contract->name}}</option>
-                            @endforeach
-                        </select>
+                    <div class="form-group">
+                        <div class="col-md-1" style="padding-top: 5px"><label> {{ trans('general.contract') }} </label> </div>
+                        <div class="col-md-3 col-sm-12">
+                            <select class="contract_select" data-endpoint="contract" style="width:100%" data-placeholder="{{ trans('general.select_contract') }}" id="contract_select" name="contract">
+                                
+                                @foreach ($listContract as $contract)
+                                <option hidden disabled selected="selected">{{ trans('general.select_contract') }}</option>
+                                <option value="{{$contract->id}}">{{$contract->name}}</option>
+                                @endforeach
+                            </select>
+                            <span class="select2-selection__arrow needsclick" role="presentation"><b role="presentation"></b></span>
                         </div>
-                    </div> 
-                    <!-- search contract -->
+                    </div>
                     <button id="searchContractReport" class="btn btn-info" onclick="searchContractReport()">Go</button>
-                </div>
-                <!-- form search -->
+                    </div>
+                    </div>
 
                 <table
                         data-cookie-id-table="activityReport"
@@ -103,18 +102,19 @@
 @section('moar_scripts')
 @include ('partials.bootstrap-table', ['exportFile' => 'components-export', 'search' => true, 'showFooter' => true, 'columns' => \App\Presenters\StorePresenter::dataTableLayout()])
 <script>
-   $table = $('#contractreportTable') 
+   $table = $('#activityReport') 
 
     function searchContractReport() {
 
         if($('#company_select').val() == null && $('#store_select').val() == null && $('#contract_select').val() == null) {
             $table.bootstrapTable('refresh', {
-                url: '{{url('/') }}/api/v1/contracts'
+                url: '{{ route('api.activity.index',['contract_type' => 'contract']) }}'
+                
             });
             }
             else {
             $table.bootstrapTable('refresh', {
-                url: '{{url('/') }}/api/v1/contracts?contract='+ $(".contract_select").val()
+                url: '{{ route('api.activity.index',['contract_id' => '']) }}'+ $(".contract_select").val()
             });
         }
     }

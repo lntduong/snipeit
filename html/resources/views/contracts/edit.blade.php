@@ -4,7 +4,7 @@
  * -->
 @extends('layouts/edit-form-contract', [
     'createText' => trans('admin/contracts/table.create') ,
-    'updateText' => trans('admin/contracts/table.update'),
+    'updateText' => trans('admin/contracts/table.edit'),
     'formAction' => ($item) ? route('contracts.update', ['contracts_id' => $item->id]) : route('contracts.store'),
 ])
 <style>
@@ -43,7 +43,7 @@
 <div class="form-group {{ $errors->has('billing_date') ? ' has-error' : '' }}">
     <label for="billing_date" class="col-md-3 control-label">{{ trans('admin/contracts/table.billing_date') }}</label>
 
-    <div class="input-group col-md-3">
+    <div class="input-group col-md-3{{  (\App\Helpers\Helper::checkIfRequired($item, 'billing_date')) ? ' required' : '' }}">
         <div class="input-group date" data-provide="datepicker" data-date-format="yyyy-mm-dd"  data-autoclose="true">
             <input type="text" class="form-control" placeholder="{{ trans('general.select_date') }}" name="billing_date" id="billing_date" value="{{ Input::old('billing_date', $item->billing_date) }}">
             <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
@@ -57,7 +57,7 @@
 <div class="form-group {{ $errors->has('payment_date') ? ' has-error' : '' }}">
     <label for="payment_date" class="col-md-3 control-label">{{ trans('admin/contracts/table.payment_date') }}</label>
 
-    <div class="input-group col-md-3">
+    <div class="input-group col-md-3{{  (\App\Helpers\Helper::checkIfRequired($item, 'payment_date')) ? ' required' : '' }}">
         <div class="input-group date" data-provide="datepicker" data-date-format="yyyy-mm-dd"  data-autoclose="true">
             <input type="text" class="form-control" placeholder="{{ trans('general.select_date') }}" name="payment_date" id="payment_date" value="{{ Input::old('payment_date', $item->payment_date) }}">
             <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
@@ -98,7 +98,7 @@
         $('#add_asset').click(function(e){
             e.preventDefault();
             $.ajax({
-                url: baseUrl + 'api/v1/contractAsset/storeAsset',
+                url: '{{route('contractAsset.storeAsset')}}',
                 headers: {
                     "X-Requested-With": 'XMLHttpRequest',
                     "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr('content')

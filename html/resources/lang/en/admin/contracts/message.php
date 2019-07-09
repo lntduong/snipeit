@@ -9,8 +9,9 @@ return array(
 
 
     'create' => array(
-        'error'   => 'Contract was not created, please try again.',
-        'success' => 'Contract created successfully.'
+        'error'         => 'Contract was not created, please try again.',
+        'success'       => 'Contract created successfully.',
+        'nameduplicate' => 'Contract Name duplicated.'
     ),
 
     'update' => array(

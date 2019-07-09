@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class AddDeleteColumn extends Migration
+class BillingDateColumn extends Migration
 {
     /**
      * Run the migrations.
@@ -13,8 +13,8 @@ class AddDeleteColumn extends Migration
      */
     public function up()
     {
-        Schema::table('inventory_results', function (Blueprint $table) {
-            //$table->softDeletes();
+        Schema::table('contracts', function (Blueprint $table) {
+            $table->date('billing_date')->nullable(false)->change();
         });
     }
 
@@ -25,7 +25,7 @@ class AddDeleteColumn extends Migration
      */
     public function down()
     {
-        Schema::table('invetory_results', function (Blueprint $table) {
+        Schema::table('contracts', function (Blueprint $table) {
             //
         });
     }

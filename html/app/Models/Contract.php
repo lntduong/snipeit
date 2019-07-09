@@ -15,6 +15,7 @@ final class Contract extends SnipeModel
             'store_id' => 'required',
             'start_date' => 'required',
             'end_date'  => 'required',
+            'billing_date'  => 'required',
     );
     use ValidatingTrait;
     use Searchable;

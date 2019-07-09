@@ -80,7 +80,8 @@
   $("#datepicker").datepicker( {
     format: "yyyy-mm",
     viewMode: "months", 
-    minViewMode: "months"
+    minViewMode: "months",
+    autoclose: true,
   });
 </script>
 @include ('partials.bootstrap-table', ['exportFile' => 'components-export', 'search' => true, 'showFooter' => true, 'columns' => \App\Presenters\ContractPresenter::dataTableLayout()])

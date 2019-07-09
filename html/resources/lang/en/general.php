@@ -199,6 +199,8 @@
     'status_labels'			=> 'Status Labels',
     'status'    			=> 'Status',
     'store'                 => 'Store',
+    'create_inventory'      => 'Inventory',
+    'inventory_mobile'      => 'Inventory (Mobile)',
     'inventory'             => 'List Inventory',
     'inventory_result'      => 'Inventory Result',
     'supplier'              => 'Supplier',

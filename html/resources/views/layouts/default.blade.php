@@ -253,10 +253,18 @@
                          </li>
                      @endcan
                      @can('create', \App\Models\User::class)
+                         <li {!! (Request::is('inventory/create') ? 'class="active"' : '') !!}>
+                             <a href="{{ route('inventory.create') }}">
+                                 <i class="fa fa-qrcode">  </i>
+                                 {{ trans('general.create_inventory') }}
+                             </a>
+                         </li>
+                     @endcan
+                     @can('create', \App\Models\User::class)
                          <li {!! (Request::is('inventorys/create') ? 'class="active"' : '') !!}>
                              <a href="{{ route('inventorys.create') }}">
                                  <i class="fa fa-qrcode">  </i>
-                                 Inventory Scan
+                                 {{ trans('general.inventory_mobile') }}
                              </a>
                          </li>
                      @endcan
@@ -546,11 +554,35 @@
             </li>
             @endcan
             @can('view', \App\Models\User::class)
-            <li{!! (Request::is('users*') ? ' class="active"' : '') !!}>
-                  <a href="{{ route('users.index') }}">
-                      <i class="fa fa-users"></i>
-                      <span>{{ trans('general.people') }}</span>
-                  </a>
+            <li class="treeview{{ (Request::is('users*') ? ' active' : '') }}">
+                <a href="#"  class="dropdown-toggle">
+                    <i class="fa fa-users"></i>
+                    <span>{{ trans('general.people') }}</span>
+                </a>
+
+                <ul class="treeview-menu">
+                    <li{!! (Request::is('users*') ? ' class="active"' : '') !!}>
+                        <a href="{{ route('users.index') }}">
+                            <i class="fa fa-users"></i>
+                            <span>{{ trans('general.people') }}</span>
+                        </a>
+                    </li>
+
+                    <li{!! (Request::is('contracts*') ? ' class="active"' : '') !!}>
+                        <a href="{{ route('contracts.index') }}">
+                                <i class=" 	fa fa-file-text-o"></i>
+                            <span> {{ trans('general.contract') }}</span>
+                        </a>
+                    </li>
+
+                    <li>
+                            <a href="{{ route('inventory.index') }}">
+                                <i class="fa fa-qrcode">  </i> 
+                                <span> {{ trans('general.create_inventory') }}</span>
+                            </a>
+                        </li>
+
+                </ul>
             </li>
             @endcan
             @can('import')
@@ -590,13 +622,6 @@
                         <li>
                             <a href="{{ route('store.index') }}">
                                 {{ trans('general.store') }}
-                            </a>
-                        </li>
-                        @endcan
-                        @can('view', \App\Models\Inventory::class)
-                        <li>
-                            <a href="{{ route('inventory.index') }}">
-                                {{ trans('admin/inventory/table.inventory') }}
                             </a>
                         </li>
                         @endcan
@@ -719,14 +744,6 @@
                         </a>
                     </li>
                 </ul>
-            </li>
-            @endcan
-            @can('view', \App\Models\Contract::class)
-            <li{!! (Request::is('contracts*') ? ' class="active"' : '') !!}>
-                  <a href="{{ route('contracts.index') }}">
-                        <i class=" 	fa fa-file-text-o"></i>
-                      <span> {{ trans('general.contract') }}</span>
-                  </a>
             </li>
             @endcan
             @can('viewRequestable', \App\Models\Asset::class)

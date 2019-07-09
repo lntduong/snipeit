@@ -32,7 +32,8 @@ class ContractAssetsPresenter extends Presenter
                 "searchable" => true,
                 "title" => trans('admin/hardware/form.name'),
                 "visible" => true,
-                "formatter" => "hardwareLinkFormatter"
+                "formatter" => "hardwareLinkFormatter",
+                "sortable" => true,
             ], [
                 "field" => "image",
                 "searchable" => false,
