@@ -27,7 +27,8 @@ class ReportsController extends Controller
         }
 
         if (($request->has('contract_id'))) {
-            $actionlogs = $actionlogs->where('item_id','=',$request->input('contract_id'));
+            $actionlogs = $actionlogs->where('item_id','=',$request->input('contract_id'))
+            ->where('item_type','=',"App\\Models\\".ucwords('contract'));;
         } 
 
         if (($request->has('contract_type'))) {

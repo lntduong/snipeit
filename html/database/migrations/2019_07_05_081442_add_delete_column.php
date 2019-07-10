@@ -14,7 +14,7 @@ class AddDeleteColumn extends Migration
     public function up()
     {
         Schema::table('inventory_results', function (Blueprint $table) {
-            //$table->softDeletes();
+            $table->softDeletes();
         });
     }
 

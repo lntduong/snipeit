@@ -54,7 +54,7 @@
 	'complete'				=> 'Complete',
     'consumable'			=> 'Consumable',
     'consumables'			=> 'Consumables',
-    'contract_reports'      => 'Contract Reports',
+    'contract_reports'      => 'Contract Activity Report',
     'country'  				=> 'Country',
     'contract'              => 'Contract',
     'create'				=> 'Create New',
@@ -237,5 +237,6 @@
     'audit_due'             => 'Due for Audit',
     'audit_overdue'         => 'Overdue for Audit',
     //add contract
-    'contract'              => 'Contract'
+    'contract'              => 'Contract',
+    'contracts'             => 'Contracts',
     ];

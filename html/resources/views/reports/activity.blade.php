@@ -13,8 +13,10 @@
     <div class="col-md-12">
         <div class="box box-default">
             <div class="box-body">
-                <a href="{{ route('reports.activity') }}" type="button" class="btn btn-primary">Activity Reports</a>
-                <a href="{{ route('reports.contracts') }}" type="button" class="btn btn-warning">Contract Reports</a>
+                <div class="btn-group">
+                    <a href="{{ route('reports.activity') }}" type="button" class="active btn btn-primary">{{ trans('general.all') }}</a>
+                    <a href="{{ route('reports.contracts') }}" type="button" class="btn btn-primary">{{ trans('general.contracts') }} </a>
+                </div>
                 <table
                         data-cookie-id-table="activityReport"
                         data-pagination="true"

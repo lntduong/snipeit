@@ -65,13 +65,13 @@ class ContractsController extends Controller
         $contract->notes                 = $request->input('notes');
         if ($checkName) {
             return redirect()->back()->with('error', trans('admin/contracts/message.create.nameduplicate'));
-         }
-         else {
+        }
+        else {
             if ($contract->save()) {
                 return redirect()->route('contracts.index')->with('success', trans('admin/contracts/message.create.success'));
             }
             return redirect()->back()->withInput()->withErrors($contract->getErrors());
-         }
+        }
     }
 
      /**
@@ -101,7 +101,6 @@ class ContractsController extends Controller
             ->join('stores', 'stores.id', '=', 'contracts.store_id') 
             ->where('contracts.id','=',$contractId)
             ->first();
-            ;
 
             return view('contracts/edit',compact('item'));
         }

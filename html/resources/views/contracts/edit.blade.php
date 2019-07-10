@@ -44,7 +44,7 @@
     <label for="billing_date" class="col-md-3 control-label">{{ trans('admin/contracts/table.billing_date') }}</label>
 
     <div class="input-group col-md-3{{  (\App\Helpers\Helper::checkIfRequired($item, 'billing_date')) ? ' required' : '' }}">
-        <div class="input-group date" data-provide="datepicker" data-date-format="yyyy-mm-dd"  data-autoclose="true">
+        <div class="input-group date datepicker-contract" data-provide="datepicker" data-date-format="yyyy-mm-dd"  data-autoclose="true">
             <input type="text" class="form-control" placeholder="{{ trans('general.select_date') }}" name="billing_date" id="billing_date" value="{{ Input::old('billing_date', $item->billing_date) }}">
             <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
         </div>
@@ -58,7 +58,7 @@
     <label for="payment_date" class="col-md-3 control-label">{{ trans('admin/contracts/table.payment_date') }}</label>
 
     <div class="input-group col-md-3{{  (\App\Helpers\Helper::checkIfRequired($item, 'payment_date')) ? ' required' : '' }}">
-        <div class="input-group date" data-provide="datepicker" data-date-format="yyyy-mm-dd"  data-autoclose="true">
+        <div class="input-group date datepicker-contract" data-provide="datepicker" data-date-format="yyyy-mm-dd"  data-autoclose="true">
             <input type="text" class="form-control" placeholder="{{ trans('general.select_date') }}" name="payment_date" id="payment_date" value="{{ Input::old('payment_date', $item->payment_date) }}">
             <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
         </div>
@@ -299,7 +299,12 @@ escapeMarkup: function (markup) { return markup; }, // let our custom formatter 
 templateResult: formatDatalist,
 templateSelection: formatDataSelection
 });
-
+$(".datepicker-contract").datepicker( {
+    autoclose: true,
+    clearBtn: true, 
+    todayHighlight: true, 
+    orientation: "top"
+  });
 </script>
 @stop
 {{-- @endif --}}

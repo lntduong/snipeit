@@ -6,7 +6,10 @@ use App\Models\Contract;
 use App\Models\Setting;
 use App\Models\Actionlog;
 use Auth;
-
+    /**
+     *
+     * @author [duong.LNT] [duong.lnt@vn.vinx.asia]
+     */
 class ContractObserver
 {
     /**
