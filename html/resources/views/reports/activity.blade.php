@@ -8,23 +8,30 @@
 
 {{-- Page content --}}
 @section('content')
-
 <div class="row">
-    <div class="col-md-12">
-        <div class="box box-default">
-            <div class="box-body">
-                <div class="btn-group">
-                    <a href="{{ route('reports.activity') }}" type="button" class="active btn btn-primary">{{ trans('general.all') }}</a>
-                    <a href="{{ route('reports.contracts') }}" type="button" class="btn btn-primary">{{ trans('general.contracts') }} </a>
-                </div>
-                <table
+   <div class="col-md-12">
+      <div class="box">
+         <div class="box-body">
+            <div class="row">
+               <div class="col-md-3">
+                  <div id="toolbar">
+                    <div class="btn-group">
+                        <a href="{{ route('reports.activity') }}" type="button" class="active btn btn-primary">{{ trans('general.all') }}</a>
+                        <a href="{{ route('reports.contracts') }}" type="button" class="btn btn-primary">{{ trans('general.contracts') }} </a>
+                    </div>
+                  </div>
+               </div>
+               <div class="col-md-12">
+               <table
                         data-cookie-id-table="activityReport"
                         data-pagination="true"
+                        data-toolbar="#toolbar"
                         data-id-table="activityReport"
                         data-search="true"
                         data-side-pagination="server"
                         data-show-columns="true"
                         data-show-export="true"
+                        data-show-footer="true"
                         data-show-refresh="true"
                         data-sort-order="desc"
                         data-sort-name="created_at"
@@ -52,9 +59,15 @@
                         </tr>
                     </thead>
                 </table>
+               </div>
+               <!-- /.col -->
             </div>
-        </div>
-    </div>
+            <!-- /.row -->
+         </div>
+         <!-- /.box-body -->
+      </div>
+      <!-- /.box -->
+   </div>
 </div>
 @stop
 

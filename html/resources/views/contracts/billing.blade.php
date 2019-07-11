@@ -15,21 +15,26 @@
 
 {{-- Page content --}}
 @section('content')
-
 <div class="row">
-  <div class="col-md-12">
-    <div class="box">
-      <div class="box-body">
-          <div class="row">
-            <div class="col-md-12">  
-              <div class="col-md-2" style="padding-top: 5px"><label> {{ trans('admin/contracts/table.billing_date') }} </label> </div>
-                <div class="col-md-3">
-                  <div id="datepicker" class="input-group date" style="position: absolute; left: -60px;" data-provide="datepicker" data-date-format="yyyy-mm"  data-autoclose="true">
-                    <input type="text" class="form-control" placeholder="{{ trans('general.select_billing_date') }}" name="payment_date" id="payment_date" >
-                    <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
-                  <button type="submit" style="float: right; margin-right: -3px;" class="btn btn-primary" onclick="filterPaymentDate()">Go</button>
-                </div>        
-              </div>
+   <div class="col-md-12">
+      <div class="box">
+         <div class="box-body">
+            <div class="row">
+               <div class="col-md-3">
+                  @if (Input::get('status')!='Deleted')
+                  <div id="toolbar">
+                     <label style="float: left; margin-top: 7px;"> {{ trans('admin/contracts/table.billing_date') }} </label>
+                     <div class="col-md-6">
+                     <div id="datepicker" style="width: 170px" class="input-group date" data-provide="datepicker" data-date-format="yyyy-mm"  data-autoclose="true">
+                      <input type="text" class="form-control" placeholder="{{ trans('general.select_billing_date') }}" name="payment_date" id="payment_date" >
+                      <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                    <button type="submit" style="float: right; margin-right: -60px;" class="btn btn-primary" onclick="filterPaymentDate()">Go</button>
+                    </div>
+                    </div> 
+                  </div>
+                  @endif
+               </div>
+               <div class="col-md-12">
               <table
                 data-click-to-select="true"
                 data-columns="{{ \App\Presenters\BillingPresenter::dataTableLayout() }}"
@@ -49,11 +54,15 @@
                 class="table table-striped snipe-table"
                 data-url="{{ route('api.contracts.index') }}" >
               </table>
+              </div>
+               <!-- /.col -->
             </div>
-          </div>
+            <!-- /.row -->
+         </div>
+         <!-- /.box-body -->
       </div>
-    </div> 
-  </div>
+      <!-- /.box -->
+   </div>
 </div>
 @stop
 

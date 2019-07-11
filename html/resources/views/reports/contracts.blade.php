@@ -8,11 +8,8 @@
     .btn-group.reports {
         float:left;
     }
-    .col-md-7.form-search-contracts {
-        margin: 15px 0;
-        float: left;
-        padding: 0;
-        position: relative;
+    .col-md-12.form-search-contracts {
+        margin-top: 12px;
     }
     button#searchContractReport {
         position: absolute;
@@ -39,21 +36,26 @@
         <div class="box box-default">
             <div class="box-body">
                 <div class="row">
-                    <div class="col-md-3" id="toolbar">
-                        <div class="btn-group reports">
-                            <a href="{{ route('reports.activity') }}" type="button" class="btn btn-primary">{{ trans('general.all') }}</a>
-                            <a href="{{ route('reports.contracts') }}" type="button" class="active btn btn-primary">{{ trans('general.contracts') }} </a>
+                    <div id="toolbar">
+                        <div class="row">
+                        <div class="col-md-12">
+                            <div class="btn-group reports">
+                                <a href="{{ route('reports.activity') }}" type="button" class="btn btn-primary">{{ trans('general.all') }}</a>
+                                <a href="{{ route('reports.contracts') }}" type="button" class="active btn btn-primary">{{ trans('general.contracts') }} </a>
+                            </div>
                         </div>
+                        <div class="row">
+                        <div class="col-md-12 form-search-contracts">
+                            {{-- Company-Name --}}
+                            @include ('partials.forms.edit.company-select', ['translated_name' => trans('general.company'), 'fieldname' => 'company_id'])
+                            {{-- Store-Name --}}
+                            @include ('partials.forms.edit.store-select-contracts', ['translated_name' =>  trans('general.store') , 'fieldname' => 'store_id'])
+                            {{-- Contract-Name --}}
+                            @include ('partials.forms.edit.contract', ['translated_name' => trans('general.contract'), 'fieldname' => 'contract_id'])
+                            <button id="searchContractReport" class="btn btn-info" onclick="searchContractReport()">Go</button>
+                        </div>
+                    </div></div>
                     </div>
-                </div>
-                <div class="col-md-7 form-search-contracts">
-                    {{-- Company-Name --}}
-                    @include ('partials.forms.edit.company-select', ['translated_name' => trans('general.company'), 'fieldname' => 'company_id'])
-                    {{-- Store-Name --}}
-                    @include ('partials.forms.edit.store-select-contracts', ['translated_name' =>  trans('general.store') , 'fieldname' => 'store_id'])
-                    {{-- Contract-Name --}}
-                    @include ('partials.forms.edit.contract', ['translated_name' => trans('general.contract'), 'fieldname' => 'contract_id'])
-                    <button id="searchContractReport" class="btn btn-info" onclick="searchContractReport()">Go</button>
                 </div>
                 <table
                         data-cookie-id-table="activityContractReport"
@@ -70,6 +72,7 @@
                         data-url="{{ route('api.activity.index',['contract_type' => 'contract']) }}"
                         data-mobile-responsive="true"
                         data-toggle="table"
+                        data-toolbar="#toolbar"
                         class="table table-striped snipe-table"
                         data-export-options='{
                         "fileName": "activity-contract-report-{{ date('Y-m-d') }}",
