@@ -226,7 +226,7 @@ ajax: {
     data: function (params) {
         var data = {
             search: params.term,
-            company_id:$("#company_select").val(),
+            company_id: ($("#company_select").val()) ? $("#company_select").val() : "-1",
             page: params.page || 1,
             assetStatusType: $(".js-data-ajax-company").data("asset-status-type"),
         };

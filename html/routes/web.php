@@ -34,7 +34,7 @@ Route::group(['middleware' => 'auth'], function () {
      /*
     * Inventory
     */
-    Route::resource('inventorys', 'InventorysController', [
+    Route::resource('inventories', 'InventorysController', [
         'parameters' => ['inventory' => 'inventory_id']
     ]);
 

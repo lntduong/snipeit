@@ -261,8 +261,8 @@
                          </li>
                      @endcan
                      @can('create', \App\Models\User::class)
-                         <li {!! (Request::is('inventorys/create') ? 'class="active"' : '') !!}>
-                             <a href="{{ route('inventorys.create') }}">
+                         <li {!! (Request::is('inventories/create') ? 'class="active"' : '') !!}>
+                             <a href="{{ route('inventories.create') }}">
                                  <i class="fa fa-qrcode">  </i>
                                  {{ trans('general.inventory_mobile') }}
                              </a>

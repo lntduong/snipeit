@@ -39,7 +39,7 @@
         <div class="box box-default">
             <div class="box-body">
                 <div class="row">
-                    <div class="col-md-3">
+                    <div class="col-md-3" id="toolbar">
                         <div class="btn-group reports">
                             <a href="{{ route('reports.activity') }}" type="button" class="btn btn-primary">{{ trans('general.all') }}</a>
                             <a href="{{ route('reports.contracts') }}" type="button" class="active btn btn-primary">{{ trans('general.contracts') }} </a>
@@ -50,7 +50,7 @@
                     {{-- Company-Name --}}
                     @include ('partials.forms.edit.company-select', ['translated_name' => trans('general.company'), 'fieldname' => 'company_id'])
                     {{-- Store-Name --}}
-                    @include ('partials.forms.edit.store', ['translated_name' =>  trans('general.store') , 'fieldname' => 'store_id'])
+                    @include ('partials.forms.edit.store-select-contracts', ['translated_name' =>  trans('general.store') , 'fieldname' => 'store_id'])
                     {{-- Contract-Name --}}
                     @include ('partials.forms.edit.contract', ['translated_name' => trans('general.contract'), 'fieldname' => 'contract_id'])
                     <button id="searchContractReport" class="btn btn-info" onclick="searchContractReport()">Go</button>
@@ -84,9 +84,7 @@
                             <th class="col-sm-2" data-field="action_type">{{ trans('general.action') }}</th>
                             <th class="col-sm-1" data-field="type" data-formatter="itemTypeFormatter">{{ trans('general.type') }}</th>
                             <th class="col-sm-3" data-field="item" data-formatter="polymorphicItemFormatter">{{ trans('general.item') }}</th>
-                            <th class="col-sm-2" data-field="target" data-formatter="polymorphicItemFormatter">To</th>
                             <th class="col-sm-1" data-field="note">{{ trans('general.notes') }}</th>
-                            <th class="col-sm-2" data-field="log_meta" data-visible="false" data-formatter="changeLogFormatter">Changed</th>
                         </tr>
                     </thead>
                 </table>
@@ -208,104 +206,6 @@
    templateSelection: formatDataSelection
    });
 
-//    $(".store_select").select2({
-//         ajax: {
-//             placeholder: "Select a store",
-//             allowClear: true,
-//             url: baseUrl + 'api/v1/store/selectlist',
-//             dataType: 'json',
-//             delay: 250,
-//             headers: {
-//                 "X-Requested-With": 'XMLHttpRequest',
-//                 "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr('content')
-//             },
-//             data: function(params) {
-//                 var data = {
-//                     company_id: $("#company_select").val(),
-//                 };
-//                 return data;
-//             },
-//             processResults: function(data) {
-//                 var answer = {
-//                     results: data.items,
-//                     pagination: {
-//                         more: "true"
-//                     }
-//                 };
-//                 return answer;
-                
-//             },
-//         },
-//     });
-
-//     $(".contract_select").select2({
-
-//         ajax: {
-//             url: baseUrl + 'api/v1/contracts/selectlist',
-//             dataType: 'json',
-//             delay: 250,
-//             headers: {
-//                 "X-Requested-With": 'XMLHttpRequest',
-//                 "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr('content')
-//             },
-//             data: function(params) {
-//                 var data = {
-//                     store_id: $("#store_select").val(),
-//                 };
-//                 return data;
-//             },
-//             processResults: function(data, params) {
-//                 params.page = params.page || 1;
-//                 var answer = {
-//                     results: data.items,
-//                     pagination: {
-//                         more: "true"
-//                     }
-//                 };
-
-//                 return answer;
-//             },
-//             cache: true
-//         },
-//         escapeMarkup: function(markup) {
-//             return markup;
-//         }, 
-        
-        
-//     });
-//     $(".company_select").select2({
-
-//     ajax: {
-//         url: baseUrl + 'api/v1/companies/selectlist',
-//         dataType: 'json',
-//         delay: 250,
-//         headers: {
-//             "X-Requested-With": 'XMLHttpRequest',
-//             "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr('content')
-//         },
-//         data: function(params) {
-//             var data = {
-//                 contract_id: $(".contract_select").val(),
-//             };
-//             return data;
-//         },
-//         processResults: function(data, params) {
-//             params.page = params.page || 1;
-//             var answer = {
-//                 results: data.items,
-//                 pagination: {
-//                     more: "true"
-//                 }
-//             };
-
-//             return answer;
-//         },
-//         cache: true
-//     },
-//     escapeMarkup: function(markup) {
-//         return markup;
-//     }, 
-// }); 
 $('#company_select').change(function () { 
        $("#store_select").html('');
        $("#contract_select").html('');

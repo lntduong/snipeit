@@ -32,7 +32,7 @@ class BillingPresenter extends Presenter
                 "switchable" => true,
                 "title" => trans('admin/contracts/table.store'),
                 "visible" => true,
-                "formatter" => "locationsLinkObjFormatter"
+                "formatter" => "storeLinkObjFormatter"
             ],
             [
                 "field" => "location_id",

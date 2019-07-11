@@ -19,7 +19,7 @@ use App\Http\Transformers\SelectlistInventoryTransformer;
  * @version    v1.0
  * @author [Thinh.NP] 
  */
-class InventorysController extends Controller
+class InventoriesController extends Controller
 {
     public function offlineDataSync()
     {

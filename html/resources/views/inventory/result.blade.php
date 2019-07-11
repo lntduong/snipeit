@@ -20,7 +20,7 @@
                      {{-- Company-Name --}}
                      @include ('partials.forms.edit.company-select', ['translated_name' => trans('general.company'), 'fieldname' => 'company_id'])
                      {{-- Store-Name --}}
-                     @include ('partials.forms.edit.store', ['translated_name' =>  trans('general.store') , 'fieldname' => 'store_id'])
+                     @include ('partials.forms.edit.store-select', ['translated_name' => trans('admin/contracts/table.store'), 'fieldname' => 'store_id'])
                      {{-- Contract-Name --}}
                      @include ('partials.forms.edit.contract', ['translated_name' => trans('general.contract'), 'fieldname' => 'contract_id'])
                      {{-- Inventory-Name --}}
@@ -95,7 +95,7 @@
          data: function (params) {
              var data = {
                  search: params.term,
-                 company_id:$("#company_select").val(),
+                 company_id: ($("#company_select").val()) ? $("#company_select").val() : "-1",
                  page: params.page || 1,
              };
              return data;
@@ -213,8 +213,11 @@
    });
    $('#company_select').change(function () { 
        $("#store_select").html('');
+       $("#store_select").val('');
        $("#contract_select").html('');
+       $("#contract_select").val('');
        $("#inventory_select").html('');
+       $("#inventory_select").val('');
    }); 
    $('#store_select').change(function () { 
        $("#contract_select").html('');
@@ -225,7 +228,7 @@
    $('#contract_select').change(function () { 
        $("#inventory_select").html('');
        $("#inventory_select").val('');
-   }); 
+   });  
 </script>
 @stop
 

@@ -10,17 +10,12 @@
 @section('inputFields')
 
     @include ('partials.forms.edit.name', ['translated_name' => trans('admin/departments/table.name')])
-
     <!-- store -->
-    @include ('partials.forms.edit.store', ['translated_name' => 'Store', 'fieldname' => 'store_id','class' => 'js-data-ajax'])
-
-
+    @include ('partials.forms.edit.store-select', ['translated_name' => trans('admin/contracts/table.store'), 'fieldname' => 'store_id','class' => 'js-data-ajax'])
     <!-- Manager -->
     @include ('partials.forms.edit.user-select', ['translated_name' => trans('admin/users/table.manager'), 'fieldname' => 'manager_id'])
-
     <!-- Location -->
     @include ('partials.forms.edit.location-select', ['translated_name' => trans('general.location'), 'fieldname' => 'location_id'])
-
     <!-- Image -->
     @if ($item->image)
         <div class="form-group {{ $errors->has('image_delete') ? 'has-error' : '' }}">
@@ -32,7 +27,6 @@
             </div>
         </div>
     @endif
-
     @include ('partials.forms.edit.image-upload')
 
 @stop

@@ -2,8 +2,7 @@
 
 return array(
 
-    'does_not_exist' => 'Store does not exist.',
-
+    'not_found' => 'Store does not exist.',
     'create' => array(
         'error'   => 'Store was not created, please try again.',
         'success' => 'Store created successfully.'

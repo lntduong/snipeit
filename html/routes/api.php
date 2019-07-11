@@ -119,6 +119,38 @@ Route::group(['prefix' => 'v1','namespace' => 'Api', 'middleware' => 'api'], fun
         ]
     ); // Categories resource
 
+    Route::group(['prefix' => 'inventories'], function () {
+        Route::get('offlinedata',
+            [
+                'as' => 'api.inventories.offlinedata',
+                'uses' => 'InventoriesController@offlineDataSync'
+            ]
+    );
+    Route::post('checkasset',
+            [
+                'as' => 'api.inventories.checkasset',
+                'uses' => 'InventoriesController@create'
+            ] 
+        
+        );
+
+    Route::post('savelist',
+            [
+                'as' => 'api.inventories.savelist',
+                'uses' => 'InventoriesController@savelist'
+            ] 
+
+        );
+
+    Route::get('selectlist',
+            [
+                'as' => 'api.inventories.selectlist',
+                'uses' => 'InventoriesController@selectlist'
+            ] 
+
+        );
+
+    }); // inventory group
 
     /*--- Companies API ---*/
 

@@ -63,7 +63,6 @@ class StoreController extends Controller
             'stores.name',
             'stores.image',
         ]);
-        $store = $stores->where('company_id', $company_id)->orderBy('name', 'ASC')->paginate(50);
         if ($request->get('search')) {
             $stores = $stores->where('stores.name', 'LIKE', '%'.$request->get('search').'%');
         }

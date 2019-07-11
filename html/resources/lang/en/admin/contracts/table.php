@@ -20,5 +20,6 @@ return array(
     'select_store'          => 'Select a Store' ,
     'contracts_company'     => 'Company' ,
     'contract'              => 'Contract',
-    'list_billing'          => 'Billing List'
+    'list_billing'          => 'Billing List',
+    'select_contract'       => 'Select a Contract' ,
     );

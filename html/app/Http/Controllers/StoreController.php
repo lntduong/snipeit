@@ -89,7 +89,7 @@ class StoreController extends Controller
             $this->authorize('update', $item);
             return view('store/edit', compact('item'));
         }
-        return redirect()->route('store.index')->with('error', trans('admin/store/message.does_not_exist'));
+        return redirect()->route('store.index')->with('error', trans('admin/store/message.not_found'));
 
     }
     /**
@@ -102,7 +102,7 @@ class StoreController extends Controller
     public function update(ImageUploadRequest $request, $storeId = null)
     {
         if (is_null($store = Store::find($storeId))) {
-            return redirect()->route('store.index')->with('error', trans('admin/store/message.does_not_exist'));
+            return redirect()->route('store.index')->with('error', trans('admin/store/message.not_found'));
         }
 
         $this->authorize('update', $store);
@@ -153,7 +153,7 @@ class StoreController extends Controller
     public function destroy($storeId)
     {
         if (is_null($store = Store::find($storeId))) {
-            return redirect()->route('store.index')->with('error', trans('admin/store/message.does_not_exist'));
+            return redirect()->route('store.index')->with('error', trans('admin/store/message.not_found'));
         }
 
         $this->authorize('delete', $store);

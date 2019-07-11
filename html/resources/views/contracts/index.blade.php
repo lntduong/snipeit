@@ -17,15 +17,14 @@
 @section('content')
 
 <div class="row">
-  <div class="col-md-12">
-    <div class="box">
-      <div class="box-body">
-       
-          <div class="row">
-            <div class="col-md-12">
-              
+   <div class="col-md-12">
+      <div class="box">
+         <div class="box-body">
+            <div class="row">
+               <div class="col-md-3">
+              <div class="search-company" id="toolbar">
                 <div class="col-md-1" style="padding-top: 5px"><label> {{ trans('admin/contracts/table.contracts_company') }} </label> </div>
-                <div class="col-md-3">
+                <div class="col-md-4" style="margin-left: 35px; width: 215px;">
                   <select class="js-data-ajax" data-endpoint="companies" data-placeholder="{{ trans('general.select_company') }}" name="company" style="width: 100%" id="company">                      
                       @foreach ($listCompany as $company)
                       <option hidden disabled selected="selected">{{ trans('general.select_company') }}</option>
@@ -34,6 +33,10 @@
                   </select>
                 </div>
                 <button type="submit" style="margin-right: -3px;" class="btn btn-primary" onclick="filterCompany()" id="filterCompany">Go</button>
+                </div>
+            
+               </div>
+               <div class="col-md-12">
                 <table
                   data-click-to-select="true"
                   data-columns="{{ \App\Presenters\ContractPresenter::dataTableLayout() }}"
@@ -53,11 +56,15 @@
                   class="table table-striped snipe-table"
                   data-url="{{ route('api.contracts.index') }}" >
                 </table>
+                </div>
+               <!-- /.col -->
             </div>
-          </div>
+            <!-- /.row -->
+         </div>
+         <!-- /.box-body -->
       </div>
-    </div>
-  </div>
+      <!-- /.box -->
+   </div>
 </div>
 @stop
 

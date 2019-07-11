@@ -8,7 +8,7 @@
                         {{ (\App\Models\Store::find($storeSelect)) ? \App\Models\Store::find($storeSelect)->name : '' }}
                     </option>
                 @else
-                    <option value="">{{ trans('general.select_company') }}</option>
+                    <option value="">{{ trans('admin.store.table.select_store') }}</option>
                 @endif
             </select>
         </div>
