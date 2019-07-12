@@ -26,13 +26,31 @@ class ContractPresenter extends Presenter
              
             ],
             [
-                "field" => "store_id",
+                "field" => "object_id",
                 "searchable" => false,
                 "sortable" => true,
                 "switchable" => true,
-                "title" => trans('admin/contracts/table.store'),
+                "title" => "Company",
                 "visible" => true,
-                "formatter" => "storeLinkObjFormatter"
+                //"formatter" => "polymorphicItemFormatter"
+            ],
+            [
+                "field" => "object_id",
+                "searchable" => false,
+                "sortable" => true,
+                "switchable" => true,
+                "title" => "Store",
+                "visible" => true,
+                //"formatter" => "polymorphicItemFormatter"
+            ],
+            [
+                "field" => "object_id",
+                "searchable" => false,
+                "sortable" => true,
+                "switchable" => true,
+                "title" => "Department",
+                "visible" => true,
+                //"formatter" => "polymorphicItemFormatter"
             ],
             [
                 "field" => "location_id",

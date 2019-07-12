@@ -16,7 +16,7 @@ class ContractsController extends Controller
         $contractList = Contract::select([
             'contracts.id',
             'contracts.name',
-            'contracts.store_id',
+            'contracts.object_id',
             'contracts.location_id',
             'contracts.contact_id_1',
             'contracts.contact_id_2',
@@ -24,14 +24,20 @@ class ContractsController extends Controller
             'contracts.end_date',
             'contracts.billing_date',
             'contracts.payment_date',
-        ])->join('stores','stores.id','=','contracts.store_id');
+            // 'departments.name',
+            // 'stores.name',
+            // 'companies.name' 
+        ]);
+        // ->leftJoin('departments', 'contracts.object_id', '=' ,'departments.id')->on('contracts.object_type', '=' ,"App\\Models\\Department" )
+        // ->leftJoin('stores', 'contracts.object_id', '=' ,'stores.id')->on('contracts.object_type', '=' , "App\\Models\\Store" )
+        // ->leftJoin('companies', 'contracts.object_id', '=' ,'companies.id')->on('contracts.object_type', '=' ,"App\\Models\\Company");
 
         if($request->input('company')){
             $contractList = $contractList->where('stores.company_id','=',$request->input('company'));
         }
-        if ($request->has('store_id')) {
-            $contractList = $contractList->where('contracts.store_id','=',$request->input('store'));
-        }
+        // if ($request->has('store_id')) {
+        //     $contractList = $contractList->where('contracts.store_id','=',$request->input('store'));
+        // }
         if($request->input('contract')){
             $contractList = $contractList->where('contracts.id','=',$request->input('contract'));
         }

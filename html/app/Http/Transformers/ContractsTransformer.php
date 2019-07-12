@@ -22,11 +22,8 @@ class ContractsTransformer
         $array = [
             'id' => (Int) $contract->id,
             'name' => $contract->name,
-           
-            'store_id' => ($contract->store_id) ? [
-                'id' => (int) $contract->store->id,
-                'name'=> e($contract->store->name)
-            ]  : null,
+            //'object_id' => $this->transformObjectId($contract),
+            'object_id' => $contract->object_id,
             'location_id' => ($contract->location_id) ? [
                 'id' => (int) $contract->location->id,
                 'name'=> e($contract->location->name)
@@ -51,5 +48,20 @@ class ContractsTransformer
         ];
         $array += $permissions_array;
         return $array;
+    }
+    public function transformObjectId($contract)
+    {
+        if ($contract->checkedOutToUser()) {
+            return $contract->assigned ? [
+                    'id' => (int) $contract->assigned->id,
+                    'name' => e($contract->assigned->getFullNameAttribute()),
+                    'type' => 'company'
+                ] : null;
+        }
+        return $contract->assigned ? [
+            'id' => $contract->assigned->id,
+            'name' => $contract->assigned->display_name,
+            'type' => $contract->objectType()
+        ] : null;
     }
 }

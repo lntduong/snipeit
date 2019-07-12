@@ -11,7 +11,7 @@
 
     @include ('partials.forms.edit.name', ['translated_name' => trans('admin/departments/table.name')])
     <!-- store -->
-    @include ('partials.forms.edit.store-select', ['translated_name' => trans('admin/contracts/table.store'), 'fieldname' => 'store_id','class' => 'js-data-ajax'])
+    @include ('partials.forms.edit.store-select-contracts', ['translated_name' => trans('admin/contracts/table.store'), 'fieldname' => 'store_id','class' => 'js-data-ajax'])
     <!-- Manager -->
     @include ('partials.forms.edit.user-select', ['translated_name' => trans('admin/users/table.manager'), 'fieldname' => 'manager_id'])
     <!-- Location -->
