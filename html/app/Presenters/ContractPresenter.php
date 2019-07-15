@@ -26,7 +26,7 @@ class ContractPresenter extends Presenter
              
             ],
             [
-                "field" => "object_id",
+                "field" => "company_name",
                 "searchable" => false,
                 "sortable" => true,
                 "switchable" => true,
@@ -35,7 +35,7 @@ class ContractPresenter extends Presenter
                 //"formatter" => "polymorphicItemFormatter"
             ],
             [
-                "field" => "object_id",
+                "field" => "store_id",
                 "searchable" => false,
                 "sortable" => true,
                 "switchable" => true,

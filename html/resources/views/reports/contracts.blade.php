@@ -41,6 +41,7 @@
                         <div class="row">
                         <div class="col-md-12">
                             <div class="btn-group reports">
+                            <a href="{{ route('reports.activity') }}" type="button" class="btn btn-primary">{{ $contractList->company_name }}</a>
                                 <a href="{{ route('reports.activity') }}" type="button" class="btn btn-primary">{{ trans('general.all') }}</a>
                                 <a href="{{ route('reports.contracts') }}" type="button" class="active btn btn-primary">{{ trans('general.contracts') }} </a>
                             </div>

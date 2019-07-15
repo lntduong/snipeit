@@ -52,9 +52,15 @@ final class Contract extends SnipeModel
         return $this->belongsTo('\App\Models\Location', 'location_id');
     }
 
+    // public function store()
+    // {
+    //     return $this->belongsTo('\App\Models\Store', 'store_id');
+    // }
     public function store()
     {
-        return $this->belongsTo('\App\Models\Store', 'store_id');
+        return $this->belongsTo('\App\Models\Store', 'store_id')
+                  ->where('store_id', '=', 'object_id')
+                  ->where('action_type', '=', '\App\Models\Store');
     }
     public function asset()
     {

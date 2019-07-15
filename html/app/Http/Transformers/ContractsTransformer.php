@@ -24,6 +24,10 @@ class ContractsTransformer
             'name' => $contract->name,
             //'object_id' => $this->transformObjectId($contract),
             'object_id' => $contract->object_id,
+            'store_id' => ($contract->store_id) ? [
+                'id' => (int) $contract->store->id,
+                'name'=> e($contract->store->name)
+            ]  : null,
             'location_id' => ($contract->location_id) ? [
                 'id' => (int) $contract->location->id,
                 'name'=> e($contract->location->name)

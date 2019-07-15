@@ -24,14 +24,19 @@ class ContractsController extends Controller
             'contracts.end_date',
             'contracts.billing_date',
             'contracts.payment_date',
-            // 'departments.name',
-            // 'stores.name',
-            // 'companies.name' 
-        ]);
-        // ->leftJoin('departments', 'contracts.object_id', '=' ,'departments.id')->on('contracts.object_type', '=' ,"App\\Models\\Department" )
-        // ->leftJoin('stores', 'contracts.object_id', '=' ,'stores.id')->on('contracts.object_type', '=' , "App\\Models\\Store" )
-        // ->leftJoin('companies', 'contracts.object_id', '=' ,'companies.id')->on('contracts.object_type', '=' ,"App\\Models\\Company");
+            'companies.name AS company_name',
+            'stores.name AS store_name',
+            'departments.name AS department_name' 
+        ])
+        ->leftJoin('companies', 'companies.id', '=' ,
+        \DB::raw('(CASE WHEN contracts.object_type = "App\Models\Company" THEN contracts.object_id ELSE null END )' ))
 
+        ->leftJoin('stores', 'stores.id', '=' ,
+        \DB::raw('(CASE WHEN contracts.object_type = "App\Models\Store" THEN contracts.object_id ELSE null END )' ))
+
+        ->leftJoin('departments', 'departments.id', '=' ,
+        \DB::raw('(CASE WHEN contracts.object_type = "App\Models\Department" THEN contracts.object_id ELSE null END )' ));
+	
         if($request->input('company')){
             $contractList = $contractList->where('stores.company_id','=',$request->input('company'));
         }
@@ -52,7 +57,6 @@ class ContractsController extends Controller
         $contractList = $contractList->orderBy($sort, $order)->skip($offset)->take($limit)->get();
 
         return response()->json((new ContractsTransformer)->transformContractList($contractList, $total), 200, ['Content-Type' => 'application/json;charset=utf8'], JSON_UNESCAPED_UNICODE);
-
     }
 
     public function selectlist(Request $request)
