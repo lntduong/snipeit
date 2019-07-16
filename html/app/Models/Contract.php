@@ -7,24 +7,30 @@ use App\Models\Traits\Searchable;
 
 final class Contract extends SnipeModel
 {
-    const COMPANY = 'company';
     protected $table = 'contracts';
 
     protected $presenter = 'App\Presenters\ContractPresenter';
     public $rules = array(
             'name' => 'required',
+            'store_id' => 'required',
             'start_date' => 'required',
             'end_date'  => 'required',
-            'billing_date'  => 'required',
-            'object_id' => 'required',
+            'store_id' => 'required',
+            'billing_date' => 'required'
     );
     use ValidatingTrait;
     use Searchable;
+    use Loggable;
     protected $searchableAttributes = ['name', 'created_at', 'updated_at']; 
+    protected $searchableRelations = [
+        'store'      => ['name'],
+        'location'   => ['name'],
+        'user'       => ['last_name'],
+        'user2'      => ['last_name']
+    ];   
     protected $fillable = [
         'id',
-        'object_id' , 
-        'object_type' ,
+        'store_id' , 
         'name' ,
         'location_id' ,
         'contact_id_1' ,
@@ -52,39 +58,22 @@ final class Contract extends SnipeModel
         return $this->belongsTo('\App\Models\Location', 'location_id');
     }
 
-    // public function store()
-    // {
-    //     return $this->belongsTo('\App\Models\Store', 'store_id');
-    // }
     public function store()
     {
-        return $this->belongsTo('\App\Models\Store', 'store_id')
-                  ->where('store_id', '=', 'object_id')
-                  ->where('action_type', '=', '\App\Models\Store');
+        return $this->belongsTo('\App\Models\Store', 'store_id');
     }
     public function asset()
     {
         return $this->belongsToMany(Asset::class);
     }
-    public function assetlog()
+
+    public function contract_assets()
     {
-        return $this->hasMany('\App\Models\Actionlog', 'item_id')->where('item_type', Component::class)->orderBy('created_at', 'desc')->withTrashed();
-    }
-    public function checkedOutToUser()
-    {
-      return $this->objectType() === self::COMPANY;
-    }
-    public function objectId()
-    {
-        return $this->morphTo('assigned', 'object_id', 'object_type');
+        return $this->belongsToMany(ContractAsset::class);
     }
 
-    public function assignedCompanies()
+    public function assetlog()
     {
-        return $this->morphMany('App\Models\Company', 'assigned', 'object_id', 'object_type')->withTrashed();
-    }
-    public function objectType()
-    {
-        return strtolower(class_basename($this->object_type));
+        return $this->hasMany('\App\Models\Actionlog', 'item_id')->where('item_type', Contract::class)->orderBy('created_at', 'desc')->withTrashed();
     }
 }

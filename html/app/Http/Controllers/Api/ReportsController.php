@@ -35,12 +35,12 @@ class ReportsController extends Controller
             $actionlogs = $actionlogs->where('item_type','=',"App\\Models\\".ucwords($request->input('contract_type')));
         } 
 
-        if (($request->has('target_type'))  && ($request->has('target_id'))) {
+        if (($request->has('target_type')) && ($request->has('target_id'))) {
             $actionlogs = $actionlogs->where('target_id','=',$request->input('target_id'))
                 ->where('target_type','=',"App\\Models\\".ucwords($request->input('target_type')));
         }
 
-        if (($request->has('item_type'))  && ($request->has('item_id'))) {
+        if (($request->has('item_type')) && ($request->has('item_id'))) {
             $actionlogs = $actionlogs->where('item_id','=',$request->input('item_id'))
                 ->where('item_type','=',"App\\Models\\".ucwords($request->input('item_type')));
         }

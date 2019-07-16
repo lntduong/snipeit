@@ -8,7 +8,7 @@ use App\Models\Actionlog;
 use Auth;
     /**
      *
-     * @author [duong.LNT] [duong.lnt@vn.vinx.asia]
+     * @author [duong.LNT]
      */
 class ContractObserver
 {
@@ -18,19 +18,15 @@ class ContractObserver
      * @param  Component  $component
      * @return void
      */
-    public function updated(Contract $contract)
-    {
-        if (($contract->getAttributes()['id'] == $contract->getOriginal()['id']))
-        {
+    public function updated(Contract $contract) {
+        if (($contract->getAttributes()['id'] == $contract->getOriginal()['id'])) {
             $changed = [];
-
             foreach ($contract->getOriginal() as $key => $value) {
                 if ($contract->getOriginal()[$key] != $contract->getAttributes()[$key]) {
                     $changed[$key]['old'] = $contract->getOriginal()[$key];
                     $changed[$key]['new'] = $contract->getAttributes()[$key];
                 }
             }
-
 
             $logAction = new Actionlog();
             $logAction->item_type = Contract::class;
@@ -39,7 +35,6 @@ class ContractObserver
             $logAction->user_id = Auth::id();
             $logAction->log_meta = json_encode($changed);
             $logAction->logaction('update');
-
         } 
     }
 
@@ -51,15 +46,13 @@ class ContractObserver
      * @param  Component  $component
      * @return void
      */
-    public function created(Contract $contract)
-    {
+    public function created(Contract $contract) {
         $logAction = new Actionlog();
         $logAction->item_type = Contract::class;
         $logAction->item_id = $contract->id;
         $logAction->created_at =  date("Y-m-d H:i:s");
         $logAction->user_id = Auth::id();
         $logAction->logaction('create');
-
     }
 
     /**
@@ -68,8 +61,7 @@ class ContractObserver
      * @param  Component  $component
      * @return void
      */
-    public function deleting(Contract $contract)
-    {
+    public function deleting(Contract $contract) {
         $logAction = new Actionlog();
         $logAction->item_type = Contract::class;
         $logAction->item_id = $contract->id;

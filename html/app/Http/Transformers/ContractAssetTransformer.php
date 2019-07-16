@@ -2,11 +2,10 @@
 namespace App\Http\Transformers;
 
 use Gate;
-use App\Models\ContractAssets;
+use App\Models\ContractAsset;
 use Illuminate\Support\Collection;
 /**
  * @author [Duong.LNT]
- * @email: duong.lnt@vn.vinx.asia 
  */
 class ContractAssetTransformer
 {
@@ -20,7 +19,7 @@ class ContractAssetTransformer
         return (new DatatablesTransformer)->transformDatatables($array, $total);
     }
 
-    public function transformContract (ContractAssets $contract)
+    public function transformContract (ContractAsset $contract)
     {
         $array = [
             'id' => (Int) $contract->id,      

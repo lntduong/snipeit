@@ -22,8 +22,7 @@ class ContractsTransformer
         $array = [
             'id' => (Int) $contract->id,
             'name' => $contract->name,
-            //'object_id' => $this->transformObjectId($contract),
-            'object_id' => $contract->object_id,
+           
             'store_id' => ($contract->store_id) ? [
                 'id' => (int) $contract->store->id,
                 'name'=> e($contract->store->name)
@@ -49,23 +48,11 @@ class ContractsTransformer
         $permissions_array['available_actions'] = [
             'update' => (bool) Gate::allows('update', Contract::class),
             'delete' => (bool) Gate::allows('delete', Contract::class),
+            // 'delete'   => ((bool) Gate::allows('delete', Contract::class) 
+            // && ($contract->contract_assets ? false : true) 
+            // && ($contract->deleted_at=='')) ? true : false,
         ];
         $array += $permissions_array;
         return $array;
-    }
-    public function transformObjectId($contract)
-    {
-        if ($contract->checkedOutToUser()) {
-            return $contract->assigned ? [
-                    'id' => (int) $contract->assigned->id,
-                    'name' => e($contract->assigned->getFullNameAttribute()),
-                    'type' => 'company'
-                ] : null;
-        }
-        return $contract->assigned ? [
-            'id' => $contract->assigned->id,
-            'name' => $contract->assigned->display_name,
-            'type' => $contract->objectType()
-        ] : null;
     }
 }

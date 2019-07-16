@@ -2,31 +2,30 @@
 namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Models\ContractAssets;
+use App\Models\ContractAsset;
 use App\Models\Contract;
 use App\Models\Asset;
 use Illuminate\Support\Facades\Auth;
 use DB;
 /**
  * @author [Duong.LNT]
- * @email: duong.lnt@vn.vinx.asia 
  */
 class ContractAssetController extends Controller
 {
     public function storeAsset(Request $request) 
     {
-        $check = ContractAssets::where('contract_assets.contract_id' , '=' ,$request->contract_id)
+        $check = ContractAsset::where('contract_assets.contract_id' , '=' ,$request->contract_id)
                 ->where('contract_assets.asset_id', '=' , $request->asset_id)
                 ->count();
         if($check <= 0) {
-            $contract = new ContractAssets([
+            $contract = new ContractAsset([
                 'contract_id' => $request->contract_id,
                 'asset_id' => $request->asset_id,
                 'user_id' => Auth::id(),
             ]);
             $contract->save();
         }
-        $listAssets = ContractAssets::select([
+        $listAssets = ContractAsset::select([
             'assets.id',
             'assets.image',
             'models.name',
@@ -45,7 +44,7 @@ class ContractAssetController extends Controller
             ->where('asset_id','=' , $request->asset_id)
             ->delete();
 
-        $listAssets = ContractAssets::select([
+        $listAssets = ContractAsset::select([
             'assets.id',
             'assets.image',
             'models.name',
@@ -60,7 +59,7 @@ class ContractAssetController extends Controller
 
     public function getAssetContractByIdContract(Request $request) 
     {
-        $listAssets = ContractAssets::select([
+        $listAssets = ContractAsset::select([
             'assets.id',
             'assets.image',
             'models.name',

@@ -1,6 +1,5 @@
 <!-- **
  * @author [Duong.LNT]
- * @email: duong.lnt@vn.vinx.asia 
  * -->
 <table
     data-columns="{{ \App\Presenters\ContractAssetsPresenter::dataTableLayout() }}"

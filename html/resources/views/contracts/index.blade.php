@@ -10,7 +10,7 @@
 
 @section('header_right')
   <a href="{{ route('contracts.create') }}" class="btn btn-primary pull-right"></i> {{ trans('general.create') }}</a>
-  <a href="{{ route('getBillingIndex')  }}" class="btn btn-info pull-right" style="margin-right: 10px;"></i> {{ trans('general.billing_list') }}</a>
+  <a href="{{ route('contracts.billing')  }}" class="btn btn-info pull-right" style="margin-right: 10px;"></i> {{ trans('general.billing_list') }}</a>
 @stop
 
 {{-- Page content --}}

@@ -10,7 +10,6 @@ use DateTime;
  */
 /**
  * @author [Duong.LNT]
- * @email: duong.lnt@vn.vinx.asia 
  */
 class ContractAssetsPresenter extends Presenter
 {

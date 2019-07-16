@@ -27,6 +27,15 @@ Route::group(['middleware' => 'auth'], function () {
     /*
     * Contracts
     */
+
+    Route::group(['middleware' => ['auth']], function () {
+
+        Route::get('contracts/billing', [
+            'as' => 'contracts.billing',
+            'uses' => 'ContractsController@billing'
+        ]);
+    });
+
     Route::resource('contracts', 'ContractsController', [
         'parameters' => ['contracts' => 'contracts_id']
     ]);
@@ -38,7 +47,6 @@ Route::group(['middleware' => 'auth'], function () {
         'parameters' => ['inventory' => 'inventory_id']
     ]);
 
-    Route::get('contracts/billing', 'ContractsController@getBillingIndex')->name('getBillingIndex');
     /*
     * Manufacturers
     */

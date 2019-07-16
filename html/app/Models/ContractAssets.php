@@ -5,8 +5,7 @@ use App\Models\SnipeModel;
 use Watson\Validating\ValidatingTrait;
 use App\Models\Traits\Searchable;
 /**
- * @author [Duong.LNT]
- * @email: duong.lnt@vn.vinx.asia 
+ * @author [Duong.LNT] 
  */
 final class ContractAssets extends SnipeModel
 {

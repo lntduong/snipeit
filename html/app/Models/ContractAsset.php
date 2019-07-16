@@ -17,12 +17,17 @@ final class ContractAsset extends SnipeModel
 
     // protected $presenter = 'App\Presenters\ContractPresenter';
 
-    use ValidatingTrait;
+    //use ValidatingTrait;
 
     // protected $searchableAttributes = ['name', 'created_at', 'updated_at']; 
-    protected $fillable = [
-                            'contract_id' , 
-                            'asset_id' ,
-                            'user_id',
-                        ];
+    protected $fillable = ['contract_id' , 'asset_id' ,'user_id',];
+    public function asset()
+    {
+        return $this->belongsToMany(Asset::class);
+    }
+
+    public function contract()
+    {
+        return $this->belongsTo(Contract::class);
+    }
 }

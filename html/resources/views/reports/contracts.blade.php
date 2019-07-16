@@ -41,7 +41,6 @@
                         <div class="row">
                         <div class="col-md-12">
                             <div class="btn-group reports">
-                            <a href="{{ route('reports.activity') }}" type="button" class="btn btn-primary">{{ $contractList->company_name }}</a>
                                 <a href="{{ route('reports.activity') }}" type="button" class="btn btn-primary">{{ trans('general.all') }}</a>
                                 <a href="{{ route('reports.contracts') }}" type="button" class="active btn btn-primary">{{ trans('general.contracts') }} </a>
                             </div>
@@ -51,7 +50,7 @@
                             {{-- Company-Name --}}
                             @include ('partials.forms.edit.company-select', ['translated_name' => trans('general.company'), 'fieldname' => 'company_id'])
                             {{-- Store-Name --}}
-                            @include ('partials.forms.edit.store-select-contracts', ['translated_name' =>  trans('general.store') , 'fieldname' => 'store_id'])
+                            @include ('partials.forms.edit.store-select-report', ['translated_name' =>  trans('general.store') , 'fieldname' => 'store_id'])
                             {{-- Contract-Name --}}
                             @include ('partials.forms.edit.contract', ['translated_name' => trans('general.contract'), 'fieldname' => 'contract_id'])
                             <button id="searchContractReport" class="btn btn-info" onclick="searchContractReport()">Go</button>
@@ -85,7 +84,7 @@
                         <tr>
                             <th data-field="icon" style="width: 40px;" class="hidden-xs" data-formatter="iconFormatter"></th>
                             <th class="col-sm-3" data-searchable="false" data-sortable="true" data-field="created_at" data-formatter="dateDisplayFormatter">{{ trans('general.date') }}</th>
-                            <th class="col-sm-2" data-field="admin" data-formatter="usersLinkObjFormatter">{{ trans('general.admin') }}</th>
+                            <th class="col-sm-2" data-field="admin" data-formatter="usersLinkObjFormatter">{{ trans('general.user') }}</th>
                             <th class="col-sm-2" data-field="action_type">{{ trans('general.action') }}</th>
                             <th class="col-sm-1" data-field="type" data-formatter="itemTypeFormatter">{{ trans('general.type') }}</th>
                             <th class="col-sm-3" data-field="item" data-formatter="polymorphicItemFormatter">{{ trans('general.item') }}</th>

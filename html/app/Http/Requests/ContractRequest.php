@@ -25,9 +25,10 @@ class ContractRequest extends Request
     {
         return [
             'name' => 'required',
+            'store_id' => 'required',
             'start_date' => 'required',
             'end_date'  => 'required',
-            'billing_date'  => 'required',
+            'billing_date'  => 'required'
         ];
     }
 

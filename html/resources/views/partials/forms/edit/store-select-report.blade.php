@@ -1,7 +1,7 @@
 
 <div id="{{ $fieldname }}" class="form-group{{ $errors->has($fieldname) ? ' has-error' : '' }}">
     {{ Form::label($fieldname, $translated_name, array('class' => 'col-md-3 control-label')) }}
-    <div class="col-md-7{{  (\App\Helpers\Helper::checkIfRequired($item, 'store_id')) ? ' required' : '' }}">
+    <div class="col-md-7{{isset($required) ? ((\App\Helpers\Helper::checkIfRequired($item, 'contract_id')) ? ' required' : '') : '' }}">
         <select class="store_select" data-endpoint="store" data-placeholder="Select Store" name="{{ $fieldname }}" style="width: 100%" id="store_select">
             @if ($store_id = Input::old($fieldname, (isset($item)) ? $item->{$fieldname} : ''))
                 <option value="{{ $store_id }}" selected="selected">

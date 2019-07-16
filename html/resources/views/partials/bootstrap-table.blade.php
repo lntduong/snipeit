@@ -300,6 +300,10 @@
                 item_destination = 'store'
                 item_icon = 'fa-map-marker';
             }
+            else if (value.type == 'contract') {
+                item_destination = 'contracts'
+                item_icon = 'fa-map-marker';
+            }
             
 
             return '<nobr><a href="{{ url('/') }}/' + item_destination +'/' + value.id + '" data-tooltip="true" title="' + value.type + '"><i class="fa ' + item_icon + ' text-blue"></i> ' + value.name + '</a></nobr>';

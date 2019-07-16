@@ -26,35 +26,17 @@ class ContractPresenter extends Presenter
              
             ],
             [
-                "field" => "company_name",
-                "searchable" => false,
-                "sortable" => true,
-                "switchable" => true,
-                "title" => "Company",
-                "visible" => true,
-                //"formatter" => "polymorphicItemFormatter"
-            ],
-            [
                 "field" => "store_id",
-                "searchable" => false,
+                "searchable" => true,
                 "sortable" => true,
                 "switchable" => true,
-                "title" => "Store",
+                "title" => trans('admin/contracts/table.store'),
                 "visible" => true,
-                //"formatter" => "polymorphicItemFormatter"
-            ],
-            [
-                "field" => "object_id",
-                "searchable" => false,
-                "sortable" => true,
-                "switchable" => true,
-                "title" => "Department",
-                "visible" => true,
-                //"formatter" => "polymorphicItemFormatter"
+                "formatter" => "storeLinkObjFormatter"
             ],
             [
                 "field" => "location_id",
-                "searchable" => false,
+                "searchable" => true,
                 "sortable" => true,
                 "switchable" => true,
                 "title" => trans('admin/contracts/table.location'),
@@ -64,7 +46,7 @@ class ContractPresenter extends Presenter
 
             [
                 "field" => "contact_id_1",
-                "searchable" => false,
+                "searchable" => true,
                 "sortable" => true,
                 "switchable" => true,
                 "title" =>  trans('admin/contracts/table.contact_person1'),
@@ -73,7 +55,7 @@ class ContractPresenter extends Presenter
             ],
             [
                 "field" => "contact_id_2",
-                "searchable" => false,
+                "searchable" => true,
                 "sortable" => true,
                 "switchable" => true,
                 "title" =>  trans('admin/contracts/table.contact_person2'),

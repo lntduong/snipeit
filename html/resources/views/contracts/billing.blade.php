@@ -1,6 +1,5 @@
 <!-- **
  * @author [Duong.LNT]
- * @email: duong.lnt@vn.vinx.asia 
  * -->
 @extends('layouts/default')
 @section('title')
