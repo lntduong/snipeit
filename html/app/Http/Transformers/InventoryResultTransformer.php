@@ -29,7 +29,8 @@ class InventoryResultTransformer
             'status_label'   => ($inventoryresult->status_id) ? [
                 'id'         => (int) $inventoryresult->status_id,
                 'name'       => e($inventoryresult->status_name),
-                'status_meta'=> self::getStatuslabelType($inventoryresult->status_pen,$inventoryresult->status_arc,$inventoryresult->status_dep),
+                'status_type'=> self::getStatuslabelType($inventoryresult->status_pen,$inventoryresult->status_arc,$inventoryresult->status_dep),
+                'status_meta' => ($inventoryresult->assigned_to) ? 'deployed' :'deployable',
             ] : null,
 
         ];

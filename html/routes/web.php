@@ -40,13 +40,6 @@ Route::group(['middleware' => 'auth'], function () {
         'parameters' => ['contracts' => 'contracts_id']
     ]);
 
-     /*
-    * Inventory
-    */
-    Route::resource('inventories', 'InventorysController', [
-        'parameters' => ['inventory' => 'inventory_id']
-    ]);
-
     /*
     * Manufacturers
     */
@@ -107,7 +100,7 @@ Route::group(['middleware' => 'auth'], function () {
 |--------------------------------------------------------------------------
 |
 | Routes for various modal dialogs to interstitially create various things
-| 
+|
 */
 
 Route::group(['middleware' => 'auth','prefix' => 'modals'], function () {
@@ -512,5 +505,3 @@ Route::resource('inventoryresults', 'InventoryResultController', [
     'parameters' => ['inventoryresult' => 'inventoryresult_id']
 ]);
 Auth::routes();
-
-

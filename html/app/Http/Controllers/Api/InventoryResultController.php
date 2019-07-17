@@ -44,10 +44,11 @@ class InventoryResultController extends Controller
         max(t2.status_dep) as status_dep,
         max(t2.pen) as status_pen,
         max(t2.arc) as status_arc,
-        max(t2.asset_tag) as asset_tag
+        max(t2.asset_tag) as asset_tag,
+        max(t2.assigned_to) as assigned_to
        from 
        (
-       select inventory_results.inventory_id,asset_id,checked_time,familiar,assets.name,assets.image,models.image as image_model,status_labels.id as status_id,status_labels.name as status_name,status_labels.deployable as status_dep,status_labels.pending as pen,status_labels.archived as arc,assets.asset_tag as asset_tag
+       select inventory_results.inventory_id,asset_id,checked_time,familiar,assets.name,assets.image,models.image as image_model,status_labels.id as status_id,status_labels.name as status_name,status_labels.deployable as status_dep,status_labels.pending as pen,status_labels.archived as arc,assets.asset_tag as asset_tag,assets.assigned_to as assigned_to
        from inventory_results
        JOIN assets on assets.id = inventory_results.asset_id AND assets.deleted_at is null
        JOIN models ON models.id = assets.model_id AND models.deleted_at is null
@@ -56,7 +57,7 @@ class InventoryResultController extends Controller
        
        UNION
        
-       select inventories.id,asset_id,null,null,assets.name,assets.image,models.image as image_model,null,null,null,null,null,assets.asset_tag as asset_tag
+       select inventories.id,asset_id,null,null,assets.name,assets.image,models.image as image_model,null,null,null,null,null,assets.asset_tag as asset_tag,assets.assigned_to as assigned_to
        from inventories
        JOIN contracts ON inventories.contract_id = contracts.id  and contracts.deleted_at IS NULL
        JOIN contract_assets ON contracts.id = contract_assets.contract_id   and contract_assets.deleted_at IS NULL

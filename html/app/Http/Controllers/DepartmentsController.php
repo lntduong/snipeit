@@ -46,6 +46,7 @@ class DepartmentsController extends Controller
         $this->authorize('create', Department::class);
         $department = new Department;
         $department->fill($request->all());
+        $department->store_id=$request->input('store_id');
         $department->user_id = Auth::user()->id;
         $department->manager_id = ($request->has('manager_id' ) ? $request->input('manager_id') : null);
 
@@ -161,10 +162,9 @@ class DepartmentsController extends Controller
         }
 
         $this->authorize('update', $department);
-
         $department->fill($request->all());
+        $department->store_id=$request->input('store_id');
         $department->manager_id = ($request->has('manager_id' ) ? $request->input('manager_id') : null);
-
         $old_image = $department->image;
 
         // Set the model's image property to null if the image is being deleted

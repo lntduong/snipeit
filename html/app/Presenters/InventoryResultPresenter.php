@@ -43,7 +43,7 @@ class InventoryResultPresenter extends Presenter
                 "sortable" => true,
                 "title" => trans('admin/hardware/table.asset_tag'),
                 "visible" => true,
-                "formatter" => "hardwareLinkFormatter"
+                "formatter" => "inventoryresultsHardwareLinkFormatter"
             ],
             [
                 "field" => "checked",

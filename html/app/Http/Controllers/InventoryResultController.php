@@ -2,7 +2,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\InventoryResult;
+use App\Helpers\Helper;
 use App\Models\Inventory;
+use App\Models\Setting;
 /**
  * This class controls all actions related to inventory for
  * the Snipe-IT Asset Management application.
@@ -22,12 +24,27 @@ class InventoryResultController extends Controller
         $this->authorize('view', InventoryResult::class);
         return view('inventory/result',['item'=> new InventoryResult]);
     }
+
+    /**
+    * create a inventory result.
+    *
+    * @return \Illuminate\InventoryResult\View\View
+    */
+    public function create()
+    {
+        $setting = Setting::first();
+        return view('inventory/edit')
+            ->with('item', new InventoryResult)
+            ->with('statuslabel_list', Helper::statusLabelList())
+            ->with('asset_tag', $setting->auto_increment_prefix);
+    }
+
     /**
     * show a inventory.
     *
     * @param int $inventoryId
     * @return \Illuminate\InventoryResult\View\View
-     */
+    */
     public function show($inventoryId=null)
     {
         if (is_null($inventory = Inventory::find($inventoryId))) {
@@ -36,7 +53,7 @@ class InventoryResultController extends Controller
         $this->authorize('create', $inventory);
         $inventory =Inventory::select('inventories.id as inventory_id','contract_id','store_id','company_id')
         ->join('contracts', 'contracts.id', '=', 'inventories.contract_id')
-        ->join('stores', 'stores.id', '=', 'contracts.store_id') 
+        ->join('stores', 'stores.id', '=', 'contracts.store_id')
         ->where('inventories.id','=',$inventoryId)
         ->first();
         return view('inventory/result')

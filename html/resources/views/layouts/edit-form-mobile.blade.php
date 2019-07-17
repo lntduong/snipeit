@@ -11,8 +11,7 @@
 @stop
 
 @section('header_right')
-<a href="#" id="offdata" class="pull-right">
-    Offline Data Sync </a>
+<a href="#" id="offdata" class="btn btn-primary pull-right" style="margin-right: 5px;">  Offline Data Sync</a>
 @stop
 
 {{-- Page content --}}
@@ -20,21 +19,8 @@
 @section('content')
 
 <div class="row">
-    <div class="col-md-8 col-md-offset-2">
+    <div class="col-md-12">
         <div class="box box-default">
-            <div class="box-header with-border">
-            <h3 class="box-title">
-            @if ($item->id)
-            {{ $item->display_name }}
-            @endif
-            </h3>
-                @if (isset($helpText))
-                    <div class="box-tools pull-right">
-                        <button class="slideout-menu-toggle btn btn-box-tool btn-box-tool-lg" data-toggle="tooltip" title="Help"><i class="fa fa-question"></i></button>
-                    </div>
-                @endif
-            </div><!-- /.box-header -->
-
             <div class="box-body">
                 <form id="create-form" class="form-horizontal" method="post" action="{{ (isset($formAction)) ? $formAction : \Request::url()  }}" autocomplete="off" role="form" enctype="multipart/form-data">
 

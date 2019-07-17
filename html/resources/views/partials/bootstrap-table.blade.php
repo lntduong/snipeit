@@ -114,6 +114,8 @@
             if (value) {
                 if(destination == 'inventoryresults'){
                     return '<a href="{{ url('/hardware') }}/' + row.deviece + '"> ' + row.name + '</a>';
+                }else if(destination =='inventoryresultsHardware'){
+                    return '<a href="{{ url('/hardware') }}/' + row.deviece + '"> ' + value + '</a>';
                 }
                 else{
                     return '<a href="{{ url('/') }}/' + destination + '/' + row.id + '"> ' + value + '</a>';
@@ -299,7 +301,7 @@
                 item_icon = 'fa-map-marker';
             } else if (value.type == 'inventoryResult') {
                 item_destination = 'inventoryresults'
-                item_icon = 'fa-map-marker';
+                item_icon = 'fa-barcode';
                 
                 return '<nobr><a href="{{ url('/') }}/' + item_destination +'/' + value.id + '" data-tooltip="true" title="' + value.type + '"><i class="fa ' + item_icon + ' text-blue"></i> ' + value.name + '</a></nobr>';
             }
@@ -395,6 +397,7 @@
         'groups',
         'inventories',
         'inventoryresults',
+        'inventoryresultsHardware',
         'stores',
         'contracts',
         'contractAssets'

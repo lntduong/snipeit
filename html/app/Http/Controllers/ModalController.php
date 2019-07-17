@@ -59,6 +59,7 @@ class ModalController extends Controller
                     $item = InventoryResult::select('assets.id','inventory_results.status_id')
                     ->join('assets', 'inventory_results.asset_id', '=', 'assets.id')
                     ->where('assets.id',$splitName[1])
+                    ->where('inventory_results.inventory_id',$inventory_id)
                     ->first();
                     $familiar=1;
                     break;
