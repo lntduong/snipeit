@@ -39,10 +39,11 @@ class InventoryResult extends SnipeModel
      */
     protected $fillable = [
         'inventory_id',
-        'unrecognized',
+        'familiar',
         'asset_id',
         'checked_time',
         'user_id'
+
     ];
 
     use Searchable;
@@ -56,7 +57,12 @@ class InventoryResult extends SnipeModel
   
     public function inventories()
     {
-    	return $this->belongsTo('\App\Models\Inventories','inventory_id');
+    	return $this->belongsTo('\App\Models\Inventory','inventory_id');
     }
+    public function asset()
+    {
+    	return $this->belongsTo('\App\Models\Asset','asset_id');
+    }
+
     
 }

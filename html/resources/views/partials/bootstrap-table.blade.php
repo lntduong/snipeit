@@ -112,7 +112,7 @@
     function genericRowLinkFormatter(destination) {
         return function (value,row) {
             if (value) {
-                if(destination == 'inventoryresult'){
+                if(destination == 'inventoryresults'){
                     return '<a href="{{ url('/hardware') }}/' + row.deviece + '"> ' + row.name + '</a>';
                 }
                 else{
@@ -213,13 +213,9 @@
             }
             
             if ((row.available_actions) && (row.available_actions.update === true)) {
-                if(destination == 'inventoryresult')
+                if(destination == 'inventoryresults')
                 {
-                    if(!row.checked)
-                    {
-                        actions += '<a href="{{ url('/') }}/' + dest + '/' + row.id + '_'+ row.deviece + '/edit" class="btn btn-sm btn-warning" data-tooltip="true" title="Update"><i class="fa fa-pencil"></i></a>&nbsp;';
-                    }
-                   
+                    actions += '<a href="{{ route('modal.inventory-result',['inventory_id' => '']) }}'+ row.id + '_'+ row.deviece + '_' + row.familiar +'" data-toggle="modal"  data-target="#createModal" data-select="assigned_user_select" class="btn btn-sm btn-warning" id="addasset" data-tooltip="true" title="Update"><i class="fa fa-pencil"></i></a>&nbsp;';
                 }
                 else
                 {
@@ -228,11 +224,11 @@
             }
 
             if ((row.available_actions) && (row.available_actions.delete === true)) {
-                if(destination == 'inventoryresult')
+                if(destination == 'inventoryresults')
                 {
                     if(row.checked)
                     {
-                        actions += '<a href="{{ url('/') }}/' + dest + '/' + row.id + '" '
+                        actions += '<a href="{{ url('/') }}/' + dest + '/' + row.id + '_' + row.deviece +  '" '
                     + ' class="btn btn-danger btn-sm delete-asset"  data-tooltip="true"  '
                     + ' data-toggle="modal" '
                     + ' data-content="{{ trans('general.sure_to_delete') }} ' + row.name + '?" '
@@ -257,7 +253,7 @@
                 actions += '<a href="{{ url('/') }}/' + dest + '/' + row.id + '/restore" class="btn btn-sm btn-warning" data-tooltip="true" title="Restore"><i class="fa fa-retweet"></i></a>&nbsp;';
             }
             if ((row.available_actions) && (row.available_actions.result === true)) {
-                actions += '<a href="{{ url('/') }}/' + dest + '/' + row.id + '/result" class="btn btn-sm btn-info" data-tooltip="true" title="Result"><i class="fa fa-copy"></i></a>&nbsp;';
+                actions += '<a href="{{ url('/') }}/inventoryresults/' + row.id + '" class="btn btn-sm btn-info" data-tooltip="true" title="Result"><i class="fa fa-copy"></i></a>&nbsp;';
             }
             actions +='</nobr>';
             return actions;
@@ -295,26 +291,29 @@
             } else if (value.type == 'location') {
                 item_destination = 'locations'
                 item_icon = 'fa-map-marker';
-            }
-            else if (value.type == 'store') {
-                item_destination = 'store'
+            } else if (value.type == 'store') {
+                item_destination = 'stores'
                 item_icon = 'fa-map-marker';
+            } else if (value.type == 'inventory') {
+                item_destination = 'inventoryresults'
+                item_icon = 'fa-map-marker';
+            } else if (value.type == 'inventoryResult') {
+                item_destination = 'inventoryresults'
+                item_icon = 'fa-map-marker';
+                
+                return '<nobr><a href="{{ url('/') }}/' + item_destination +'/' + value.id + '" data-tooltip="true" title="' + value.type + '"><i class="fa ' + item_icon + ' text-blue"></i> ' + value.name + '</a></nobr>';
             }
             else if (value.type == 'contract') {
                 item_destination = 'contracts'
                 item_icon = 'fa-map-marker';
             }
             
-
             return '<nobr><a href="{{ url('/') }}/' + item_destination +'/' + value.id + '" data-tooltip="true" title="' + value.type + '"><i class="fa ' + item_icon + ' text-blue"></i> ' + value.name + '</a></nobr>';
 
         } else {
             return '';
         }
-
-
     }
-
     // This just prints out the item type in the activity report
     function itemTypeFormatter(value, row) {
 
@@ -323,14 +322,12 @@
         }
     }
 
-
     // Convert line breaks to <br>
     function notesFormatter(value) {
         if (value) {
             return value.replace(/(?:\r\n|\r|\n)/g, '<br />');;
         }
     }
-
 
     // We need a special formatter for license seats, since they don't work exactly the same
     // Checkouts need the license ID, checkins need the specific seat ID
@@ -363,14 +360,9 @@
                 } else if (row.assigned_pivot_id) {
                     return '<a href="{{ url('/') }}/' + destination + '/' + row.assigned_pivot_id + '/checkin" class="btn btn-sm bg-purple" data-tooltip="true" title="Check this item in so it is available for re-imaging, re-issue, etc.">{{ trans('general.checkin') }}</a>';
                 }
-
             }
-
         }
-
-
     }
-
 
     // This is only used by the requestable assets section
     function assetRequestActionsFormatter (row, value) {
@@ -381,8 +373,6 @@
         }
 
     }
-
-
 
     var formatters = [
         'hardware',
@@ -403,9 +393,9 @@
         'depreciations',
         'fieldsets',
         'groups',
-        'inventory',
-        'inventoryresult',
-        'store',
+        'inventories',
+        'inventoryresults',
+        'stores',
         'contracts',
         'contractAssets'
     ];

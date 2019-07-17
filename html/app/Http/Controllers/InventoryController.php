@@ -3,7 +3,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\ImageUploadRequest;
 use App\Models\Company;
-use App\Models\Inventories;
+use App\Models\Inventory;
 use Auth;
 use DB;
 /**
@@ -22,7 +22,7 @@ class InventoryController extends Controller
     */
     public function index()
     {
-        $this->authorize('view', Inventories::class);
+        $this->authorize('view', Inventory::class);
         $company =Company::all();
         return view('inventory/index')->with('company', $company);
     }
@@ -35,8 +35,8 @@ class InventoryController extends Controller
     */
     public function create()
     {
-        $this->authorize('create', Inventories::class);
-        return view('inventory/edit-web')->with('item', new Inventories);
+        $this->authorize('create', Inventory::class);
+        return view('inventory/edit-web')->with('item', new Inventory);
     }
 
 
@@ -48,15 +48,15 @@ class InventoryController extends Controller
      */
     public function store(ImageUploadRequest $request)
     {
-        $this->authorize('create', Inventories::class);
-        $inventory = new Inventories();
+        $this->authorize('create', Inventory::class);
+        $inventory = new Inventory();
         $inventory->contract_id               = $request->input('contract_id');
         $inventory->inventory_date            = $request->input('inventory_date');
         $inventory->name                      = $request->input('name');
         $inventory->notes                     = $request->input('notes');
         $inventory->user_id                   = Auth::id();
         if ($inventory->save()) {
-            return redirect()->route('inventory.index')->with('success', trans('admin/inventory/message.create.success'));
+            return redirect()->route('inventories.index')->with('success', trans('admin/inventory/message.create.success'));
         }
         return redirect()->back()->withInput()->withErrors($inventory->getErrors());
     }
@@ -70,9 +70,9 @@ class InventoryController extends Controller
      */
     public function edit($inventory = null)
     {
-        if ($item = Inventories::find($inventory)) {
+        if ($item = Inventory::find($inventory)) {
             $this->authorize('update', $item);
-            $item = Inventories::select('inventories.id','contract_id','store_id','company_id','inventory_date','inventories.name','inventories.notes')
+            $item = Inventory::select('inventories.id','contract_id','store_id','company_id','inventory_date','inventories.name','inventories.notes')
             ->join('contracts', 'contracts.id', '=', 'inventories.contract_id')
             ->join('stores', 'stores.id', '=', 'contracts.store_id') 
             ->where('inventories.id','=',$inventory)
@@ -81,7 +81,7 @@ class InventoryController extends Controller
             return view('inventory/edit-web', compact('item'));
         }
 
-        return redirect()->route('inventory.index')->with('error', trans('admin/inventory/message.does_not_exist'));
+        return redirect()->route('inventories.index')->with('error', trans('admin/inventory/message.does_not_exist'));
     }
 
 
@@ -94,8 +94,8 @@ class InventoryController extends Controller
      */
     public function update(ImageUploadRequest $request, $inventoryId = null)
     {
-        if (is_null($inventory = Inventories::find($inventoryId))) {
-            return redirect()->route('store.index')->with('error', trans('admin/inventory/message.does_not_exist'));
+        if (is_null($inventory = Inventory::find($inventoryId))) {
+            return redirect()->route('stores.index')->with('error', trans('admin/inventory/message.does_not_exist'));
         }
         $this->authorize('update', $inventory);
         $inventory->contract_id               = $request->input('contract_id');
@@ -103,7 +103,7 @@ class InventoryController extends Controller
         $inventory->name                      = $request->input('name');
         $inventory->notes                     = $request->input('notes');
         if ($inventory->save()) {
-            return redirect()->route('inventory.index')->with('success', trans('admin/inventory/message.update.success'));
+            return redirect()->route('inventories.index')->with('success', trans('admin/inventory/message.update.success'));
         }
         return redirect()->back()->withInput()->withErrors($inventory->getErrors());
     }
@@ -116,12 +116,12 @@ class InventoryController extends Controller
      */
     public function destroy($inventoryId)
     {
-        if (is_null($inventory = Inventories::find($inventoryId))) {
-            return redirect()->route('inventory.index')->with('error', trans('admin/inventory/message.does_not_exist'));
+        if (is_null($inventory = Inventory::find($inventoryId))) {
+            return redirect()->route('inventories.index')->with('error', trans('admin/inventory/message.does_not_exist'));
         }
         $this->authorize('delete', $inventory);
         $inventory->delete();
-        return redirect()->route('inventory.index')->with('success', trans('admin/inventory/message.delete.success'));
+        return redirect()->route('inventories.index')->with('success', trans('admin/inventory/message.delete.success'));
     }
      /**
     * Return a view to result a inventory.
@@ -133,14 +133,14 @@ class InventoryController extends Controller
     public function getResult($inventoryId = null)
     {
         // Check if the asset exists
-        if (is_null($inventory = Inventories::find($inventoryId))) {
+        if (is_null($inventory = Inventory::find($inventoryId))) {
             // Redirect to the asset management page
-            return redirect()->route('inventory.index')->with('error', trans('admin/inventory/message.does_not_exist'));
+            return redirect()->route('inventories.index')->with('error', trans('admin/inventory/message.does_not_exist'));
         }
 
         $this->authorize('create', $inventory);
 
-        $inventory =Inventories::select('inventories.id as inventory_id','contract_id','store_id','company_id')
+        $inventory =Inventory::select('inventories.id as inventory_id','contract_id','store_id','company_id')
         ->join('contracts', 'contracts.id', '=', 'inventories.contract_id')
         ->join('stores', 'stores.id', '=', 'contracts.store_id') 
         ->where('inventories.id','=',$inventoryId)

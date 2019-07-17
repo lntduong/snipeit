@@ -1,7 +1,7 @@
 @extends('layouts/edit-form', [
     'createText' => trans('admin/inventory/table.create'),
     'updateText' => trans('admin/inventory/table.edit'),
-    'formAction' => ($item) ? route('inventory.update', ['inventory' => $item->id]) : route('inventory.store'),
+    'formAction' => ($item) ? route('inventories.update', ['inventory' => $item->id]) : route('inventories.store'),
     ])
     {{-- Page content --}}
     @section('inputFields')
@@ -32,7 +32,7 @@
            ajax: {
        
                // the baseUrl includes a trailing slash
-               url: baseUrl + 'api/v1/store/selectlist',
+               url: baseUrl + 'api/v1/stores/selectlist',
                dataType: 'json',
                delay: 250,
                headers: {

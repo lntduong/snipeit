@@ -19,12 +19,18 @@ class InventoryResultTransformer
     public function transformInventoryresult($inventoryresult)
     {
         $array = [
-            'id'      => e($inventoryresult->id),
-            'deviece' => e($inventoryresult->asset_id),
-            'image'   => self::getImageUrl($inventoryresult->image,$inventoryresult->image_model),
-            'name' => e($inventoryresult->name),
-            'checked' =>  Helper::getFormattedDateObject($inventoryresult->checked_time, 'datetime'),
-            'recognized' =>  e($inventoryresult->unrecognized),
+            'id'             => e($inventoryresult->id),
+            'deviece'        => e($inventoryresult->asset_id),
+            'image'          => self::getImageUrl($inventoryresult->image,$inventoryresult->image_model),
+            'asset_tag'      => e($inventoryresult->asset_tag),
+            'name'           => e($inventoryresult->name),
+            'checked'        =>  Helper::getFormattedDateObject($inventoryresult->checked_time, 'date'),
+            'familiar'       =>  e($inventoryresult->familiar),
+            'status_label'   => ($inventoryresult->status_id) ? [
+                'id'         => (int) $inventoryresult->status_id,
+                'name'       => e($inventoryresult->status_name),
+                'status_meta'=> self::getStatuslabelType($inventoryresult->status_pen,$inventoryresult->status_arc,$inventoryresult->status_dep),
+            ] : null,
 
         ];
         $permissions_array['available_actions'] = [
@@ -43,6 +49,34 @@ class InventoryResultTransformer
             return url('/').'/uploads/models/'.$image_model;
         }
         return false;
+    }
+    public function getStatuslabelType($pending,$archived,$deployable)
+    {
+
+        if (($pending == '1') && ($archived == '0')  && ($deployable == '0')) {
+            return 'pending';
+        } elseif (($pending == '0') && ($archived == '1')  && ($deployable == '0')) {
+            return 'archived';
+        } elseif (($pending == '0') && ($archived == '0')  && ($deployable == '0')) {
+            return 'undeployable';
+        }
+
+        return 'deployable';
+
+    }
+    public function present()
+    {
+
+        if (!$this->presenter || !class_exists($this->presenter)) {
+            throw new \Exception('Presenter class does not exist');
+        }
+
+        if (!isset($this->presenterInterface)) {
+            $this->presenterInterface = new $this->presenter($this);
+        }
+
+        return $this->presenterInterface;
+
     }
     
 

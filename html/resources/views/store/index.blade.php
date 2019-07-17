@@ -8,7 +8,7 @@
 
 @section('header_right')
   @can('create', \App\Models\Store::class)
-    <a href="{{ route('store.create') }}" class="btn btn-primary pull-right"> {{ trans('general.create') }}</a>
+    <a href="{{ route('stores.create') }}" class="btn btn-primary pull-right"> {{ trans('general.create') }}</a>
   @endcan
 @stop
 
@@ -34,7 +34,7 @@
                 data-sort-name="name"
                 id="storeTable"
                 class="table table-striped snipe-table"
-                data-url="{{ route('api.store.index') }}"
+                data-url="{{ route('api.stores.index') }}"
                 data-export-options='{
                 "fileName": "export-store-{{ date('Y-m-d') }}",
                 "ignoreColumn": ["actions","image","icon"]

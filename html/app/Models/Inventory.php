@@ -11,7 +11,7 @@ use Watson\Validating\ValidatingTrait;
  *
  * @version    v1.0
  */
-class Inventories extends SnipeModel
+class Inventory extends SnipeModel
 {
     protected $presenter = 'App\Presenters\InventoryPresenter';
     use CompanyableTrait;
@@ -82,6 +82,10 @@ class Inventories extends SnipeModel
     public function contract()
     {
     	return $this->belongsTo('\App\Models\Contract','contract_id');
+    }
+    public function inventoryresult()
+    {
+    	return $this->belongsTo('\App\Models\InventoryResult','id','inventory_id');
     }
   
 }

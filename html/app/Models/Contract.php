@@ -4,6 +4,7 @@ namespace App\Models;
 use App\Models\SnipeModel;
 use Watson\Validating\ValidatingTrait;
 use App\Models\Traits\Searchable;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 final class Contract extends SnipeModel
 {
@@ -11,17 +12,28 @@ final class Contract extends SnipeModel
 
     protected $presenter = 'App\Presenters\ContractPresenter';
     public $rules = array(
-            'name' => 'required',
+            'name' => 'required|unsame_name:contracts,store_id',
             'store_id' => 'required',
             'start_date' => 'required',
             'end_date'  => 'required',
-            'store_id' => 'required',
             'billing_date' => 'required'
     );
     use ValidatingTrait;
     use Searchable;
     use Loggable;
-    protected $searchableAttributes = ['name', 'created_at', 'updated_at']; 
+    use SoftDeletes;
+    protected $dates = ['deleted_at'];
+    protected $searchableAttributes = [
+        'name', 
+        'created_at', 
+        'updated_at',
+        'start_date',
+        'end_date',
+        'billing_date',
+        'payment_date',
+        'terms_and_conditions',
+        'notes'
+    ]; 
     protected $searchableRelations = [
         'store'      => ['name'],
         'location'   => ['name'],
@@ -69,7 +81,7 @@ final class Contract extends SnipeModel
 
     public function contract_assets()
     {
-        return $this->belongsToMany(ContractAsset::class);
+    	return $this->belongsTo('\App\Models\ContractAsset','id','contract_id');
     }
 
     public function assetlog()

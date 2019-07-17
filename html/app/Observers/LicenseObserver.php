@@ -17,7 +17,6 @@ class LicenseObserver
      */
     public function updated(License $license)
     {
-
         $logAction = new Actionlog();
         $logAction->item_type = License::class;
         $logAction->item_id = $license->id;
@@ -25,8 +24,6 @@ class LicenseObserver
         $logAction->user_id = Auth::id();
         $logAction->logaction('update');
     }
-
-
     /**
      * Listen to the License created event when
      * a new license is created.
@@ -36,7 +33,6 @@ class LicenseObserver
      */
     public function created(License $license)
     {
-
         $logAction = new Actionlog();
         $logAction->item_type = License::class;
         $logAction->item_id = $license->id;

@@ -39,7 +39,7 @@ class InventoryPresenter extends Presenter
                 "switchable" => true,
                 "title" => trans('general.store'),
                 "visible" => true,
-                "formatter" => 'storeLinkObjFormatter',
+                "formatter" => 'storesLinkObjFormatter',
             ],
             [
                 "field" => "contract",
@@ -54,7 +54,7 @@ class InventoryPresenter extends Presenter
                 "field" => "date",
                 "searchable" => true,
                 "sortable" => true,
-                "title" => trans('admin/inventory/table.inventory_date'),
+                "title" => trans('general.date'),
                 "visible" => true,
                 "formatter" => "dateDisplayFormatter"
               
@@ -83,7 +83,7 @@ class InventoryPresenter extends Presenter
             "switchable" => false,
             "visible" => true,
             "title" => trans('table.actions'),
-            "formatter" => "inventoryActionsFormatter",
+            "formatter" => "inventoriesActionsFormatter",
         ];
 
 

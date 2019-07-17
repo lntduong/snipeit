@@ -238,7 +238,7 @@
        $("#contract_select").attr("class", "contract_select");
        $(".store_select").select2({
        ajax: {
-           url: baseUrl + 'api/v1/store/selectlist',
+           url: baseUrl + 'api/v1/stores/selectlist',
            dataType: 'json',
            delay: 250,
            headers: {

@@ -24,9 +24,9 @@ class InventoryResultPresenter extends Presenter
                 "searchable" => true,
                 "sortable" => true,
                 "switchable" => true,
-                "title" => trans('admin/inventory/table.device'),
+                "title" => trans('admin/hardware/form.name'),
                 "visible" => true,
-                "formatter" => 'inventoryresultLinkFormatter',
+                "formatter" => 'inventoryresultsLinkFormatter',
             ],
             [
                 "field" => "image",
@@ -38,6 +38,14 @@ class InventoryResultPresenter extends Presenter
                 "formatter" => "imageFormatter"
             ],
             [
+                "field" => "asset_tag",
+                "searchable" => true,
+                "sortable" => true,
+                "title" => trans('admin/hardware/table.asset_tag'),
+                "visible" => true,
+                "formatter" => "hardwareLinkFormatter"
+            ],
+            [
                 "field" => "checked",
                 "searchable" => true,
                 "sortable" => true,
@@ -47,12 +55,20 @@ class InventoryResultPresenter extends Presenter
                 "formatter" => 'dateDisplayFormatter',
             ],
             [
-                "field" => "recognized",
+                "field" => "familiar",
                 "searchable" => true,
                 "sortable" => true,
                 "title" => trans('admin/inventory/table.recognized'),
                 "visible" => true,
                 "formatter" => 'RecognizedFormatter',
+            ],
+            [
+                "field" => "status_label",
+                "searchable" => true,
+                "sortable" => true,
+                "title" => trans('admin/hardware/table.status'),
+                "visible" => true,
+                "formatter" => 'statuslabelsLinkObjFormatter',
             ],
             
         ];
@@ -62,7 +78,7 @@ class InventoryResultPresenter extends Presenter
             "sortable" => false,
             "switchable" => false,
             "title" => trans('table.actions'),
-            "formatter" => "inventoryresultActionsFormatter",
+            "formatter" => "inventoryresultsActionsFormatter",
         ];
 
 

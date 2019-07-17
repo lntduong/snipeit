@@ -15,8 +15,18 @@ class ContractsController extends Controller
     {      
         $this->authorize('view', Contract::class);
         $contract = Contract::select('contracts.*')
-            ->with('store', 'location', 'user', 'user2');
+            ->with('store', 'location', 'user', 'user2')
+            ->join('stores', 'stores.id', '=', 'contracts.store_id' );
 
+        if($request->input('company')) {
+            $contract = $contract->where('stores.company_id','=',$request->input('company'));
+        }
+        if ($request->has('store_id')) {
+            $contract = $contract->where('contracts.store_id','=',$request->input('store_id'));
+        }
+        if($request->input('contract')) {
+            $contract = $contract->where('contracts.id','=',$request->input('contract'));
+        }
         if ($request->has('search')) {
             $contract = $contract->TextSearch($request->input('search'));
         }
@@ -54,7 +64,8 @@ class ContractsController extends Controller
     public function selectlist(Request $request)
     {
         $listContract = Contract::where('contracts.store_id', '=', $request->store_id);
-        if($request->date_contract != null){
+        
+        if($request->date_contract != null) {
             $listContract->where('contracts.start_date', '=' , $request->date_contract);
         }
         $listContract = $listContract->orderBy('name', 'ASC')->paginate(50);

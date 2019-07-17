@@ -6,7 +6,7 @@
 @stop
 @section('header_right')
 @can('create', \App\Models\Component::class)
-<a href="{{ route('inventory.create') }}" class="btn btn-primary pull-right"> {{ trans('general.create') }}</a>
+<a href="{{ route('inventories.create') }}" class="btn btn-primary pull-right"> {{ trans('general.create') }}</a>
 @endcan
 @stop
 {{-- Page content --}}
@@ -21,6 +21,7 @@
                   <div id="toolbar">
                      <label> {{ trans('admin/inventory/table.company') }} : </label>
                      <select name="company_id" class="form-control select2" id="company_id">
+                        <option value="">{{ trans('general.select_company') }}</option>
                         @foreach($company as $cp)
                         <option value="{{$cp->id}}">{{$cp->name}}</option>
                         @endforeach
@@ -45,7 +46,7 @@
                   data-sort-name="name"
                   id="inventoryTable"
                   class="table table-striped snipe-table"
-                  data-url="{{ route('api.inventory.index') }}"
+                  data-url="{{ route('api.inventories.index') }}"
                   data-export-options='{
                   "fileName": "export-components-{{ date('Y-m-d') }}",
                   "ignoreColumn": ["actions","image","change","checkbox","checkincheckout","icon"]
@@ -69,7 +70,7 @@
    $('#company_id').change(function () {
      var company_id1=$('#company_id').val();
      var temp = {
-       url: '{{ route('api.inventory.index',['company_id' => '']) }}' + company_id1
+       url: '{{ route('api.inventories.index',['company_id' => '']) }}' + company_id1
      };
      $table.bootstrapTable('refresh', temp);
    });   

@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Api;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Http\Transformers\InventoryTransformer;
-use App\Models\Inventories;
+use App\Models\Inventory;
 use App\Http\Transformers\SelectlistTransformer;
 
     /**
@@ -25,8 +25,8 @@ class InventoryController extends Controller
      */
     public function index(Request $request)
     {
-        $this->authorize('view', Inventories::class);
-        $inventory = Inventories::select('inventories.*','stores.company_id')
+        $this->authorize('view', Inventory::class);
+        $inventory = Inventory::select('inventories.*','stores.company_id')
         ->leftJoin('contracts', 'inventories.contract_id', '=', 'contracts.id')
         ->leftJoin('stores', 'stores.id', '=', 'contracts.store_id')
         ->with('contract');
@@ -60,20 +60,19 @@ class InventoryController extends Controller
     public function selectlist(Request $request)
     {
 
-        $inventories = Inventories::select([
+        $inventories = Inventory::select([
             'inventories.id',
             'inventories.name',
             'inventories.inventory_date',
         ]);
+        $inventories = $inventories->where('inventories.contract_id', '=', $request->get('contract_id'));
 
         if ($request->input('search')) {
             $inventories = $inventories->where('inventories.name', 'LIKE', '%'.$request->get('search').'%');
         }
-        if($request->contract_id)
-        {
-            $inventories = $inventories->where('inventories.contract_id', '=', $request->contract_id);
+        if($request->get('contract_id')) {
+            $inventories = $inventories->where('inventories.contract_id', '=', $request->get('contract_id'));
         }
-        
         $inventories = $inventories->orderBy('name', 'ASC')->paginate(50);
         return (new SelectlistTransformer)->transformSelectlistInventory($inventories);
     }

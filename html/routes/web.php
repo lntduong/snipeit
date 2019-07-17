@@ -494,11 +494,11 @@ Route::group(['middleware' => 'web'], function () {
     );
 
 });
-Route::resource('store', 'StoreController', [
+Route::resource('stores', 'StoresController', [
     'middleware' => ['auth'],
-    'parameters' => ['store' => 'store_id']
+    'parameters' => ['stores' => 'store_id']
 ]);
-Route::resource('inventory', 'InventoryController', [
+Route::resource('inventories', 'InventoryController', [
     'middleware' => ['auth'],
     'parameters' => ['inventory' => 'inventory_id']
 ]);
@@ -507,7 +507,7 @@ Route::get('inventory/{inventoryId}/result', [
     'as' => 'result/inventory',
     'uses' => 'InventoryController@getResult'
 ]);
-Route::resource('inventoryresult', 'InventoryResultController', [
+Route::resource('inventoryresults', 'InventoryResultController', [
     'middleware' => ['auth'],
     'parameters' => ['inventoryresult' => 'inventoryresult_id']
 ]);

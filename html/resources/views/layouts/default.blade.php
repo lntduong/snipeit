@@ -254,7 +254,7 @@
                      @endcan
                      @can('create', \App\Models\User::class)
                          <li {!! (Request::is('inventory/create') ? 'class="active"' : '') !!}>
-                             <a href="{{ route('inventory.create') }}">
+                             <a href="{{ route('inventories.create') }}">
                                  <i class="fa fa-qrcode">  </i>
                                  {{ trans('general.create_inventory') }}
                              </a>
@@ -576,7 +576,7 @@
                     </li>
 
                     <li>
-                            <a href="{{ route('inventory.index') }}">
+                            <a href="{{ route('inventories.index') }}">
                                 <i class="fa fa-qrcode">  </i> 
                                 <span> {{ trans('general.create_inventory') }}</span>
                             </a>
@@ -620,7 +620,7 @@
                         @endcan
                         @can('view', \App\Models\Store::class)
                         <li>
-                            <a href="{{ route('store.index') }}">
+                            <a href="{{ route('stores.index') }}">
                                 {{ trans('general.store') }}
                             </a>
                         </li>

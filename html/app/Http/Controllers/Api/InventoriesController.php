@@ -6,9 +6,9 @@ use App\Models\Store;
 use App\Models\Contract;
 use Illuminate\Http\Request;
 use App\Models\ContractAsset;
-use App\Models\Inventories;
+use App\Models\Inventory;
 use App\Http\Transformers\SelectlistTransformer;
-use App\Models\InventoryResults;
+use App\Models\InventoryResult;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Asset;
@@ -26,7 +26,7 @@ class InventoriesController extends Controller
         $listAllCompany = Company::select('id','name')->orderBy('name', 'ASC')->paginate();
         $listAllStore = Store::select('id','name','company_id')->orderBy('name', 'ASC')->paginate();
         $listAllContract = Contract::select('id','name','store_id')->orderBy('name', 'ASC')->paginate();
-        $listAllInventory = Inventories::select('id','name','contract_id', 'inventory_date')->orderBy('name', 'ASC')->paginate();
+        $listAllInventory = Inventory::select('id','name','contract_id', 'inventory_date')->orderBy('name', 'ASC')->paginate();
 
         return response()->json([
                                 'listCompany'  => $listAllCompany,
@@ -47,7 +47,7 @@ class InventoriesController extends Controller
         ->where("assets.asset_tag", '=' , substr($request->asset_tag,4 ))
         ->get();
 
-        $inventory = new InventoryResults();
+        $inventory = new InventoryResult();
         $inventory->inventory_id = $request->inventory_id ;
         $inventory->checked_time = Carbon::now()->toDateTimeString();
         $inventory->user_id = Auth::id();
@@ -72,7 +72,7 @@ class InventoriesController extends Controller
     public function selectlist(Request $request)
     {
    
-      $listInventory = Inventories::where('inventories.contract_id', '=', $request->contract_id);
+      $listInventory = Inventory::where('inventories.contract_id', '=', $request->contract_id);
       $listInventory = $listInventory->orderBy('name', 'ASC')->paginate();
       return (new SelectlistInventoryTransformer)->transformSelectlist($listInventory);
     }  
@@ -89,7 +89,7 @@ class InventoriesController extends Controller
             ])->join('assets','assets.id','=','contract_assets.asset_id')
             ->where("assets.asset_tag" , '=', substr($arrayAssetOff[$i]['asset_number'],4))->get();
 
-            $inventory = new InventoryResults();
+            $inventory = new InventoryResult();
             $inventory->inventory_id = $request->inventory_id ;
             $inventory->checked_time = Carbon::parse($arrayAssetOff[$i]['date_scan'])->format('Y-m-d h:i:s');
             $inventory->user_id = Auth::id();

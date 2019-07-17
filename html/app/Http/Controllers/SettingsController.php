@@ -718,7 +718,7 @@ class SettingsController extends Controller
             return redirect()->to('admin')->with('error', trans('admin/settings/message.update.error'));
         }
 
-        $setting->qr_code = $request->input('qr_code', '1');
+        $setting->qr_code = $request->input('qr_code', '0');
         $setting->alt_barcode = $request->input('alt_barcode');
         $setting->alt_barcode_enabled = $request->input('alt_barcode_enabled', '0');
         $setting->barcode_type = $request->input('barcode_type');

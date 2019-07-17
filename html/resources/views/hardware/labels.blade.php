@@ -169,7 +169,7 @@
               <h5 class="card-title" id="vinx-card-name2">PCU1907DTP00001</h5>
             </div>
             <div class="col-4">
-              @if ($settings->qr_code=='1')
+              @if($settings->qr_code=='1')
                 <img src="./{{ $asset->id }}/qr_code" class="img-qrcode">
               @endif
             </div>

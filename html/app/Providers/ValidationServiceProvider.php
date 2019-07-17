@@ -69,6 +69,19 @@ class ValidationServiceProvider extends ServiceProvider
             }
 
         });
+        Validator::extend('unsame_name', function ($attribute, $value, $parameters, $validator) {
+            $all_form_data=$validator->getData();
+            if(isset($all_form_data['id'])) {
+                $id=$all_form_data['id'];
+            }else{
+                $id=0;
+            }
+            if (count($parameters)) {
+                $count = DB::table($parameters[0])->select('id')->where($attribute, '=', $value)->whereNull('deleted_at')->where($parameters[1], '=', $all_form_data[$parameters[1]])->where('id', '!=', $id)->count();
+                return $count < 1;
+            }
+
+        });
 
 
         // Yo dawg. I heard you like validators.

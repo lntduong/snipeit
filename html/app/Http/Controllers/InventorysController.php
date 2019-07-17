@@ -1,13 +1,13 @@
 <?php
 namespace App\Http\Controllers;
 
-use App\Models\Inventories;
+use App\Models\Inventory;
 
 class InventorysController extends Controller
 {
     public function create()
     {
         return view('inventory/edit')
-            ->with('item', new Inventories);
+            ->with('item', new Inventory);
     }
 }

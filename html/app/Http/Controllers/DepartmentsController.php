@@ -141,11 +141,16 @@ class DepartmentsController extends Controller
     public function edit($id = null)
     {
         if (is_null($item = Department::find($id))) {
+          
             return redirect()->back()->with('error', trans('admin/locations/message.does_not_exist'));
         }
-
+        $item=Department::select('departments.*','companies.id as company_id' )
+        ->join('stores', 'stores.id', '=', 'departments.store_id')
+        ->join('companies', 'stores.company_id', '=', 'companies.id')
+        ->where('departments.id',$id)
+        ->first();
         $this->authorize('update', $item);
-
+           
         return view('departments/edit', compact('item'));
     }
 

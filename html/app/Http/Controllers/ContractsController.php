@@ -57,7 +57,7 @@ class ContractsController extends Controller
 
             return view('contracts/edit',compact('item'));
         }
-        return redirect()->route('contracts.index')->with('error', trans('admin/contracts/essage.does_not_exist'));
+        return redirect()->route('contracts.index')->with('error', trans('admin/contracts/message.does_not_exist'));
     
     }
 
@@ -77,10 +77,6 @@ class ContractsController extends Controller
      */
     public function store(ContractRequest $request)
     {
-        $checkName = DB::table('contracts')
-            ->where('name',$request->input('name'))
-            ->where('store_id',$request->input('store_id'))
-            ->first();
         $contract = new Contract();
         $contract->name                  = $request->input('name');
         $contract->store_id              = $request->input('store_id');
@@ -94,14 +90,11 @@ class ContractsController extends Controller
         $contract->terms_and_conditions  = $request->input('terms_and_conditions');
         $contract->notes                 = $request->input('notes');
         $contract->user_id               = Auth::id();
-        if ($checkName) {
-            return redirect()->back()->with('error', trans('admin/contracts/message.create.nameduplicate'));
-        } else {
-            if ($contract->save()) {
-                return redirect()->route('contracts.index')->with('success', trans('admin/contracts/message.create.success'));
-            }
-            return redirect()->back()->withInput()->withErrors($contract->getErrors());
+
+        if ($contract->save()) {
+            return redirect()->route('contracts.index')->with('success', trans('admin/contracts/message.create.success'));
         }
+        return redirect()->back()->withInput()->withErrors($contract->getErrors());
     }
 
      /**
@@ -157,7 +150,7 @@ class ContractsController extends Controller
         $contract->terms_and_conditions  = $request->input('terms_and_conditions');
         $contract->notes                 = $request->input('notes');
         $contract->user_id               = Auth::id();
-        
+
         if ($contract->save()) {
             return redirect()->route('contracts.index')->with('success', trans('admin/contracts/message.update.success'));
         }

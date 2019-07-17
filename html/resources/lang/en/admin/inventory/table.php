@@ -10,11 +10,12 @@ return array(
     'inventory_date'        => 'Inventory Date',
     'inventory'             => 'Inventory',
     'device'                => 'Device',
-    'checked'               => 'Checked Date',
+    'checked'               => 'Scan Date',
     'recognized'            => 'Recognized',
     'inventory_result_edit' => 'Inventory Result Edit',
     'unrecognized_flag'     => 'Unrecognized Flag',
     'unknown'               => 'Unknown',
     'familiar'              => 'Familiar',
-    'device_image'          => 'Device Image'
+    'device_image'          => 'Device Image',
+    'select_status'         => 'Select Status'
 );

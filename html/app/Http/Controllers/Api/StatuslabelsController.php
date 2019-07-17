@@ -9,6 +9,7 @@ use App\Models\Statuslabel;
 use App\Models\Asset;
 use App\Http\Transformers\StatuslabelsTransformer;
 use App\Http\Transformers\AssetsTransformer;
+use App\Http\Transformers\SelectlistTransformer;
 
 class StatuslabelsController extends Controller
 {
@@ -245,5 +246,17 @@ class StatuslabelsController extends Controller
         }
 
         return '0';
+    }
+    public function selectlist(Request $request)
+    {
+        $status = Statuslabel::select([
+            'status_labels.id',
+            'status_labels.name',
+        ]);
+        if ($request->get('search')){
+            $status = $status->where('status_labels.name', 'LIKE', '%'.$request->get('search').'%');
+        }
+        $status = $status->orderBy('name', 'ASC')->paginate(50);
+        return (new SelectlistTransformer)->transformSelectlist($status);
     }
 }

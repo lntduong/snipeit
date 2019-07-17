@@ -13,7 +13,7 @@ use File;
  * @author [Dang.HT]
  * @version[v1.0]
  */
-class StoreController extends Controller
+class StoresController extends Controller
 {
     /**
     * Returns a view that invokes the ajax tables which actually contains
@@ -71,7 +71,7 @@ class StoreController extends Controller
         }
 
         if ($store->save()) {
-            return redirect()->route('store.index')->with('success', trans('admin/store/message.create.success'));
+            return redirect()->route('stores.index')->with('success', trans('admin/store/message.create.success'));
         }
         return redirect()->back()->withInput()->withErrors($store->getErrors());
     }
@@ -89,7 +89,7 @@ class StoreController extends Controller
             $this->authorize('update', $item);
             return view('store/edit', compact('item'));
         }
-        return redirect()->route('store.index')->with('error', trans('admin/store/message.not_found'));
+        return redirect()->route('stores.index')->with('error', trans('admin/store/message.not_found'));
 
     }
     /**
@@ -102,7 +102,7 @@ class StoreController extends Controller
     public function update(ImageUploadRequest $request, $storeId = null)
     {
         if (is_null($store = Store::find($storeId))) {
-            return redirect()->route('store.index')->with('error', trans('admin/store/message.not_found'));
+            return redirect()->route('stores.index')->with('error', trans('admin/store/message.not_found'));
         }
 
         $this->authorize('update', $store);
@@ -139,7 +139,7 @@ class StoreController extends Controller
         }
 
         if ($store->save()) {
-            return redirect()->route('store.index')->with('success', trans('admin/store/message.update.success'));
+            return redirect()->route('stores.index')->with('success', trans('admin/store/message.update.success'));
         }
         return redirect()->back()->withInput()->withErrors($store->getErrors());
     }
@@ -153,19 +153,19 @@ class StoreController extends Controller
     public function destroy($storeId)
     {
         if (is_null($store = Store::find($storeId))) {
-            return redirect()->route('store.index')->with('error', trans('admin/store/message.not_found'));
+            return redirect()->route('stores.index')->with('error', trans('admin/store/message.not_found'));
         }
 
         $this->authorize('delete', $store);
         $store->delete();
-        return redirect()->route('store.index')->with('success', trans('admin/store/message.delete.success'));
+        return redirect()->route('stores.index')->with('success', trans('admin/store/message.delete.success'));
     }
 
     public function show($id) {
         $this->authorize('view', Store::class);
 
         if (is_null($store = Store::find($id))) {
-            return redirect()->route('store.index')
+            return redirect()->route('stores.index')
                 ->with('error', trans('admin/store/message.not_found'));
         } else {
             return view('store/view')->with('store',$store);

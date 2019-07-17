@@ -39,7 +39,7 @@ class StorePresenter extends Presenter
                 "sortable" => true,
                 "title" => trans('admin/store/table.store_name'),
                 "visible" => true,
-                "formatter" => 'storeLinkFormatter',
+                "formatter" => 'storesLinkFormatter',
             ], [
                 "field" => "image",
                 "searchable" => false,
@@ -63,7 +63,7 @@ class StorePresenter extends Presenter
             "switchable" => false,
             "visible" => true,
             "title" => trans('table.actions'),
-            "formatter" => "storeActionsFormatter",
+            "formatter" => "storesActionsFormatter",
         ];
 
         return json_encode($layout);

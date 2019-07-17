@@ -36,7 +36,7 @@ class StoreTransformer
         ];
         $permissions_array['available_actions'] = [
             'update'   => (bool) Gate::allows('update', Store::class),
-            'delete'   => (bool) Gate::allows('delete', Store::class),
+            'delete'   => ((bool) Gate::allows('delete', Store::class) && ($store->contract ? false : true) && ($store->department ? false : true) && ($store->deleted_at=='')) ? true : false,
         ];
         $array += $permissions_array;
         return $array;

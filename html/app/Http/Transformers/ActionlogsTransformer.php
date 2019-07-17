@@ -39,7 +39,7 @@ class ActionlogsTransformer
 
 
         $array = [
-            'id'          => (int) $actionlog->id,
+            'id'          =>  (int) $actionlog->id,
             'icon'          => $icon,
             'file' => ($actionlog->filename!='') ?
                 [
@@ -49,8 +49,8 @@ class ActionlogsTransformer
                 ] : null,
 
             'item' => ($actionlog->item) ? [
-                'id' => (int) $actionlog->item->id,
-                'name' => e($actionlog->item->getDisplayNameAttribute()),
+                'id' => e($actionlog->itemType())=='inventoryResult' ? (int) $actionlog->item->inventories->id :(int) $actionlog->item->id,
+                'name' => e($actionlog->itemType())=='inventoryResult' ?  $actionlog->item->inventories->name.'-'.$actionlog->item->asset->asset_tag : e($actionlog->item->getDisplayNameAttribute()),
                 'type' => e($actionlog->itemType()),
             ] : null,
             'location' => ($actionlog->location) ? [

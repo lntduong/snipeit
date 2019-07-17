@@ -14,18 +14,21 @@
                     </div>
             
                     <div class="dynamic-form-row">
-                        @include ('partials.forms.edit.asset-select', ['translated_name' => trans('admin/inventory/table.device'), 'fieldname' => 'asset_id' ,'required' => 'true'])
+                        @include ('partials.forms.edit.asset-select', ['translated_name' => trans('admin/hardware/form.name'), 'fieldname' => 'asset_id' ,'required' => 'true'])
+                    </div>
+                    <div class="dynamic-form-row">
+                        @include ('partials.forms.edit.status-inventory-result', ['translated_name' => trans('admin/hardware/form.status') , 'fieldname' => 'status_id'])
                     </div>
                     <div class="dynamic-form-row">
                         <div class="col-md-4 col-xs-12">
                             <label for="modal-last_name">{{trans('admin/inventory/table.unrecognized_flag')}}</label></div>
               
                         <div class="col-md-6 col-xs-12">
-                            <div id="Unknown" class="col-md-6 btn btn-default">{{trans('admin/inventory/table.unknown')}} <input type="radio" class="custom-control-input" id="Unknown_radio" name="checked" hidden="true" value='0' ></div>
-                            <div id="Familiar" class="col-md-6 btn btn-default">{{trans('admin/inventory/table.familiar')}}<input type="radio" class="custom-control-input" id="Farmilar_radio" name="checked" hidden="true" value='1' ></div>
+                            <div id="Unknown"  class="col-md-6 btn {{isset($familiar) ? ($familiar == 0 ? 'btn-danger' : 'btn-default' ) :'btn-danger'}}">{{trans('admin/inventory/table.unknown')}} <input type="radio" class="custom-control-input" id="Unknown_radio" name="checked" hidden="true" value='0' {{isset($familiar) ? ($familiar == 0 ? 'checked' : '' ) :''}}></div>
+                            <div id="Familiar" class="col-md-6 btn {{isset($familiar) ? ($familiar == 1 ? 'btn-danger' : 'btn-default' ) :'btn-default'}}">{{trans('admin/inventory/table.familiar')}}<input type="radio" class="custom-control-input" id="Farmilar_radio" name="checked" hidden="true" value='1' {{isset($familiar) ? ($familiar == 1 ? 'checked' : '' ) :''}}></div>
                         </div>
                     </div>
-                    <input type="text" class="custom-control-input" id="inventoryid" name="inventory_id" hidden>
+                    <input type="text" class="custom-control-input" id="inventoryid" name="inventory_id" value="{{isset($inventory_id) ? $inventory_id :''}}" hidden>
        
 
 
@@ -46,6 +49,7 @@
     });
     
      $('#assigned_asset_select').change(function () {
+      var elem = $('#status_select')
       var asset_id=$('#assigned_asset_select').val();
       var contract_id=$('#contract_select').val();
       var inventory_id=$('#inventory_select').val();
@@ -62,6 +66,12 @@
         contract_id:contract_id,
         },
       success:function(data){ //dữ liệu nhận về
+        elem.append($('<option>', { 
+            value: data.status_id,
+            text : data.status_name,
+            selected : "selected"
+        }));
+        elem.trigger("change");
         if(data.Recongnized == 1)
         {
             $("#Farmilar_radio").prop("checked", true);

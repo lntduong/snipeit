@@ -83,12 +83,12 @@ Route::group(['prefix' => 'v1','namespace' => 'Api', 'middleware' => 'api'], fun
 
     }); // contractuser group
 
-    Route::group(['prefix' => 'store'], function () {
+    Route::group(['prefix' => 'stores'], function () {
 
         Route::get('selectlist',
             [
-                'as' => 'api.store.selectlist',
-                'uses' => 'StoreController@selectlist'
+                'as' => 'api.stores.selectlist',
+                'uses' => 'StoresController@selectlist'
             ]
         );
 
@@ -190,15 +190,7 @@ Route::group(['prefix' => 'v1','namespace' => 'Api', 'middleware' => 'api'], fun
         );  
     }); // Departments group
 
-    Route::group(['prefix' => 'store'], function () {
-
-        Route::get('selectlist',
-            [
-                'as' => 'api.store.selectlist',
-                'uses'=> 'StoreController@selectlist'
-            ]
-        );
-    }); // Store group
+   
 
 
 
@@ -629,7 +621,7 @@ Route::group(['prefix' => 'v1','namespace' => 'Api', 'middleware' => 'api'], fun
         // );
         Route::get('selectlist',
             [
-                'as' => 'api.inventory.selectlist',
+                'as' => 'api.inventories.selectlist',
                 'uses'=> 'InventoryController@selectlist'
             ]
         );
@@ -644,7 +636,7 @@ Route::group(['prefix' => 'v1','namespace' => 'Api', 'middleware' => 'api'], fun
         // );
         Route::get('selectlist',
             [
-                'as' => 'api.store.selectlist',
+                'as' => 'api.stores.selectlist',
                 'uses'=> 'ContractsController@selectlist'
             ]
         );
@@ -726,6 +718,12 @@ Route::group(['prefix' => 'v1','namespace' => 'Api', 'middleware' => 'api'], fun
                 'uses' => 'StatuslabelsController@checkIfDeployable'
             ]
         );
+        Route::get('selectlist',
+        [
+            'as' => 'api.statuslabels.selectlist',
+            'uses' => 'StatuslabelsController@selectlist'
+        ]
+    );
 
     });
 
@@ -884,15 +882,15 @@ Route::group(['prefix' => 'v1','namespace' => 'Api', 'middleware' => 'api'], fun
         [ 'as' => 'api.activity.index', 'uses' => 'ReportsController@index' ]
     );
     /*--- Store API ---*/
-    Route::resource('store', 'StoreController',
+    Route::resource('stores', 'StoresController',
     [
         'names' =>
          [
-             'index' => 'api.store.index',
-             'show' => 'api.store.show',
-             'store' => 'api.store.store',
-             'update' => 'api.store.update',
-             'destroy' => 'api.store.destroy'
+             'index' => 'api.stores.index',
+             'show' => 'api.stores.show',
+             'store' => 'api.stores.store',
+             'update' => 'api.stores.update',
+             'destroy' => 'api.stores.destroy'
          ],
         'except' => ['create', 'edit'],
         'parameters' => ['store' => 'store_id']
@@ -900,15 +898,15 @@ Route::group(['prefix' => 'v1','namespace' => 'Api', 'middleware' => 'api'], fun
     ); // Store resource
     /*--- Store API ---*/
 /*--- Inventory API ---*/
-Route::resource('inventory', 'InventoryController',
+Route::resource('inventories', 'InventoryController',
 [
     'names' =>
         [
-            'index' => 'api.inventory.index',
-            'show' => 'api.inventory.show',
-            'store' => 'api.inventory.store',
-            'update' => 'api.inventory.update',
-            'destroy' => 'api.inventory.destroy'
+            'index' => 'api.inventories.index',
+            'show' => 'api.inventories.show',
+            'store' => 'api.inventories.store',
+            'update' => 'api.inventories.update',
+            'destroy' => 'api.inventories.destroy'
         ],
     'except' => ['create', 'edit'],
     'parameters' => ['inventory' => 'inventory_id']

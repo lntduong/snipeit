@@ -32,7 +32,7 @@ class Store extends SnipeModel
     * Category validation rules
     */
     public $rules = array(
-        'name'        => 'required',
+        'name'        => 'required|unsame_name:stores,company_id',
         'company_id'  => 'required|integer|nullable',
     );
 
@@ -87,6 +87,14 @@ class Store extends SnipeModel
     {
         return $this->belongsTo('\App\Models\Company', 'company_id');
     }
+    public function department()
+    {
+        return $this->belongsTo('\App\Models\Department', 'id','store_id');
+    }
+    public function contract()
+    {
+        return $this->belongsTo('\App\Models\Contract', 'id','store_id');
+    }
     /**
     * Get action logs for this consumable
     */
@@ -94,7 +102,7 @@ class Store extends SnipeModel
     {
         return $this->hasMany('\App\Models\Actionlog', 'item_id')->where('item_type', Component::class)->orderBy('created_at', 'desc')->withTrashed();
     }
-
+   
     /**
     * Query builder scope to order on company
     *

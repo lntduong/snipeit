@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class UpdateContractsTable extends Migration
+class RepairInventoryResult extends Migration
 {
     /**
      * Run the migrations.
@@ -13,10 +13,10 @@ class UpdateContractsTable extends Migration
      */
     public function up()
     {
-        Schema::table('contracts', function (Blueprint $table) {
-            $table->dropColumn('store_id');
-            $table->integer('object_id')->nullable(false);
-            $table->string('object_type')->nullable(false);
+        Schema::table('inventory_results', function($table) {
+            $table->integer('status_id');
+            $table->dropColumn('unrecognized');
+            $table->boolean('familiar');
         });
     }
 
@@ -27,8 +27,6 @@ class UpdateContractsTable extends Migration
      */
     public function down()
     {
-        Schema::table('contracts', function (Blueprint $table) {
-            //
-        });
+        
     }
 }

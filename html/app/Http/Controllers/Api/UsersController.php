@@ -147,8 +147,11 @@ class UsersController extends Controller
                 'users.avatar',
                 'users.email',
             ]
-            )->where('show_in_list', '=', '1')->where('company_id',$company_id);
-
+            )->where('show_in_list', '=', '1');
+        
+        if($company_id != null){
+            $users=$users->where('company_id',$company_id);
+        }   
         $users = Company::scopeCompanyables($users);
         if($company_id == null){
             if ($request->has('search')) {
@@ -156,7 +159,7 @@ class UsersController extends Controller
                     ->orWhere('username', 'LIKE', '%'.$request->get('search').'%')
                     ->orWhere('employee_num', 'LIKE', '%'.$request->get('search').'%');
             }
-    }
+        }
 
         $users = $users->orderBy('last_name', 'asc')->orderBy('first_name', 'asc');
         $users = $users->paginate(50);

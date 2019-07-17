@@ -14,7 +14,7 @@ use App\Models\Store;
 * @since [v1.0]
 */
 
-class StoreController extends Controller
+class StoresController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -57,7 +57,6 @@ class StoreController extends Controller
     public function selectlist(Request $request)
     {
 
-        $company_id=$request->company_id;
         $stores = Store::select([
             'stores.id',
             'stores.name',

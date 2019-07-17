@@ -90,7 +90,7 @@
  @endif
 
 <script>
-
+    var srcImg;
     //add contract assets action
     $(document).ready(function() {
         $table = $("#table_contract_assets");
@@ -116,16 +116,17 @@
                     for(var i =0 ; i<data.length ;i++){
                         
                         if(data[i].image) {
-                            var srcImg = '/uploads/assets/'+ data[i].image +'';
+                            srcImg = '/uploads/assets/'+ data[i].image +'';
                         }
                         else {
-                            var srcImg = '/uploads/models/mbp.jpg';
+                            srcImg = '/uploads/models/mbp.jpg';
                         }
                         $table.bootstrapTable('insertRow', {
                             index: 1,
                             row: {
-                                name:  data[i].name + "(" +data[i].asset_tag + ")",
-                                image: '<img src='+srcImg+' width="50" height="50" />',
+                                name:  
+                                '<a href="/hardware/'+ data[i].id +'">'+data[i].name + "(" + data[i].asset_tag + ")" + '</a>',
+                                image: '<img src='+srcImg+' width="50" height="40" />',
                                 actions: "<a href='#' class='btn btn-danger btn-sm' onclick='removeAsset(" + data[i].id+ "); return false;'> <i class='fa fa-trash'></i> </a>"
                             }
                         })
@@ -157,16 +158,16 @@
             success: function(data) {
                 for(var i =0 ; i<data.length ;i++){
                     if(data[i].image) {
-                        var srcImg = '/uploads/assets/'+ data[i].image +'';
+                        srcImg = '/uploads/assets/'+ data[i].image +'';
                     }
                     else {
-                        var srcImg = '/uploads/models/mbp.jpg';
+                        srcImg = '/uploads/models/mbp.jpg';
                     }
                     $table.bootstrapTable('insertRow', {
                         index: 1,
                         row: {
-                            name:  data[i].name + "(" +data[i].asset_tag + ")",
-                            image: '<img src='+srcImg+' width="50" height="50" />',
+                            name:  '<a href="/hardware/'+ data[i].id +'">'+data[i].name + "(" + data[i].asset_tag + ")" + '</a>',
+                            image: '<img src='+srcImg+' width="50" height="40" />',
                             actions: "<a href='#' class='btn btn-danger btn-sm' onclick='removeAsset(" + data[i].id+ "); return false;'> <i class='fa fa-trash'></i> </a>"
                         }
                     })
@@ -196,16 +197,16 @@
                 $table.bootstrapTable('removeAll');
                 for(var i =0 ; i<data.length ;i++){
                     if(data[i].image) {
-                        var srcImg = '/uploads/assets/'+ data[i].image +'';
+                        srcImg = '/uploads/assets/'+ data[i].image +'';
                     }
                     else {
-                        var srcImg = '/uploads/models/mbp.jpg';
+                        srcImg = '/uploads/models/mbp.jpg';
                     }
                     $table.bootstrapTable('insertRow', {
                         index: 1,
                         row: {
-                            name:  data[i].name + "(" +data[i].asset_tag + ")",
-                            image: '<img src='+srcImg+' width="50" height="50" />',
+                            name:  '<a href="/hardware/'+ data[i].id +'">'+data[i].name + "(" + data[i].asset_tag + ")" + '</a>',
+                            image: '<img src='+srcImg+' width="50" height="40" />',
                             actions: "<a href='#' class='btn btn-danger btn-sm' onclick='removeAsset(" + data[i].id+ "); return false;'> <i class='fa fa-trash'></i> </a>"
                         }
                     })
@@ -231,7 +232,7 @@ allowClear: true,
 ajax: {
 
     // the baseUrl includes a trailing slash
-    url: baseUrl + 'api/v1/store/selectlist',
+    url: baseUrl + 'api/v1/stores/selectlist',
     dataType: 'json',
     delay: 250,
     headers: {
@@ -289,7 +290,7 @@ ajax: {
     data: function (params) {
         var data = {
             search: params.term,
-            company_id:$("#company_select").val(),
+            company_id:($("#company_select").val() == '') ? 0 : $("#company_select").val() ,
             page: params.page || 1,
             assetStatusType: $(".js-data-ajax-company").data("asset-status-type"),
         };

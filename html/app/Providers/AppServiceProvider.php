@@ -11,6 +11,8 @@ use App\Observers\AccessoryObserver;
 use App\Observers\ConsumableObserver;
 use App\Observers\ComponentObserver;
 use App\Observers\StoreObserver;
+use App\Observers\InventoryObserver;
+use App\Observers\InventoryResultObserver;
 use App\Observers\ContractObserver;
 use App\Models\Asset;
 use App\Models\License;
@@ -18,6 +20,8 @@ use App\Models\Accessory;
 use App\Models\Consumable;
 use App\Models\Component;
 use App\Models\Store;
+use App\Models\InventoryResult;
+use App\Models\Inventory;
 use App\Models\Contract;
 
 /**
@@ -45,6 +49,8 @@ class AppServiceProvider extends ServiceProvider
         Consumable::observe(ConsumableObserver::class);
         License::observe(LicenseObserver::class);
         Store::observe(StoreObserver::class);
+        InventoryResult::observe(InventoryResultObserver::class);
+        Inventory::observe(InventoryObserver::class);
         Contract::observe(ContractObserver::class);
     }
 
