@@ -125,7 +125,7 @@
                             index: 1,
                             row: {
                                 name:  
-                                '<a href="/hardware/'+ data[i].id +'">'+data[i].name + "(" + data[i].asset_tag + ")" + '</a>',
+                                '<a href="/hardware/'+ data[i].id +'">'+data[i].name + " (" + data[i].asset_tag + ")" + '</a>',
                                 image: '<img src='+srcImg+' width="50" height="40" />',
                                 actions: "<a href='#' class='btn btn-danger btn-sm' onclick='removeAsset(" + data[i].id+ "); return false;'> <i class='fa fa-trash'></i> </a>"
                             }
@@ -166,7 +166,7 @@
                     $table.bootstrapTable('insertRow', {
                         index: 1,
                         row: {
-                            name:  '<a href="/hardware/'+ data[i].id +'">'+data[i].name + "(" + data[i].asset_tag + ")" + '</a>',
+                            name:  '<a href="/hardware/'+ data[i].id +'">'+data[i].name + " (" + data[i].asset_tag + ")" + '</a>',
                             image: '<img src='+srcImg+' width="50" height="40" />',
                             actions: "<a href='#' class='btn btn-danger btn-sm' onclick='removeAsset(" + data[i].id+ "); return false;'> <i class='fa fa-trash'></i> </a>"
                         }
@@ -205,7 +205,7 @@
                     $table.bootstrapTable('insertRow', {
                         index: 1,
                         row: {
-                            name:  '<a href="/hardware/'+ data[i].id +'">'+data[i].name + "(" + data[i].asset_tag + ")" + '</a>',
+                            name:  '<a href="/hardware/'+ data[i].id +'">'+data[i].name + " (" + data[i].asset_tag + ")" + '</a>',
                             image: '<img src='+srcImg+' width="50" height="40" />',
                             actions: "<a href='#' class='btn btn-danger btn-sm' onclick='removeAsset(" + data[i].id+ "); return false;'> <i class='fa fa-trash'></i> </a>"
                         }
@@ -317,8 +317,6 @@ templateSelection: formatDataSelection
 });
 $(".datepicker-contract").datepicker( {
     autoclose: true,
-    clearBtn: true, 
-    todayHighlight: true, 
     orientation: "top"
   });
 </script>

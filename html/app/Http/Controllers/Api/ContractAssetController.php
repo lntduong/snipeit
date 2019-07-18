@@ -28,7 +28,7 @@ class ContractAssetController extends Controller
         $listAssets = ContractAsset::select([
             'assets.id',
             'assets.image',
-            'models.name',
+            'assets.name',
             'assets.asset_tag'
             ])
             ->join('assets','assets.id','=','contract_assets.asset_id')
@@ -47,7 +47,7 @@ class ContractAssetController extends Controller
         $listAssets = ContractAsset::select([
             'assets.id',
             'assets.image',
-            'models.name',
+            'assets.name',
             'assets.asset_tag'
             ])
             ->join('assets','assets.id','=','contract_assets.asset_id')
@@ -62,7 +62,7 @@ class ContractAssetController extends Controller
         $listAssets = ContractAsset::select([
             'assets.id',
             'assets.image',
-            'models.name',
+            'assets.name',
             'assets.asset_tag'
             ])
             ->join('assets','assets.id','=','contract_assets.asset_id')

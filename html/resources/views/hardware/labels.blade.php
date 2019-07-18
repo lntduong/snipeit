@@ -165,8 +165,8 @@
         <div class="card-body">
           <div class="row">
             <div class="col-8">
-              <h5 class="card-title" id="vinx-card-name1">AMY-9000 </h5>
-              <h5 class="card-title" id="vinx-card-name2">PCU1907DTP00001</h5>
+              <h5 class="card-title" id="vinx-card-name1">{{$asset->name}} </h5>
+              <h5 class="card-title" id="vinx-card-name2">{{$asset->asset_tag}}</h5>
             </div>
             <div class="col-4">
               @if($settings->qr_code=='1')
