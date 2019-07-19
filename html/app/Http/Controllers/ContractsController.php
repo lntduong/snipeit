@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 use App\Models\Company;
+use App\Models\Store;
+use App\Models\Department;
 use App\Models\Contract;
 use App\Models\ContractAsset;
 use App\Models\Asset;
@@ -79,7 +81,7 @@ class ContractsController extends Controller
     {
         $contract = new Contract();
         $contract->name                  = $request->input('name');
-        $contract->store_id              = $request->input('store_id');
+        // $contract->store_id              = $request->input('store_id');
         $contract->location_id           = $request->input('location_id');
         $contract->contact_id_1          = $request->input('contact_id_1');
         $contract->contact_id_2          = $request->input('contact_id_2');
@@ -90,6 +92,17 @@ class ContractsController extends Controller
         $contract->terms_and_conditions  = $request->input('terms_and_conditions');
         $contract->notes                 = $request->input('notes');
         $contract->user_id               = Auth::id();
+
+        if (request('checkout_to_type_contract')=='company') {
+            $contract->object_id   = $request->input('assigned_company');
+            $contract->object_type = Company::class;
+        } elseif (request('checkout_to_type_contract')=='store') {
+            $contract->object_id   = $request->input('assigned_store');
+            $contract->object_type = Store::class;
+        } elseif (request('checkout_to_type_contract')=='department') {
+            $contract->object_id   = $request->input('assigned_department');
+            $contract->object_type = Department::class;
+        }
 
         if ($contract->save()) {
             return redirect()->route('contracts.index')->with('success', trans('admin/contracts/message.create.success'));
@@ -108,8 +121,10 @@ class ContractsController extends Controller
             $this->authorize('update', $item);
             $item = Contract::select(
                 'contracts.id',
-                'contracts.store_id',
-                'stores.company_id',
+                // 'contracts.store_id',
+                // 'stores.company_id',
+                'contracts.object_id',
+                'contracts.object_type',
                 'contracts.name',
                 'contracts.location_id',
                 'contracts.contact_id_1',
@@ -120,9 +135,18 @@ class ContractsController extends Controller
                 'contracts.payment_date',
                 'contracts.terms_and_conditions',
                 'contracts.notes'
-                )->join('stores', 'stores.id', '=', 'contracts.store_id') 
-                ->where('contracts.id','=',$contractId)
-                ->first();
+                // )->join('stores', 'stores.id', '=', 'contracts.store_id') 
+                // ->where('contracts.id','=',$contractId)
+                // ->first();
+                )->where('contracts.id','=',$contractId)
+            ->first();;
+            // if($contract->object_type = 'App\Models\Company') {
+            //     $item->join('companies', 'companies.id', '=', 'contracts.object_id');
+            // } else if($contract->object_type = 'App\Models\Store') {
+            //     $item->join('stores', 'stores.id', '=', 'contracts.object_id');
+            // } else {
+            //     $item->join('departments', 'departments.id', '=', 'contracts.object_id');
+            // }
             return view('contracts/edit',compact('item'));
         }
         return redirect()->route('contracts.index')->with('error', trans('admin/contracts/essage.does_not_exist'));
@@ -139,7 +163,7 @@ class ContractsController extends Controller
             return redirect()->route('contract.index')->with('error', trans('admin/contracts/message.does_not_exist'));
         }
         $contract->name                  = $request->input('name');
-        $contract->store_id              = $request->input('store_id');
+        //$contract->store_id              = $request->input('store_id');
         $contract->location_id           = $request->input('location_id');
         $contract->contact_id_1          = $request->input('contact_id_1');
         $contract->contact_id_2          = $request->input('contact_id_2');
@@ -151,6 +175,17 @@ class ContractsController extends Controller
         $contract->notes                 = $request->input('notes');
         $contract->user_id               = Auth::id();
 
+        if (request('checkout_to_type_contract')=='company') {
+            $contract->object_id   = $request->input('assigned_company');
+            $contract->object_type = 'App\Models\Company';
+        } elseif (request('checkout_to_type_contract')=='store') {
+            $contract->object_id   = $request->input('assigned_store');
+            $contract->object_type = 'App\Models\Store';
+        } elseif (request('checkout_to_type_contract')=='department') {
+            $contract->object_id   = $request->input('assigned_department');
+            $contract->object_type = 'App\Models\Department';
+        }
+        
         if ($contract->save()) {
             return redirect()->route('contracts.index')->with('success', trans('admin/contracts/message.update.success'));
         }

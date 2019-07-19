@@ -15,28 +15,30 @@
 
 {{-- Page content --}}
 @section('content')
-
+<style>
+.col-md-7 {
+    width: 130%!important;
+}
+</style>
 <div class="row">
-   <div class="col-md-12">
-      <div class="box">
-         <div class="box-body">
-            <div class="row">
-               <div class="col-md-3">
-              <div class="search-company" id="toolbar">
-                <div class="col-md-1" style="padding-top: 5px"><label> {{ trans('admin/contracts/table.contracts_company') }} </label> </div>
-                <div class="col-md-4" style="margin-left: 35px; width: 215px;">
-                  <select class="js-data-ajax" data-endpoint="companies" data-placeholder="{{ trans('general.select_company') }}" name="company" style="width: 100%" id="company">                      
-                      @foreach ($listCompany as $company)
-                      <option hidden disabled selected="selected">{{ trans('general.select_company') }}</option>
-                      <option value="{{$company->id}}">{{$company->name}}</option>
-                      @endforeach
-                  </select>
+    <div class="col-md-12">
+        <div class="box box-default">
+            <div class="box-body">
+                <div class="row">
+                    <div id="toolbar">
+                        <div class="row">
+                        <div class="col-md-12">
+                            {{-- Company-Name --}}
+                            @include ('partials.forms.edit.company-select', ['translated_name' => trans('general.company'), 'fieldname' => 'company_id'])
+                            {{-- Store-Name --}}
+                            @include ('partials.forms.edit.store-select-report', ['translated_name' =>  trans('general.store') , 'fieldname' => 'store_id'])
+                            {{-- Department-Name --}}
+                            @include ('partials.forms.edit.department-select', ['translated_name' => trans('general.department'), 'fieldname' => 'contract_id'])
+                            <button type="submit" id="filterCompany" class="btn btn-primary" onclick="filterCompany()">Go</button>
+                        </div>
+                    </div>
+                  </div>
                 </div>
-                <button type="submit" style="margin-right: -3px;" class="btn btn-primary" onclick="filterCompany()" id="filterCompany">Go</button>
-                </div>
-            
-               </div>
-               <div class="col-md-12">
                 <table
                   data-click-to-select="true"
                   data-columns="{{ \App\Presenters\ContractPresenter::dataTableLayout() }}"
@@ -56,15 +58,9 @@
                   class="table table-striped snipe-table"
                   data-url="{{ route('api.contracts.index') }}" >
                 </table>
-                </div>
-               <!-- /.col -->
             </div>
-            <!-- /.row -->
-         </div>
-         <!-- /.box-body -->
-      </div>
-      <!-- /.box -->
-   </div>
+        </div>
+    </div>
 </div>
 @stop
 
@@ -72,20 +68,191 @@
 <script nonce="{{ csrf_token() }}">
   var $table = $('#contractsTable');
   function filterCompany() {
-    if($('#company').val() == null) {
+    if($('#company_select').val() == null) {
       $table.bootstrapTable('refresh', {
         url: '{{url('/') }}/api/v1/contracts'
       });
     }
+    else if($('#store_select').val()) {
+      $table.bootstrapTable('refresh', {
+        url: '{{url('/') }}/api/v1/contracts?store='+ $('#store_select').val()+'&company=' +$('#company_select').val()
+      });
+    }
     else {
       $table.bootstrapTable('refresh', {
-        url: '{{url('/') }}/api/v1/contracts?company='+ $('#company').val()
+        url: '{{url('/') }}/api/v1/contracts?company='+ $('#company_select').val()
       });
     }
   }
-</script>
+  $(".store_select").select2({
+     placeholder: '',
+     allowClear: true,
+     
+     ajax: {
+   
+         // the baseUrl includes a trailing slash
+         url: baseUrl + 'api/v1/stores/selectlist',
+         dataType: 'json',
+         delay: 250,
+         headers: {
+             "X-Requested-With": 'XMLHttpRequest',
+             "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr('content')
+         },
+         data: function (params) {
+             var data = {
+                 search: params.term,
+                 company_id:($("#company_select").val()) ? $("#company_select").val() : "-1",
+                 page: params.page || 1,
+             };
+             return data;
+         },
+         processResults: function (data, params) {
+   
+             params.page = params.page || 1;
+   
+             var answer =  {
+                 results: data.items,
+                 pagination: {
+                     more: "true" //(params.page  < data.page_count)
+                 }
+             };
+   
+             return answer;
+         },
+         cache: true
+     },
+     escapeMarkup: function (markup) { return markup; }, // let our custom formatter work
+     templateResult: formatDatalist,
+     templateSelection: formatDataSelection
+   });
+
+   $('#company_select').change(function () { 
+        $("#store_select").html('');
+        $("#store_select").val('');
+        $("#contract_select").html('');
+        $("#contract_select").val('');
+   }); 
+   
+   $('#store_select').change(function () { 
+       $("#contract_select").html('');
+       $("#contract_select").val('');
+   }); 
+</script> 
 
 @include ('partials.bootstrap-table', ['exportFile' => 'components-export', 'search' => true, 'showFooter' => true, 'columns' => \App\Presenters\ContractPresenter::dataTableLayout()])
 
+<!-- <script>
+   $table = $('#contractsTable') 
+    function filterCompany() {
+      if($('#company_select').val() == null) {
+        $table.bootstrapTable('refresh', {
+          url: '{{url('/') }}/api/v1/contracts'
+        });
+      }
+      else {
+        $table.bootstrapTable('refresh', {
+          url: '{{url('/') }}/api/v1/contracts?company='+ $('#company_select').val()
+        });
+      } 
 
+   $(".store_select").select2({
+     placeholder: '',
+     allowClear: true,
+     
+     ajax: {
+   
+         // the baseUrl includes a trailing slash
+         url: baseUrl + 'api/v1/stores/selectlist',
+         dataType: 'json',
+         delay: 250,
+         headers: {
+             "X-Requested-With": 'XMLHttpRequest',
+             "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr('content')
+         },
+         data: function (params) {
+             var data = {
+                 search: params.term,
+                 company_id:($("#company_select").val()) ? $("#company_select").val() : "-1",
+                 page: params.page || 1,
+             };
+             return data;
+         },
+         processResults: function (data, params) {
+   
+             params.page = params.page || 1;
+   
+             var answer =  {
+                 results: data.items,
+                 pagination: {
+                     more: "true" //(params.page  < data.page_count)
+                 }
+             };
+   
+             return answer;
+         },
+         cache: true
+     },
+     escapeMarkup: function (markup) { return markup; }, // let our custom formatter work
+     templateResult: formatDatalist,
+     templateSelection: formatDataSelection
+   });
+   $(".contract_select").select2({
+   
+   /**
+   * Adds an empty placeholder, allowing every select2 instance to be cleared.
+   * This placeholder can be overridden with the "data-placeholder" attribute.
+   */
+   placeholder: '',
+   allowClear: true,
+   
+   ajax: {
+   
+     // the baseUrl includes a trailing slash
+     url: baseUrl + 'api/v1/contract/selectlist',
+     dataType: 'json',
+     delay: 250,
+     headers: {
+         "X-Requested-With": 'XMLHttpRequest',
+         "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr('content')
+     },
+     data: function (params) {
+         var data = {
+             search: params.term,
+             store_id:$("#store_select").val(),
+             page: params.page || 1,
+         };
+         return data;
+     },
+     processResults: function (data, params) {
+   
+         params.page = params.page || 1;
+   
+         var answer =  {
+             results: data.items,
+             pagination: {
+                 more: "true" //(params.page  < data.page_count)
+             }
+         };
+   
+         return answer;
+     },
+     cache: true
+   },
+   escapeMarkup: function (markup) { return markup; }, // let our custom formatter work
+   templateResult: formatDatalist,
+   templateSelection: formatDataSelection
+   });
+
+    $('#company_select').change(function () { 
+        $("#store_select").html('');
+        $("#store_select").val('');
+        $("#contract_select").html('');
+        $("#contract_select").val('');
+   }); 
+   
+   $('#store_select').change(function () { 
+       $("#contract_select").html('');
+       $("#contract_select").val('');
+   }); 
+</script> -->
 @stop

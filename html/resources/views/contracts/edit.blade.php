@@ -20,11 +20,16 @@
 <!-- contract name-->
 @include ('partials.forms.edit.name', ['translated_name' => trans('admin/contracts/table.contract_name')])
 
+@include ('partials.forms.scope-selector-contract', ['scope_company_contract' => 'true','scope_store_contract' => 'true', 'scope_department_contract' => 'true'])
+
 <!-- Company-->
-@include ('partials.forms.edit.company-select', ['translated_name' => trans('admin/contracts/table.contracts_company'), 'fieldname' => 'company_id'])
+@include ('partials.forms.edit.scope-company-contract', ['translated_name' => trans('general.company'), 'fieldname' => 'assigned_company', 'required'=>'true'])
 
 <!-- Store-->
-@include ('partials.forms.edit.store-select-contracts', ['translated_name' => trans('admin/contracts/table.store'), 'fieldname' => 'store_id'])
+@include ('partials.forms.edit.scope-store-contract', ['translated_name' => trans('general.store'), 'fieldname' => 'assigned_store', 'unselect' => 'true', 'style' => 'display:none;', 'required'=>'true'])
+
+<!-- Department-->
+@include ('partials.forms.edit.scope-department-contract', ['translated_name' => trans('general.department'), 'fieldname' => 'assigned_department', 'style' => 'display:none;', 'required'=>'true'])
 
 <!-- Location-->
 @include ('partials.forms.edit.location-select-contract', ['translated_name' => trans('admin/contracts/table.location'), 'fieldname' => 'location_id', 'new' => 'no'])
@@ -91,6 +96,31 @@
 
 <script>
     var srcImg;
+    $('input[name=checkout_to_type_contract]').on("change",function () {
+        var object_type = $('input[name=checkout_to_type_contract]:checked').val();
+        var object_id = $('#assigned_company option:selected').val();
+        if (object_type == 'company') {
+            $('#current_assets_box').fadeOut();
+            $('#assigned_company').show();
+            $('#assigned_store').hide();
+            $('#assigned_department').hide();
+            $('.notification-callout').fadeOut();
+        } else if (object_type == 'store') {
+            $('#current_assets_box').fadeOut();
+            $('#assigned_company').show();
+            $('#assigned_store').show();
+            $('#assigned_department').hide();
+            $('.notification-callout').fadeOut();
+        } else  {
+            $('#assigned_company').show();
+            $('#assigned_store').show();
+            $('#assigned_department').show();
+            if (object_id) {
+                $('#current_assets_box').fadeIn();
+            }
+            $('.notification-callout').fadeIn();
+        }
+    });
     //add contract assets action
     $(document).ready(function() {
         $table = $("#table_contract_assets");
@@ -121,6 +151,7 @@
                         else {
                             srcImg = '/uploads/models/mbp.jpg';
                         }
+                        console.log(data[i].id);
                         $table.bootstrapTable('insertRow', {
                             index: 1,
                             row: {
@@ -128,7 +159,7 @@
                                 '<a href="/hardware/'+ data[i].id +'">'+data[i].name + " (" + data[i].asset_tag + ")" + '</a>',
                                 image: '<img src='+srcImg+' width="50" height="40" />',
                                 actions: "<a href='#' class='btn btn-danger btn-sm' onclick='removeAsset(" + data[i].id+ "); return false;'> <i class='fa fa-trash'></i> </a>"
-                            }
+                            }  
                         })
                     }    
                 },

@@ -22,11 +22,31 @@ class ContractsTransformer
         $array = [
             'id' => (Int) $contract->id,
             'name' => $contract->name,
-           
-            'store_id' => ($contract->store_id) ? [
+
+            'company' => ($contract->department) ? [
+                'id' => (int) $contract->department->id,
+                'name'=> e($contract->department->company_name)
+            ] : (($contract->store) ?[
                 'id' => (int) $contract->store->id,
-                'name'=> e($contract->store->name)
+                'name'=> e($contract->store->company_name),
+            ] : (($contract->company) ? [
+                'id' => (int) $contract->company->id,
+                'name'=> e($contract->company->name)
+            ]  : null)),
+
+            'store' => ($contract->department) ? [
+                'id' => (int) $contract->department->id,
+                'name'=> e($contract->department->store_name)
+            ] : (($contract->store) ? [
+                'id' => (int) $contract->store->id,
+                'name'=> e($contract->store->name),
+            ]  : null),
+  
+            'department' => ($contract->department) ? [
+                'id' => (int) $contract->department->id,
+                'name'=> e($contract->department->name)
             ]  : null,
+            'object_id' => $contract->object_id,
             'location_id' => ($contract->location_id) ? [
                 'id' => (int) $contract->location->id,
                 'name'=> e($contract->location->name)

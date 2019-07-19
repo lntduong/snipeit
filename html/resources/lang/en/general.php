@@ -239,4 +239,5 @@
     //add contract
     'contract'              => 'Contract',
     'contracts'             => 'Contracts',
+    'scope'                 => 'Scope',
     ];

@@ -10,19 +10,32 @@ use App\Models\Contract;
  * @author [Thinh.NP] 
  */
 class ContractsController extends Controller
-{
+{   
     public function index(Request $request)
     {      
         $this->authorize('view', Contract::class);
-        $contract = Contract::select('contracts.*')
-            ->with('store', 'location', 'user', 'user2')
-            ->join('stores', 'stores.id', '=', 'contracts.store_id' );
+        $contract = Contract::select(
+            'contracts.*',
+            'companies.name AS company_name',
+            'stores.name AS store_name',
+            'departments.name AS department_name' 
+            )->leftJoin('companies', 'companies.id', '=' ,
+            \DB::raw('(CASE WHEN contracts.object_type = "App\\\Models\\\Company" THEN contracts.object_id ELSE null END )' ))
+            ->leftJoin('stores', 'stores.id', '=' ,
+            \DB::raw('(CASE WHEN contracts.object_type = "App\\\Models\\\Store" THEN contracts.object_id ELSE null END )' ))
+            ->leftJoin('departments', 'departments.id', '=' ,
+            \DB::raw('(CASE WHEN contracts.object_type = "App\\\Models\\\Department" THEN contracts.object_id ELSE null END )' ))
+            ;
+    
+            //->with('store', 'location', 'user', 'user2');
+            //->join('stores', 'stores.id', '=', 'contracts.store_id' );
 
         if($request->input('company')) {
-            $contract = $contract->where('stores.company_id','=',$request->input('company'));
+            $contract = $contract->where('companies.id','=',$request->input('company'));
         }
-        if ($request->has('store_id')) {
-            $contract = $contract->where('contracts.store_id','=',$request->input('store_id'));
+        if ($request->has('store') && $request->input('company')) {
+            $contract = $contract->where('stores.id','=',$request->input('store'))
+            ->orWhere('companies.id','=',$request->input('company'));
         }
         if($request->input('contract')) {
             $contract = $contract->where('contracts.id','=',$request->input('contract'));
@@ -63,8 +76,12 @@ class ContractsController extends Controller
 
     public function selectlist(Request $request)
     {
-        $listContract = Contract::where('contracts.store_id', '=', $request->store_id);
-        
+        //$listContract = Contract::where('contracts.store_id', '=', $request->store_id);
+        $listContract = Contract::select([
+            'contracts.id',
+            'contracts.name',
+            'contracts.start_date',
+        ]);
         if($request->date_contract != null) {
             $listContract->where('contracts.start_date', '=' , $request->date_contract);
         }

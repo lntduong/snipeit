@@ -12,11 +12,12 @@ final class Contract extends SnipeModel
 
     protected $presenter = 'App\Presenters\ContractPresenter';
     public $rules = array(
-            'name' => 'required|unsame_name:contracts,store_id',
-            'store_id' => 'required',
+            'name' => 'required|unsame_name:contracts,object_id',
+            //'store_id' => 'required',
             'start_date' => 'required',
             'end_date'  => 'required',
-            'billing_date' => 'required'
+            'billing_date' => 'required',
+            'object_id' => 'required',
     );
     use ValidatingTrait;
     use Searchable;
@@ -42,7 +43,9 @@ final class Contract extends SnipeModel
     ];   
     protected $fillable = [
         'id',
-        'store_id' , 
+        //'store_id' , 
+        'object_id' , 
+        'object_type' ,
         'name' ,
         'location_id' ,
         'contact_id_1' ,
@@ -70,9 +73,32 @@ final class Contract extends SnipeModel
         return $this->belongsTo('\App\Models\Location', 'location_id');
     }
 
+    public function company()
+    {
+        return $this->belongsTo('\App\Models\Company', 'object_id', 'id')
+        ->select(['companies.*', 'stores.name as store_name'])
+        ->join('contracts','companies.id', '=' , 'contracts.object_id')
+        ->join('stores','stores.company_id', '=' , 'companies.id')
+        ->where("contracts.object_type","=",\DB::raw('"App\\\Models\\\Company"'));
+    }
+
     public function store()
     {
-        return $this->belongsTo('\App\Models\Store', 'store_id');
+        return $this->belongsTo('\App\Models\Store', 'object_id', 'id')
+        ->select(['stores.*', 'companies.name as company_name'])
+        ->join('contracts','stores.id', '=' , 'contracts.object_id')
+        ->join('companies','stores.company_id', '=' , 'companies.id')
+        ->where("contracts.object_type","=",\DB::raw('"App\\\Models\\\Store"'));
+    }
+    
+    public function department()
+    {
+        return $this->belongsTo('\App\Models\Department', 'object_id', 'id')
+        ->select(['departments.*', 'stores.name as store_name', 'companies.name as company_name'])
+        ->join('contracts','departments.id', '=' , 'contracts.object_id')
+        ->join('stores','stores.id', '=' , 'departments.store_id')
+        ->join('companies','stores.company_id', '=' , 'companies.id')
+        ->where("contracts.object_type","=",\DB::raw('"App\\\Models\\\Department"'));
     }
     public function asset()
     {
@@ -86,6 +112,6 @@ final class Contract extends SnipeModel
 
     public function assetlog()
     {
-        return $this->hasMany('\App\Models\Actionlog', 'item_id')->where('item_type', Contract::class)->orderBy('created_at', 'desc')->withTrashed();
+        return $this->hasMany('\App\Models\Actionlog', 'item_id')->where('item_type', Component::class)->orderBy('created_at', 'desc')->withTrashed();
     }
 }
