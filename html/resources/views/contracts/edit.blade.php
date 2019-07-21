@@ -253,51 +253,93 @@
     });
     
      $(".store_select").select2({
-/**
- * Adds an empty placeholder, allowing every select2 instance to be cleared.
- * This placeholder can be overridden with the "data-placeholder" attribute.
- */
-placeholder: '',
-allowClear: true,
+    /**
+    * Adds an empty placeholder, allowing every select2 instance to be cleared.
+    * This placeholder can be overridden with the "data-placeholder" attribute.
+    */
+    placeholder: '',
+    allowClear: true,
 
-ajax: {
+    ajax: {
 
-    // the baseUrl includes a trailing slash
-    url: baseUrl + 'api/v1/stores/selectlist',
-    dataType: 'json',
-    delay: 250,
-    headers: {
-        "X-Requested-With": 'XMLHttpRequest',
-        "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr('content')
+        // the baseUrl includes a trailing slash
+        url: baseUrl + 'api/v1/stores/selectlist',
+        dataType: 'json',
+        delay: 250,
+        headers: {
+            "X-Requested-With": 'XMLHttpRequest',
+            "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr('content')
+        },
+        data: function (params) {
+            var data = {
+                search: params.term,
+                company_id: ($("#company_select").val()) ? $("#company_select").val() : "-1",
+                page: params.page || 1,
+                assetStatusType: $(".js-data-ajax-company").data("asset-status-type"),
+            };
+            return data;
+        },
+        processResults: function (data, params) {
+
+            params.page = params.page || 1;
+
+            var answer =  {
+                results: data.items,
+                pagination: {
+                    more: "true" //(params.page  < data.page_count)
+                }
+            };
+
+            return answer;
+        },
+        cache: true
     },
-    data: function (params) {
-        var data = {
-            search: params.term,
-            company_id: ($("#company_select").val()) ? $("#company_select").val() : "-1",
-            page: params.page || 1,
-            assetStatusType: $(".js-data-ajax-company").data("asset-status-type"),
-        };
-        return data;
-    },
-    processResults: function (data, params) {
+    escapeMarkup: function (markup) { return markup; }, // let our custom formatter work
+    templateResult: formatDatalist,
+    templateSelection: formatDataSelection
+    });
 
-        params.page = params.page || 1;
-
-        var answer =  {
-            results: data.items,
-            pagination: {
-                more: "true" //(params.page  < data.page_count)
-            }
-        };
-
-        return answer;
-    },
-    cache: true
-},
-escapeMarkup: function (markup) { return markup; }, // let our custom formatter work
-templateResult: formatDatalist,
-templateSelection: formatDataSelection
-});
+    $(".department_select").select2({
+     placeholder: '',
+     allowClear: true,
+     
+     ajax: {
+   
+         // the baseUrl includes a trailing slash
+         url: baseUrl + 'api/v1/departments/selectlist',
+         dataType: 'json',
+         delay: 250,
+         headers: {
+             "X-Requested-With": 'XMLHttpRequest',
+             "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr('content')
+         },
+         data: function (params) {
+             var data = {
+                 search: params.term,
+                 store_id:($("#store_select").val()) ? $("#store_select").val() : "-1",
+                 page: params.page || 1,
+             };
+             return data;
+         },
+         processResults: function (data, params) {
+   
+             params.page = params.page || 1;
+   
+             var answer =  {
+                 results: data.items,
+                 pagination: {
+                     more: "true" //(params.page  < data.page_count)
+                 }
+             };
+   
+             return answer;
+         },
+         cache: true
+     },
+     escapeMarkup: function (markup) { return markup; }, // let our custom formatter work
+     templateResult: formatDatalist,
+     templateSelection: formatDataSelection
+   });
 
 $(".user_select").select2({
 
@@ -321,7 +363,7 @@ ajax: {
     data: function (params) {
         var data = {
             search: params.term,
-            company_id:($("#company_select").val() == '') ? 0 : $("#company_select").val() ,
+            //company_id:($("#company_select").val() == '') ? 0 : $("#company_select").val() ,
             page: params.page || 1,
             assetStatusType: $(".js-data-ajax-company").data("asset-status-type"),
         };

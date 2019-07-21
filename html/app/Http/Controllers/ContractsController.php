@@ -40,8 +40,8 @@ class ContractsController extends Controller
             $this->authorize('update', $item);
             $item = Contract::select(
                 'contracts.id',
-                'contracts.store_id',
-                'stores.company_id',
+                //'contracts.store_id',
+                //'stores.company_id',
                 'contracts.name',
                 'contracts.location_id',
                 'contracts.contact_id_1',
@@ -53,7 +53,7 @@ class ContractsController extends Controller
                 'contracts.terms_and_conditions',
                 'contracts.notes'
                 )
-            ->join('stores', 'stores.id', '=', 'contracts.store_id') 
+            //->join('stores', 'stores.id', '=', 'contracts.store_id') 
             ->where('contracts.id','=',$contractId)
             ->first();
 
@@ -117,39 +117,45 @@ class ContractsController extends Controller
      */
     public function edit($contractId = null)
     {
-        if ($item = Contract::find($contractId)) {
-            $this->authorize('update', $item);
-            $item = Contract::select(
-                'contracts.id',
-                // 'contracts.store_id',
-                // 'stores.company_id',
-                'contracts.object_id',
-                'contracts.object_type',
-                'contracts.name',
-                'contracts.location_id',
-                'contracts.contact_id_1',
-                'contracts.contact_id_2',
-                'contracts.start_date',
-                'contracts.end_date',
-                'contracts.billing_date',
-                'contracts.payment_date',
-                'contracts.terms_and_conditions',
-                'contracts.notes'
-                // )->join('stores', 'stores.id', '=', 'contracts.store_id') 
-                // ->where('contracts.id','=',$contractId)
-                // ->first();
-                )->where('contracts.id','=',$contractId)
-            ->first();;
-            // if($contract->object_type = 'App\Models\Company') {
-            //     $item->join('companies', 'companies.id', '=', 'contracts.object_id');
-            // } else if($contract->object_type = 'App\Models\Store') {
-            //     $item->join('stores', 'stores.id', '=', 'contracts.object_id');
-            // } else {
-            //     $item->join('departments', 'departments.id', '=', 'contracts.object_id');
-            // }
-            return view('contracts/edit',compact('item'));
+        // if ($item = Contract::find($contractId)) {
+        //     $this->authorize('update', $item);
+        //     return view('contracts/edit', compact('item'));
+        // }
+        // return redirect()->route('contract.index')->with('error', trans('admin/contracts/message.not_found'));
+
+        if (is_null($item = Contract::find($contractId))) {
+          
+            return redirect()->back()->with('error', trans('admin/contracts/message.not_found'));
         }
-        return redirect()->route('contracts.index')->with('error', trans('admin/contracts/essage.does_not_exist'));
+        // $item = Contract::select('contracts.*','companies.id as assigned_company' )
+        // ->join('companies', 'contracts.object_id', '=', 'companies.id')
+        // ->where('contracts.id',$contractId)
+        // ->where('contracts.object_type',Company::class)
+        $item = Contract::select(
+            'contracts.*'        
+        );
+        if($item->object_type = Company::class) {
+            $item = $item
+            ->select(['contracts.*', 'companies.id AS assigned_company'])
+            ->join('companies', 'companies.id', '=', 'contracts.object_id')->first();
+        }
+        else if($item->object_type = Store::class) {
+            $item = $item
+            ->select(['contracts.*', 'stores.id AS assigned_store', 'companies.id AS assigned_company'])
+            ->join('stores', 'stores.id', '=', 'contracts.object_id')      
+            ->join('companies','stores.company_id', '=' , 'companies.id')->first();
+        }
+        else if($item->object_type = Department::class) {
+            $item = $item
+            ->select(['contracts.*','departments.id AS assigned_department', 'stores.id AS assigned_store', 'companies.id AS assigned_company'])
+            ->join('stores','stores.id', '=' , 'departments.store_id')
+            ->join('companies','stores.company_id', '=' , 'companies.id')
+            ->join('departments', 'departments.id', '=', 'contracts.object_id')->first();
+        }
+
+        $this->authorize('update', $item);
+           
+        return view('contracts/edit', compact('item'));
     }
 
      /**
@@ -177,13 +183,13 @@ class ContractsController extends Controller
 
         if (request('checkout_to_type_contract')=='company') {
             $contract->object_id   = $request->input('assigned_company');
-            $contract->object_type = 'App\Models\Company';
+            $contract->object_type = Company::class;
         } elseif (request('checkout_to_type_contract')=='store') {
             $contract->object_id   = $request->input('assigned_store');
-            $contract->object_type = 'App\Models\Store';
+            $contract->object_type = Store::class;
         } elseif (request('checkout_to_type_contract')=='department') {
             $contract->object_id   = $request->input('assigned_department');
-            $contract->object_type = 'App\Models\Department';
+            $contract->object_type = Department::class;
         }
         
         if ($contract->save()) {

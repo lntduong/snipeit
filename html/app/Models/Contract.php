@@ -85,7 +85,7 @@ final class Contract extends SnipeModel
     public function store()
     {
         return $this->belongsTo('\App\Models\Store', 'object_id', 'id')
-        ->select(['stores.*', 'companies.name as company_name'])
+        ->select(['stores.*', 'companies.name as company_name', 'companies.id as company_id'])
         ->join('contracts','stores.id', '=' , 'contracts.object_id')
         ->join('companies','stores.company_id', '=' , 'companies.id')
         ->where("contracts.object_type","=",\DB::raw('"App\\\Models\\\Store"'));
@@ -94,7 +94,7 @@ final class Contract extends SnipeModel
     public function department()
     {
         return $this->belongsTo('\App\Models\Department', 'object_id', 'id')
-        ->select(['departments.*', 'stores.name as store_name', 'companies.name as company_name'])
+        ->select(['departments.*', 'stores.name as store_name', 'companies.name as company_name', 'stores.id as store_id', 'companies.id as company_id'])
         ->join('contracts','departments.id', '=' , 'contracts.object_id')
         ->join('stores','stores.id', '=' , 'departments.store_id')
         ->join('companies','stores.company_id', '=' , 'companies.id')

@@ -24,18 +24,18 @@ class ContractsTransformer
             'name' => $contract->name,
 
             'company' => ($contract->department) ? [
-                'id' => (int) $contract->department->id,
+                'id' => (int) $contract->department->company_id,
                 'name'=> e($contract->department->company_name)
             ] : (($contract->store) ?[
-                'id' => (int) $contract->store->id,
+                'id' => (int) $contract->store->company_id,
                 'name'=> e($contract->store->company_name),
-            ] : (($contract->company) ? [
+            ] : ($contract->company) ? [
                 'id' => (int) $contract->company->id,
                 'name'=> e($contract->company->name)
-            ]  : null)),
+            ]  : null),
 
             'store' => ($contract->department) ? [
-                'id' => (int) $contract->department->id,
+                'id' => (int) $contract->department->store_id,
                 'name'=> e($contract->department->store_name)
             ] : (($contract->store) ? [
                 'id' => (int) $contract->store->id,

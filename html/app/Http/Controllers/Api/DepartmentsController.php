@@ -150,6 +150,10 @@ class DepartmentsController extends Controller
             $departments = $departments->where('name', 'LIKE', '%'.$request->get('search').'%');
         }
 
+        if ($request->get('store_id')) {
+            $departments = $departments->where('store_id', '=', $request->get('store_id'));
+        }
+
         $departments = $departments->orderBy('name', 'ASC')->paginate(50);
 
         // Loop through and set some custom properties for the transformer to use.
