@@ -7,14 +7,14 @@ use Illuminate\Support\Collection;
 
 class ContractsTransformer
 {
-    public function transformContractList(Collection $contractList, $total)
+    public function transformContractList(Collection $contractList)
     {
         $array = array();
       
         foreach ($contractList as $contract) {
             $array[] = self::transformContract($contract);
         }
-        return (new DatatablesTransformer)->transformDatatables($array, $total);
+        return (new DatatablesTransformer)->transformDatatables($array);
     }
 
     public function transformContract (Contract $contract)
@@ -23,26 +23,25 @@ class ContractsTransformer
             'id' => (Int) $contract->id,
             'name' => $contract->name,
 
-            'company' => ($contract->department) ? [
-                'id' => (int) $contract->department->company_id,
+            'company' => (($contract->object_type == 'App\Models\Department') ? [
+                'id' => (int) $contract->department->id,
                 'name'=> e($contract->department->company_name)
-            ] : (($contract->store) ?[
-                'id' => (int) $contract->store->company_id,
+            ] : (($contract->object_type == 'App\Models\Store') ?[
+                'id' => (int) $contract->store->id,
                 'name'=> e($contract->store->company_name),
-            ] : ($contract->company) ? [
+            ] : (($contract->object_type == 'App\Models\Company') ? [
                 'id' => (int) $contract->company->id,
                 'name'=> e($contract->company->name)
-            ]  : null),
+            ]  : null))),
 
-            'store' => ($contract->department) ? [
-                'id' => (int) $contract->department->store_id,
+            'store' => ($contract->object_type == 'App\Models\Department') ? [
+                'id' => (int) $contract->department->id,
                 'name'=> e($contract->department->store_name)
-            ] : (($contract->store) ? [
+            ] : (($contract->object_type == 'App\Models\Store') ? [
                 'id' => (int) $contract->store->id,
                 'name'=> e($contract->store->name),
             ]  : null),
-  
-            'department' => ($contract->department) ? [
+            'department' => ($contract->object_type == 'App\Models\Department') ? [
                 'id' => (int) $contract->department->id,
                 'name'=> e($contract->department->name)
             ]  : null,

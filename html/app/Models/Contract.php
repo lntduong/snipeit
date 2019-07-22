@@ -76,29 +76,43 @@ final class Contract extends SnipeModel
     public function company()
     {
         return $this->belongsTo('\App\Models\Company', 'object_id', 'id')
-        ->select(['companies.*', 'stores.name as store_name'])
-        ->join('contracts','companies.id', '=' , 'contracts.object_id')
-        ->join('stores','stores.company_id', '=' , 'companies.id')
-        ->where("contracts.object_type","=",\DB::raw('"App\\\Models\\\Company"'));
+        ->select(['companies.*'])
+        ->join('contracts','companies.id', '=' , 
+        \DB::raw('(CASE WHEN contracts.object_type = "App\\\Models\\\Company" THEN contracts.object_id ELSE null END )' ));
+        //->join('stores','stores.company_id', '=' , 'companies.id')
+        // ->where("contracts.object_type","=",\DB::raw('"App\\\Models\\\Company"'));
     }
 
     public function store()
     {
         return $this->belongsTo('\App\Models\Store', 'object_id', 'id')
-        ->select(['stores.*', 'companies.name as company_name', 'companies.id as company_id'])
-        ->join('contracts','stores.id', '=' , 'contracts.object_id')
-        ->join('companies','stores.company_id', '=' , 'companies.id')
-        ->where("contracts.object_type","=",\DB::raw('"App\\\Models\\\Store"'));
+        ->select(['stores.*', 'companies.name as company_name'])
+        ->leftJoin('contracts','stores.id', '=' , 
+        \DB::raw('(CASE WHEN contracts.object_type = "App\\\Models\\\Store" THEN contracts.object_id ELSE null END )' ))
+        ->leftJoin('companies','companies.id', '=' , 'stores.company_id');
+        //->where("contracts.object_type","=",\DB::raw('"App\\\Models\\\Store"'));
     }
     
     public function department()
     {
         return $this->belongsTo('\App\Models\Department', 'object_id', 'id')
-        ->select(['departments.*', 'stores.name as store_name', 'companies.name as company_name', 'stores.id as store_id', 'companies.id as company_id'])
+        ->select(['departments.*', 'stores.name as store_name', 'companies.name as company_name'])
         ->join('contracts','departments.id', '=' , 'contracts.object_id')
         ->join('stores','stores.id', '=' , 'departments.store_id')
         ->join('companies','stores.company_id', '=' , 'companies.id')
         ->where("contracts.object_type","=",\DB::raw('"App\\\Models\\\Department"'));
+        // ->select(['departments.*', 'store_name', 'company_name'])
+        // ->join('contracts','departments.id', '=' , 'contracts.object_id')
+        // ->join("\DB::raw(
+        //     (
+        //         SELECT stores.id As store_id,
+        //         stores.name As store_name,
+        //         companies.name As company_name
+        //         FROM stores
+        //         INNER JOIN
+        //     companies ON companies.id = stores.company_id
+        //     ) AS name
+        // )" ,'name.store_id', '=', 'departments.store_id');
     }
     public function asset()
     {

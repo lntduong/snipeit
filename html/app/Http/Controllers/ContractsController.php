@@ -131,31 +131,37 @@ class ContractsController extends Controller
         // ->join('companies', 'contracts.object_id', '=', 'companies.id')
         // ->where('contracts.id',$contractId)
         // ->where('contracts.object_type',Company::class)
-        $item = Contract::select(
-            'contracts.*'        
-        );
-        if($item->object_type = Company::class) {
-            $item = $item
-            ->select(['contracts.*', 'companies.id AS assigned_company'])
-            ->join('companies', 'companies.id', '=', 'contracts.object_id')->first();
-        }
-        else if($item->object_type = Store::class) {
-            $item = $item
-            ->select(['contracts.*', 'stores.id AS assigned_store', 'companies.id AS assigned_company'])
-            ->join('stores', 'stores.id', '=', 'contracts.object_id')      
-            ->join('companies','stores.company_id', '=' , 'companies.id')->first();
-        }
-        else if($item->object_type = Department::class) {
-            $item = $item
-            ->select(['contracts.*','departments.id AS assigned_department', 'stores.id AS assigned_store', 'companies.id AS assigned_company'])
-            ->join('stores','stores.id', '=' , 'departments.store_id')
-            ->join('companies','stores.company_id', '=' , 'companies.id')
-            ->join('departments', 'departments.id', '=', 'contracts.object_id')->first();
-        }
+        if ($item = Contract::find($contractId)) {
+            $scope = $item->object_type;
+            if($scope == Company::class) {
+                $item = $item
+                ->select('contracts.*', 'companies.id AS assigned_company')
+                ->join('companies', 'companies.id', '=', 
+                \DB::raw('(CASE WHEN contracts.object_type = "App\\\Models\\\Company" THEN contracts.object_id ELSE null END )' ))
+                ->first();
+            }
+            else if($scope == Store::class) {
+                $item = $item
+                ->select('contracts.*', 'stores.id AS assigned_store', 'companies.id AS assigned_company')
+                ->join('stores', 'stores.id', '=', 
+                \DB::raw('(CASE WHEN contracts.object_type = "App\\\Models\\\Store" THEN contracts.object_id ELSE null END )' ))      
+                ->join('companies','stores.company_id', '=' , 'companies.id')
+                ->first();
+            }
+            else if($scope == Department::class) {
+                $item = $item
+                ->select('contracts.*','departments.id AS assigned_department', 'stores.id AS assigned_store', 'companies.id AS assigned_company')
+                ->join('departments', 'departments.id', '=', 
+                \DB::raw('(CASE WHEN contracts.object_type = "App\\\Models\\\Department" THEN contracts.object_id ELSE null END )' ))
+                ->join('stores','stores.id', '=' , 'departments.store_id')
+                ->join('companies','stores.company_id', '=' , 'companies.id')
+                ->first();
+            }
 
-        $this->authorize('update', $item);
+            $this->authorize('update', $item);
            
         return view('contracts/edit', compact('item'));
+    }
     }
 
      /**
