@@ -15,64 +15,59 @@ class ContractsController extends Controller
 {   
     public function index(Request $request)
     {      
-        $this->authorize('view', Contract::class);
 
+        $this->authorize('view', Contract::class);
         $contract = Contract::select(
             'contracts.*'
-            // 'companies.name AS company_name',
-            // 'stores.name AS store_name',
-            // 'departments.name AS department_name' 
-            )
-            // ->leftJoin('companies', 'companies.id', '=' ,
-            // \DB::raw('(CASE WHEN contracts.object_type = "App\\\Models\\\Company" THEN contracts.object_id ELSE null END )' ))
-            // ->leftJoin('stores', 'stores.id', '=' ,
-            // \DB::raw('(CASE WHEN contracts.object_type = "App\\\Models\\\Store" THEN contracts.object_id ELSE null END )' ))
-            // ->leftJoin('departments', 'departments.id', '=' ,
-            // \DB::raw('(CASE WHEN contracts.object_type = "App\\\Models\\\Department" THEN contracts.object_id ELSE null END )' ))
-
-            ;
-            //->with('store', 'location', 'user', 'user2');
-            //->join('stores', 'stores.id', '=', 'contracts.store_id' );
-
-        if($request->input('company')) {
-            //$contract = $contract->where('companies.id','=',$request->input('company'));
-            // ->unionAll(
-            //     Store::select('contracts.*',
-            //         'companies.name AS company_name',
-            //         'stores.name AS store_name')->leftJoin('companies', 'companies.id', '=', 'stores.company_id')
-            //         ->leftJoin('contracts', 'stores.id', '=', 
-            //         \DB::raw('(CASE WHEN contracts.object_type = "App\\\Models\\\Store" THEN contracts.object_id ELSE null END )' ))
-            //     )
-            //     ;
+            );
+        if($request->has('department')) {
             $contract = $contract
             ->where('contracts.object_type', '=', \DB::raw('"App\\\Models\\\Department"') )
             ->whereIn('contracts.object_id', 
                 Department::select('departments.id')
-                ->join('stores','stores.id', '=', 'departments.store_id')
-                ->join('companies','companies.id', '=', 'stores.company_id')
-                ->where('companies.id','=',$request->input('company'))
-            )
-            ->union(
-                Contract::select('contracts.*')
-                ->where('contracts.object_type', '=', \DB::raw('"App\\\Models\\\Store"'))
+                ->where('departments.id','=',$request->input('department'))
+            );
+        } else {
+            if ($request->has('store') ) {
+                    $contract = $contract
+                    ->orWhere('contracts.object_type', '=', \DB::raw('"App\\\Models\\\Department"') )
+                    ->whereIn('contracts.object_id', 
+                        Department::select('departments.id')
+                        ->join('stores','stores.id', '=', 'departments.store_id')
+                        ->where('stores.id','=',$request->input('store'))
+                    )
+                    ->union(
+                        Contract::select('contracts.*')
+                        ->where('contracts.object_type', '=', \DB::raw('"App\\\Models\\\Store"'))
+                        ->where('contracts.object_id', '=', $request->input('store'))
+                    );
+                }
+            else if($request->input('company')) {
+                $contract = $contract
+                ->where('contracts.object_type', '=', \DB::raw('"App\\\Models\\\Department"') )
                 ->whereIn('contracts.object_id', 
-                    Store::select('stores.id')
+                    Department::select('departments.id')
+                    ->join('stores','stores.id', '=', 'departments.store_id')
                     ->join('companies','companies.id', '=', 'stores.company_id')
                     ->where('companies.id','=',$request->input('company'))
                 )
-            )
-            ->union(
-                Contract::select('contracts.*')
-                ->where('contracts.object_type', '=', \DB::raw('"App\\\Models\\\Company"'))
-                ->where('contracts.object_id', '=', $request->input('company'))
-            );
+                ->union(
+                    Contract::select('contracts.*')
+                    ->where('contracts.object_type', '=', \DB::raw('"App\\\Models\\\Store"'))
+                    ->whereIn('contracts.object_id', 
+                        Store::select('stores.id')
+                        ->join('companies','companies.id', '=', 'stores.company_id')
+                        ->where('companies.id','=',$request->input('company'))
+                    )
+                )
+                ->union(
+                    Contract::select('contracts.*')
+                    ->where('contracts.object_type', '=', \DB::raw('"App\\\Models\\\Company"'))
+                    ->where('contracts.object_id', '=', $request->input('company'))
+                );
+            }
         }
-        if ($request->has('store') ) {
-            $contract = $contract->orwhere('stores.id','=',$request->input('store'));
-        }
-        if($request->has('department')) {
-            $contract = $contract->orWhere('departments.id','=',$request->input('department'));
-        }
+        
         if ($request->has('search')) {
             $contract = $contract->TextSearch($request->input('search'));
         }

@@ -138,6 +138,7 @@ class ContractsController extends Controller
                 ->select('contracts.*', 'companies.id AS assigned_company')
                 ->join('companies', 'companies.id', '=', 
                 \DB::raw('(CASE WHEN contracts.object_type = "App\\\Models\\\Company" THEN contracts.object_id ELSE null END )' ))
+                ->where('contracts.id','=',$contractId)
                 ->first();
             }
             else if($scope == Store::class) {
@@ -146,6 +147,7 @@ class ContractsController extends Controller
                 ->join('stores', 'stores.id', '=', 
                 \DB::raw('(CASE WHEN contracts.object_type = "App\\\Models\\\Store" THEN contracts.object_id ELSE null END )' ))      
                 ->join('companies','stores.company_id', '=' , 'companies.id')
+                ->where('contracts.id','=',$contractId)
                 ->first();
             }
             else if($scope == Department::class) {
@@ -155,6 +157,7 @@ class ContractsController extends Controller
                 \DB::raw('(CASE WHEN contracts.object_type = "App\\\Models\\\Department" THEN contracts.object_id ELSE null END )' ))
                 ->join('stores','stores.id', '=' , 'departments.store_id')
                 ->join('companies','stores.company_id', '=' , 'companies.id')
+                ->where('contracts.id','=',$contractId)
                 ->first();
             }
 
