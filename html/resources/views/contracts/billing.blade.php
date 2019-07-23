@@ -74,7 +74,7 @@
     table = document.getElementById("contractsTable");
     tr = table.getElementsByTagName("tr");
     for (i = 0; i < tr.length; i++) {       
-      td = tr[i].getElementsByTagName("td")[7];
+      td = tr[i].getElementsByTagName("td")[9];
       if (td) {
         txtValue = td.textContent || td.innerText;
         if (txtValue.toUpperCase().indexOf(filter) > -1) {

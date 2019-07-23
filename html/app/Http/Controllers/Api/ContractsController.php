@@ -71,40 +71,44 @@ class ContractsController extends Controller
         if ($request->has('search')) {
             $contract = $contract->TextSearch($request->input('search'));
         }
-       
-        //$offset = (($contract) && (request('offset') > $contract->count())) ? 0 : request('offset', 0);
+        
         $limit = request('limit', 50);
 
-        $allowed_columns = ['location','store', 'user', 'user2'];
+        
         $order = $request->input('order') === 'asc' ? 'asc' : 'desc';
-        $sort = in_array($request->input('sort'), $allowed_columns) ? $request->input('sort') : 'created_at';
 
-        switch ($sort) {
+        switch ($request->input('sort')) {
             case 'location':
-                $contract = $contract->OrderLocation($order);
-                break;
-            case 'store':
-                $contract = $contract->OrderStore($order);
-                break;
-            case 'user':
-                $contract = $contract->OrderUser($order);
-                break;
-            case 'user2':
-                $contract = $contract->OrderUser($order);
-                break;
-            default:
-                $contract = $contract->orderBy($sort, $order);
-                break;
-        }
+                $contract = $contract->leftJoin('locations', 'locations.id', '=', 'contracts.locaiton_id')->orderBy('locations.name', $order);
+            break;
+        case 'store':
+            $contract = $contract->leftJoin('stores', 'stores.id', '=', 'contracts.object_id')->orderBy('stores.name', $order);
+            break;
+        case 'user':
+            $contract = $contract->leftJoin('users', 'users.id', '=', 'contracts.contact_id_1')->orderBy('users.name', $order);
+            break;
+        case 'user2':
+            $contract = $contract->leftJoin('users', 'users.id', '=', 'contracts.contact_id_2')->orderBy('users.name', $order);
+            break;
+        case 'company':
+            $contract = $contract->leftJoin('companies', 'companies.id', '=', 'contracts.object_id')->orderBy('companies.name', $order);
+            break;
+        case 'department':
+            $contract = $contract->leftJoin('departments', 'departments.id', '=', 'contracts.object_id')->orderBy('departments.name', $order);
+            break;
+        default:
+            $allowed_columns = ['location','store', 'user', 'user2', 'company', 'department'];
+            $sort = in_array($request->input('sort'), $allowed_columns) ? e($request->input('sort')) : 'created_at';
+            $contract = $contract->orderBy($sort, $order);
+            break;
+    }
 
-        //$total = $contract->count();
         $contract = $contract->take($limit)->get();
         return (new ContractsTransformer)->transformContractList($contract);
     }
 
     public function selectlist(Request $request)
     {
-        //$listContract = Contract::where('contracts.store_id', '=', $request->store_id);
         $listContract = Contract::select([
             'contracts.id',
             'contracts.name',

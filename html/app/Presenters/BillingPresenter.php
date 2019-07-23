@@ -26,13 +26,31 @@ class BillingPresenter extends Presenter
              
             ],
             [
-                "field" => "store_id",
-                "searchable" => false,
+                "field" => "company",
+                "searchable" => true,
                 "sortable" => true,
                 "switchable" => true,
-                "title" => trans('admin/contracts/table.store'),
+                "title" => trans('general.company'),
+                "visible" => true,
+                "formatter" => "companiesLinkObjFormatter"
+            ],
+            [
+                "field" => "store",
+                "searchable" => true,
+                "sortable" => true,
+                "switchable" => true,
+                "title" => trans('general.store'),
                 "visible" => true,
                 "formatter" => "storesLinkObjFormatter"
+            ],
+            [
+                "field" => "department",
+                "searchable" => true,
+                "sortable" => true,
+                "switchable" => true,
+                "title" => trans('general.department'),
+                "visible" => true,
+                "formatter" => "departmentsLinkObjFormatter"
             ],
             [
                 "field" => "location_id",
@@ -92,7 +110,7 @@ class BillingPresenter extends Presenter
                 "searchable" => true,
                 "sortable" => true,
                 "switchable" => true,
-                "title" =>  trans('admin/contracts/table.payment_date'),
+                "title" =>  trans('admin/contracts/table.payment'),
                 "visible" => true,
             ]
             

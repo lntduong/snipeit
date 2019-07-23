@@ -6,15 +6,7 @@
     'updateText' => trans('admin/contracts/table.edit'),
     'formAction' => ($item) ? route('contracts.update', ['contracts_id' => $item->id]) : route('contracts.store'),
 ])
-<style>
 
-#table_contract_assets {
-    font-size: 13px;
-}
-#add_asset {
-    width: 60px;
-}
-</style>
 {{-- Page content --}}
 @section('inputFields')
 <!-- contract name-->
@@ -35,10 +27,10 @@
 @include ('partials.forms.edit.location-select-contract', ['translated_name' => trans('admin/contracts/table.location'), 'fieldname' => 'location_id', 'new' => 'no'])
 
 <!-- Contact Person 1-->
-@include ('partials.forms.edit.user2-select', ['translated_name' => trans('admin/contracts/table.contact_person1'), 'fieldname' => 'contact_id_1', 'classname' => 'user_select_id'])
+@include ('partials.forms.edit.user2-select', ['translated_name' => trans('admin/contracts/table.contact_person_1'), 'fieldname' => 'contact_id_1', 'classname' => 'user_select_id'])
 
 <!-- Contact Person 2-->
-@include ('partials.forms.edit.user2-select', ['translated_name' => trans('admin/contracts/table.contact_person2'), 'fieldname' => 'contact_id_2', 'classname' => 'user2_select_id'])
+@include ('partials.forms.edit.user2-select', ['translated_name' => trans('admin/contracts/table.contact_person_2'), 'fieldname' => 'contact_id_2', 'classname' => 'user2_select_id'])
 
 <!-- Date contracts-->   
 @include ('partials.forms.edit.date-contract')
@@ -96,6 +88,7 @@
 
 <script>
     var srcImg;
+    var nameAsset;
     $('input[name=checkout_to_type_contract]').on("change",function () {
         var object_type = $('input[name=checkout_to_type_contract]:checked').val();
         var object_id = $('#assigned_company option:selected').val();
@@ -151,12 +144,18 @@
                         else {
                             srcImg = '/uploads/models/mbp.jpg';
                         }
-                        console.log(data[i].id);
+
+                        if(data[i].name == null ) {
+                            nameAsset = data[i].asset_tag ;
+                        }
+                        else {
+                            nameAsset = data[i].name + ' (' + data[i].asset_tag + ')';
+                        }
                         $table.bootstrapTable('insertRow', {
                             index: 1,
                             row: {
                                 name:  
-                                '<a href="/hardware/'+ data[i].id +'">'+data[i].name + " (" + data[i].asset_tag + ")" + '</a>',
+                                '<a href="/hardware/'+ data[i].id +'">'+nameAsset + '</a>',
                                 image: '<img src='+srcImg+' width="50" height="40" />',
                                 actions: "<a href='#' class='btn btn-danger btn-sm' onclick='removeAsset(" + data[i].id+ "); return false;'> <i class='fa fa-trash'></i> </a>"
                             }  
@@ -194,10 +193,17 @@
                     else {
                         srcImg = '/uploads/models/mbp.jpg';
                     }
+
+                    if(data[i].name == null ) {
+                        nameAsset = data[i].asset_tag ;
+                    }
+                    else {
+                        nameAsset = data[i].name + ' (' + data[i].asset_tag + ')';
+                    }
                     $table.bootstrapTable('insertRow', {
                         index: 1,
                         row: {
-                            name:  '<a href="/hardware/'+ data[i].id +'">'+data[i].name + " (" + data[i].asset_tag + ")" + '</a>',
+                            name:  '<a href="/hardware/'+ data[i].id +'">'+nameAsset + '</a>',
                             image: '<img src='+srcImg+' width="50" height="40" />',
                             actions: "<a href='#' class='btn btn-danger btn-sm' onclick='removeAsset(" + data[i].id+ "); return false;'> <i class='fa fa-trash'></i> </a>"
                         }
@@ -233,10 +239,16 @@
                     else {
                         srcImg = '/uploads/models/mbp.jpg';
                     }
+                    if(data[i].name == null ) {
+                        nameAsset = data[i].asset_tag ;
+                    }
+                    else {
+                        nameAsset = data[i].name + ' (' + data[i].asset_tag + ')';
+                    }
                     $table.bootstrapTable('insertRow', {
                         index: 1,
                         row: {
-                            name:  '<a href="/hardware/'+ data[i].id +'">'+data[i].name + " (" + data[i].asset_tag + ")" + '</a>',
+                            name:  '<a href="/hardware/'+ data[i].id +'">'+nameAsset + '</a>',
                             image: '<img src='+srcImg+' width="50" height="40" />',
                             actions: "<a href='#' class='btn btn-danger btn-sm' onclick='removeAsset(" + data[i].id+ "); return false;'> <i class='fa fa-trash'></i> </a>"
                         }

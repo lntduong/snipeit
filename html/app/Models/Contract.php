@@ -13,7 +13,6 @@ final class Contract extends SnipeModel
     protected $presenter = 'App\Presenters\ContractPresenter';
     public $rules = array(
             'name' => 'required|unsame_name:contracts,object_id',
-            //'store_id' => 'required',
             'start_date' => 'required',
             'end_date'  => 'required',
             'billing_date' => 'required',
@@ -39,11 +38,12 @@ final class Contract extends SnipeModel
         'store'      => ['name'],
         'location'   => ['name'],
         'user'       => ['last_name'],
-        'user2'      => ['last_name']
+        'user2'      => ['last_name'],
+        'company'    => ['name'],
+        'deparment'  => ['name']
     ];   
     protected $fillable = [
         'id',
-        //'store_id' , 
         'object_id' , 
         'object_type' ,
         'name' ,

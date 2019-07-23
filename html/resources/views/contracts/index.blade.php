@@ -15,19 +15,13 @@
 
 {{-- Page content --}}
 @section('content')
-<style>
-.col-md-7 {
-    width: 130%!important;
-}
-</style>
 <div class="row">
-    <div class="col-md-12">
-        <div class="box box-default">
-            <div class="box-body">
-                <div class="row">
-                    <div id="toolbar">
-                        <div class="row">
-                        <div class="col-md-12">
+   <div class="col-md-12">
+      <div class="box">
+         <div class="box-body">
+            <div class="row">
+               <div class="col-md-12">
+                  <div class="col-md-6">
                             {{-- Company-Name --}}
                             @include ('partials.forms.edit.company-select', ['translated_name' => trans('general.company'), 'fieldname' => 'company_id'])
                             {{-- Store-Name --}}
@@ -36,9 +30,6 @@
                             @include ('partials.forms.edit.department-select-contract', ['translated_name' => trans('general.department'), 'fieldname' => 'department_id'])
                             <button type="submit" id="filterCompany" class="btn btn-primary" onclick="filterCompany()">Go</button>
                         </div>
-                    </div>
-                  </div>
-                </div>
                 <table
                   data-click-to-select="true"
                   data-columns="{{ \App\Presenters\ContractPresenter::dataTableLayout() }}"
@@ -58,9 +49,15 @@
                   class="table table-striped snipe-table"
                   data-url="{{ route('api.contracts.index') }}" >
                 </table>
+                </div>
+               <!-- /.row -->
             </div>
-        </div>
-    </div>
+            <!-- /.row -->
+         </div>
+         <!-- /.box-body -->
+      </div>
+      <!-- /.box -->
+   </div>
 </div>
 @stop
 

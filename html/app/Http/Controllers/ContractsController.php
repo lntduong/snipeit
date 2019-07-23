@@ -37,25 +37,36 @@ class ContractsController extends Controller
     public function show($contractId = null)
     {
         if ($item = Contract::find($contractId)) {
+            $scope = $item->object_type;
+            if($scope == Company::class) {
+                $item = $item
+                ->select('contracts.*', 'companies.id AS assigned_company')
+                ->join('companies', 'companies.id', '=', 
+                \DB::raw('(CASE WHEN contracts.object_type = "App\\\Models\\\Company" THEN contracts.object_id ELSE null END )' ))
+                ->where('contracts.id','=',$contractId)
+                ->first();
+            }
+            else if($scope == Store::class) {
+                $item = $item
+                ->select('contracts.*', 'stores.id AS assigned_store', 'companies.id AS assigned_company')
+                ->join('stores', 'stores.id', '=', 
+                \DB::raw('(CASE WHEN contracts.object_type = "App\\\Models\\\Store" THEN contracts.object_id ELSE null END )' ))      
+                ->join('companies','stores.company_id', '=' , 'companies.id')
+                ->where('contracts.id','=',$contractId)
+                ->first();
+            }
+            else if($scope == Department::class) {
+                $item = $item
+                ->select('contracts.*','departments.id AS assigned_department', 'stores.id AS assigned_store', 'companies.id AS assigned_company')
+                ->join('departments', 'departments.id', '=', 
+                \DB::raw('(CASE WHEN contracts.object_type = "App\\\Models\\\Department" THEN contracts.object_id ELSE null END )' ))
+                ->join('stores','stores.id', '=' , 'departments.store_id')
+                ->join('companies','stores.company_id', '=' , 'companies.id')
+                ->where('contracts.id','=',$contractId)
+                ->first();
+            }
+
             $this->authorize('update', $item);
-            $item = Contract::select(
-                'contracts.id',
-                //'contracts.store_id',
-                //'stores.company_id',
-                'contracts.name',
-                'contracts.location_id',
-                'contracts.contact_id_1',
-                'contracts.contact_id_2',
-                'contracts.start_date',
-                'contracts.end_date',
-                'contracts.billing_date',
-                'contracts.payment_date',
-                'contracts.terms_and_conditions',
-                'contracts.notes'
-                )
-            //->join('stores', 'stores.id', '=', 'contracts.store_id') 
-            ->where('contracts.id','=',$contractId)
-            ->first();
 
             return view('contracts/edit',compact('item'));
         }
@@ -81,7 +92,6 @@ class ContractsController extends Controller
     {
         $contract = new Contract();
         $contract->name                  = $request->input('name');
-        // $contract->store_id              = $request->input('store_id');
         $contract->location_id           = $request->input('location_id');
         $contract->contact_id_1          = $request->input('contact_id_1');
         $contract->contact_id_2          = $request->input('contact_id_2');
@@ -98,7 +108,7 @@ class ContractsController extends Controller
             $contract->object_type = Company::class;
         } elseif (request('checkout_to_type_contract')=='store') {
             $contract->object_id   = $request->input('assigned_store');
-            $contract->object_type = Store::class;
+            $contract->object_typede = Store::class;
         } elseif (request('checkout_to_type_contract')=='department') {
             $contract->object_id   = $request->input('assigned_department');
             $contract->object_type = Department::class;
@@ -117,20 +127,11 @@ class ContractsController extends Controller
      */
     public function edit($contractId = null)
     {
-        // if ($item = Contract::find($contractId)) {
-        //     $this->authorize('update', $item);
-        //     return view('contracts/edit', compact('item'));
-        // }
-        // return redirect()->route('contract.index')->with('error', trans('admin/contracts/message.not_found'));
-
         if (is_null($item = Contract::find($contractId))) {
           
             return redirect()->back()->with('error', trans('admin/contracts/message.not_found'));
         }
-        // $item = Contract::select('contracts.*','companies.id as assigned_company' )
-        // ->join('companies', 'contracts.object_id', '=', 'companies.id')
-        // ->where('contracts.id',$contractId)
-        // ->where('contracts.object_type',Company::class)
+
         if ($item = Contract::find($contractId)) {
             $scope = $item->object_type;
             if($scope == Company::class) {
@@ -172,13 +173,12 @@ class ContractsController extends Controller
      * @param  int $id
      * @return \Illuminate\Http\RedirectResponse
      */
-    public function update(ImageUploadRequest $request,  $contractId = null)
+    public function update(ContractRequest $request,  $contractId = null)
     {
         if (is_null($contract = Contract::find($contractId))) {
             return redirect()->route('contract.index')->with('error', trans('admin/contracts/message.does_not_exist'));
         }
         $contract->name                  = $request->input('name');
-        //$contract->store_id              = $request->input('store_id');
         $contract->location_id           = $request->input('location_id');
         $contract->contact_id_1          = $request->input('contact_id_1');
         $contract->contact_id_2          = $request->input('contact_id_2');

@@ -15,7 +15,7 @@
         </select>
     </div>
     <div class="col-md-1 col-sm-1 text-left">
-        <a class="btn btn-sm btn-warning" id="add_asset">Add</a>
+        <a class="btn btn-sm btn-warning" style="width: 60px;" id="add_asset">Add</a>
     </div>   
     {!! $errors->first($fieldname, '<div class="col-md-8 col-md-offset-3"><span class="alert-msg"><i class="fa fa-times"></i> :message</span></div>') !!}
 </div>

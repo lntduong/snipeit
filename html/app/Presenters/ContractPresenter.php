@@ -112,7 +112,7 @@ class ContractPresenter extends Presenter
                 "searchable" => true,
                 "sortable" => true,
                 "switchable" => true,
-                "title" =>  trans('admin/contracts/table.payment_date'),
+                "title" =>  trans('admin/contracts/table.payment'),
                 "visible" => true,
             ]
             

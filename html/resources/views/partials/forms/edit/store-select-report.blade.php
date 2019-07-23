@@ -1,5 +1,5 @@
 
-<div id="{{ $fieldname }}" class="form-group{{ $errors->has($fieldname) ? ' has-error' : '' }}">
+<div id="{{ $fieldname }}" style="margin-top:40px" class="form-group{{ $errors->has($fieldname) ? ' has-error' : '' }}">
     {{ Form::label($fieldname, $translated_name, array('class' => 'col-md-3 control-label')) }}
     <div class="col-md-7{{isset($required) ? ((\App\Helpers\Helper::checkIfRequired($item, 'contract_id')) ? ' required' : '') : '' }}">
         <select class="store_select" data-endpoint="store" data-placeholder="Select Store" name="{{ $fieldname }}" style="width: 100%" id="store_select">

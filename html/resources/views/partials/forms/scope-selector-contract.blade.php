@@ -3,7 +3,7 @@
     <div class="col-md-8">
         <div class="btn-group" data-toggle="buttons">
             @if ((isset($scope_company_contract)) && ($scope_company_contract!='false'))
-            <label class="btn btn-default active">
+            <label class="btn btn-default {!! (isset($scope)) ? 'active' : '' !!}">
                 <input name="checkout_to_type_contract" value="company" type="radio" checked="checked"><i class="fa fa-user"></i> {{ trans('general.company') }}
             </label>
             @endif
