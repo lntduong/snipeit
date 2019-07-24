@@ -18,10 +18,10 @@
 @include ('partials.forms.edit.scope-company-contract', ['translated_name' => trans('general.company'), 'fieldname' => 'assigned_company', 'required'=>'true'])
 
 <!-- Store-->
-@include ('partials.forms.edit.scope-store-contract', ['translated_name' => trans('general.store'), 'fieldname' => 'assigned_store', 'unselect' => 'true', 'style' => 'display:none;', 'required'=>'true'])
+@include ('partials.forms.edit.scope-store-contract', ['translated_name' => trans('general.store'), 'fieldname' => 'assigned_store', 'required'=>'true'])
 
 <!-- Department-->
-@include ('partials.forms.edit.scope-department-contract', ['translated_name' => trans('general.department'), 'fieldname' => 'assigned_department', 'style' => 'display:none;', 'required'=>'true'])
+@include ('partials.forms.edit.scope-department-contract', ['translated_name' => trans('general.department'), 'fieldname' => 'assigned_department', 'required'=>'true'])
 
 <!-- Location-->
 @include ('partials.forms.edit.location-select-contract', ['translated_name' => trans('admin/contracts/table.location'), 'fieldname' => 'location_id', 'new' => 'no'])

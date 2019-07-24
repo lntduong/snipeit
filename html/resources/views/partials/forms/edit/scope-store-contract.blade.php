@@ -1,5 +1,5 @@
 <!-- Store -->
-<div id="assigned_store" class="form-group{{ $errors->has($fieldname) ? ' has-error' : '' }}"{!!  (isset($style)) ? ' style="'.e($style).'"' : ''  !!}>
+<div id="assigned_store" class="form-group{{ $errors->has($fieldname) ? ' has-error' : '' }}"{!!  (isset($showStore)) ? '' : ' style="display:none"'  !!}>
         {{ Form::label($fieldname, $translated_name, array('class' => 'col-md-3 control-label')) }}
         <div class="col-md-7{{  ((isset($required) && ($required =='true'))) ?  ' required' : '' }}">
             <select class="store_select" data-endpoint="" data-placeholder="Select Store" name="{{ $fieldname }}" style="width: 100%" id="store_select">

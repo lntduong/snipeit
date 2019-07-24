@@ -50,6 +50,14 @@ class ContractRequest extends Request
                 'assigned_store' =>'required',
                 'assigned_department' =>'required'
             ];
+        } else {
+            return [
+                'name' => 'required',
+                'start_date' => 'required',
+                'end_date'  => 'required|after:start_date',
+                'billing_date'  => 'required',
+                'assigned_company' => 'required'
+            ];   
         }
     }
 

@@ -40,7 +40,7 @@ final class Contract extends SnipeModel
         'user'       => ['last_name'],
         'user2'      => ['last_name'],
         'company'    => ['name'],
-        'deparment'  => ['name']
+        'department'  => ['name']
     ];   
     protected $fillable = [
         'id',

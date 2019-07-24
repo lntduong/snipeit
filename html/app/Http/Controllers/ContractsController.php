@@ -45,6 +45,7 @@ class ContractsController extends Controller
                 \DB::raw('(CASE WHEN contracts.object_type = "App\\\Models\\\Company" THEN contracts.object_id ELSE null END )' ))
                 ->where('contracts.id','=',$contractId)
                 ->first();
+                $scopeCompany = true;
             }
             else if($scope == Store::class) {
                 $item = $item
@@ -54,6 +55,8 @@ class ContractsController extends Controller
                 ->join('companies','stores.company_id', '=' , 'companies.id')
                 ->where('contracts.id','=',$contractId)
                 ->first();
+                $scopeStore = true;     
+                $showStore = true;
             }
             else if($scope == Department::class) {
                 $item = $item
@@ -64,11 +67,14 @@ class ContractsController extends Controller
                 ->join('companies','stores.company_id', '=' , 'companies.id')
                 ->where('contracts.id','=',$contractId)
                 ->first();
+                $scopeDepartment = true;
+                $showDepartment = true;  
+                $showStore = true;
             }
 
             $this->authorize('update', $item);
 
-            return view('contracts/edit',compact('item'));
+            return view('contracts/edit',compact('item', 'scopeCompany', 'scopeStore', 'scopeDepartment', 'showDepartment', 'showStore'));
         }
         return redirect()->route('contracts.index')->with('error', trans('admin/contracts/message.does_not_exist'));
     
@@ -108,7 +114,7 @@ class ContractsController extends Controller
             $contract->object_type = Company::class;
         } elseif (request('checkout_to_type_contract')=='store') {
             $contract->object_id   = $request->input('assigned_store');
-            $contract->object_typede = Store::class;
+            $contract->object_type = Store::class;
         } elseif (request('checkout_to_type_contract')=='department') {
             $contract->object_id   = $request->input('assigned_department');
             $contract->object_type = Department::class;
@@ -131,7 +137,6 @@ class ContractsController extends Controller
           
             return redirect()->back()->with('error', trans('admin/contracts/message.not_found'));
         }
-
         if ($item = Contract::find($contractId)) {
             $scope = $item->object_type;
             if($scope == Company::class) {
@@ -141,6 +146,7 @@ class ContractsController extends Controller
                 \DB::raw('(CASE WHEN contracts.object_type = "App\\\Models\\\Company" THEN contracts.object_id ELSE null END )' ))
                 ->where('contracts.id','=',$contractId)
                 ->first();
+                $scopeCompany = true;
             }
             else if($scope == Store::class) {
                 $item = $item
@@ -150,6 +156,8 @@ class ContractsController extends Controller
                 ->join('companies','stores.company_id', '=' , 'companies.id')
                 ->where('contracts.id','=',$contractId)
                 ->first();
+                $scopeStore = true;     
+                $showStore = true;
             }
             else if($scope == Department::class) {
                 $item = $item
@@ -160,11 +168,14 @@ class ContractsController extends Controller
                 ->join('companies','stores.company_id', '=' , 'companies.id')
                 ->where('contracts.id','=',$contractId)
                 ->first();
+                $scopeDepartment = true;
+                $showDepartment = true;  
+                $showStore = true;
             }
 
             $this->authorize('update', $item);
            
-        return view('contracts/edit', compact('item'));
+        return view('contracts/edit', compact('item', 'scopeCompany', 'scopeStore', 'scopeDepartment', 'showDepartment', 'showStore'));
     }
     }
 
