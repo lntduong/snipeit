@@ -55,6 +55,11 @@
                     {{ csrf_field() }}
                     @yield('inputFields')
                     @include('partials.forms.edit.submit')
+                    <div class="alert alert-success fade in" id="plzAddContract" style="display: none;">
+                        <button type="button" class="close" data-dismiss="alert">&times;</button>
+                        <i class="fa fa-check faa-pulse animated"></i>
+                        Please add Assets for Contract
+                    </div>
                     <div class="alert alert-success fade in" id="mgsContractAssets" style="display: none;">
                         <button type="button" class="close" data-dismiss="alert">&times;</button>
                         <i class="fa fa-check faa-pulse animated"></i>

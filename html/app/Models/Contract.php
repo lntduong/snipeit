@@ -57,6 +57,7 @@ final class Contract extends SnipeModel
         'terms_and_conditions' ,
         'notes'
     ];
+    public $sortable = ['id', 'name', 'company', 'department', 'store'];
 
     public function user()
     {

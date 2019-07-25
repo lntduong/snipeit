@@ -109,19 +109,19 @@ class ContractsController extends Controller
         $contract->notes                 = $request->input('notes');
         $contract->user_id               = Auth::id();
 
-        if (request('checkout_to_type_contract')=='company') {
-            $contract->object_id   = $request->input('assigned_company');
-            $contract->object_type = Company::class;
-        } elseif (request('checkout_to_type_contract')=='store') {
-            $contract->object_id   = $request->input('assigned_store');
-            $contract->object_type = Store::class;
-        } elseif (request('checkout_to_type_contract')=='department') {
+        if ($request->input('assigned_department')) {
             $contract->object_id   = $request->input('assigned_department');
             $contract->object_type = Department::class;
+        } elseif ($request->input('assigned_store')) {
+            $contract->object_id   = $request->input('assigned_store');
+            $contract->object_type = Store::class;
+        } elseif ($request->input('assigned_company')) {
+            $contract->object_id   = $request->input('assigned_company');
+            $contract->object_type = Company::class;
         }
-
         if ($contract->save()) {
-            return redirect()->route('contracts.index')->with('success', trans('admin/contracts/message.create.success'));
+            $key=$contract->id;
+            return redirect()->route('contracts.edit',['id'=>$key])->with('success', trans('admin/contracts/message.create.success'));
         }
         return redirect()->back()->withInput()->withErrors($contract->getErrors());
     }
@@ -133,12 +133,15 @@ class ContractsController extends Controller
      */
     public function edit($contractId = null)
     {
+        
+                
         if (is_null($item = Contract::find($contractId))) {
           
             return redirect()->back()->with('error', trans('admin/contracts/message.not_found'));
         }
         if ($item = Contract::find($contractId)) {
             $scope = $item->object_type;
+            $check = ContractAsset::where('contract_assets.contract_id' , '=' ,$item->id)->count();
             if($scope == Company::class) {
                 $item = $item
                 ->select('contracts.*', 'companies.id AS assigned_company')
@@ -146,7 +149,6 @@ class ContractsController extends Controller
                 \DB::raw('(CASE WHEN contracts.object_type = "App\\\Models\\\Company" THEN contracts.object_id ELSE null END )' ))
                 ->where('contracts.id','=',$contractId)
                 ->first();
-                $scopeCompany = true;
             }
             else if($scope == Store::class) {
                 $item = $item
@@ -156,8 +158,6 @@ class ContractsController extends Controller
                 ->join('companies','stores.company_id', '=' , 'companies.id')
                 ->where('contracts.id','=',$contractId)
                 ->first();
-                $scopeStore = true;     
-                $showStore = true;
             }
             else if($scope == Department::class) {
                 $item = $item
@@ -167,16 +167,13 @@ class ContractsController extends Controller
                 ->join('stores','stores.id', '=' , 'departments.store_id')
                 ->join('companies','stores.company_id', '=' , 'companies.id')
                 ->where('contracts.id','=',$contractId)
-                ->first();
-                $scopeDepartment = true;
-                $showDepartment = true;  
-                $showStore = true;
+                ->first();;
             }
 
             $this->authorize('update', $item);
            
-        return view('contracts/edit', compact('item', 'scopeCompany', 'scopeStore', 'scopeDepartment', 'showDepartment', 'showStore'));
-    }
+        return view('contracts/edit', compact('check','item'));
+        }
     }
 
      /**
@@ -201,15 +198,15 @@ class ContractsController extends Controller
         $contract->notes                 = $request->input('notes');
         $contract->user_id               = Auth::id();
 
-        if (request('checkout_to_type_contract')=='company') {
-            $contract->object_id   = $request->input('assigned_company');
-            $contract->object_type = Company::class;
-        } elseif (request('checkout_to_type_contract')=='store') {
-            $contract->object_id   = $request->input('assigned_store');
-            $contract->object_type = Store::class;
-        } elseif (request('checkout_to_type_contract')=='department') {
+        if ($request->input('assigned_department')) {
             $contract->object_id   = $request->input('assigned_department');
             $contract->object_type = Department::class;
+        } elseif ($request->input('assigned_store')) {
+            $contract->object_id   = $request->input('assigned_store');
+            $contract->object_type = Store::class;
+        } elseif ($request->input('assigned_company')) {
+            $contract->object_id   = $request->input('assigned_company');
+            $contract->object_type = Company::class;
         }
         
         if ($contract->save()) {

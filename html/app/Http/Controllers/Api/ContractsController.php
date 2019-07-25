@@ -72,7 +72,6 @@ class ContractsController extends Controller
             $contract = $contract->TextSearch($request->input('search'));
         }
         $allowed_columns = ['location','store', 'user', 'user2', 'company', 'department'];
-        $offset = (($contract) && (request('offset') > $contract->count())) ? 0 : request('offset', 0);
         $limit = request('limit', 50);
         $order = $request->input('order') === 'asc' ? 'asc' : 'desc';
         $sort = in_array($request->input('sort'), $allowed_columns) ? e($request->input('sort')) : 'name';
@@ -102,9 +101,8 @@ class ContractsController extends Controller
             break;
         }
 
-        $total = $contract->count();
-        $contract = $contract->skip($offset)->take($limit)->get();
-        return (new ContractsTransformer)->transformContractList($contract, $total);
+        $contract = $contract->take($limit)->get();
+        return (new ContractsTransformer)->transformContractList($contract);
     }
 
     public function selectlist(Request $request)

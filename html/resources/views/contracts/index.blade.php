@@ -30,28 +30,30 @@
                             @include ('partials.forms.edit.department-select-contract', ['translated_name' => trans('general.department'), 'fieldname' => 'department_id'])
                             <button type="submit" id="filterCompany" class="btn btn-primary" onclick="filterCompany()">Go</button>
                         </div>
-                <table
-                  data-click-to-select="true"
-                  data-columns="{{ \App\Presenters\ContractPresenter::dataTableLayout() }}"
-                  data-cookie-id-table="contractsTable"
-                  data-pagination="true"
-                  data-id-table="contractsTable"
-                  data-search="true"
-                  data-side-pagination="server"
-                  data-show-columns="true"
-                  data-show-export="true"
-                  data-show-footer="true"
-                  data-show-refresh="true"
-                  data-sort-order="asc"
-                  data-sort-name="name"
-                  data-toolbar="#toolbar"
-                  id="contractsTable"
-                  class="table table-striped snipe-table"
-                  data-url="{{ route('api.contracts.index') }}" >
-                </table>
+                        <table
+                          data-click-to-select="true"
+                          data-columns="{{ \App\Presenters\ContractPresenter::dataTableLayout() }}"
+                          data-cookie-id-table="contractsTable"
+                          data-pagination="true"
+                          data-id-table="contractsTable"
+                          data-search="true"
+                          data-sortable="true"
+                          data-side-pagination="server"
+                          data-show-columns="true"
+                          data-show-export="true"
+                          data-show-footer="true"
+                          data-show-refresh="true"
+                          data-sort-order="asc"
+                          data-sort-name="name"
+                          data-custom-sort="customSort"
+                          data-toolbar="#toolbar"
+                          id="contractsTable"
+                          class="table table-striped snipe-table"
+                          data-url="{{ route('api.contracts.index') }}" >
+                        </table>
+                    </div>
+                <!-- /.row -->
                 </div>
-               <!-- /.row -->
-            </div>
             <!-- /.row -->
          </div>
          <!-- /.box-body -->
@@ -62,6 +64,7 @@
 @stop
 
 @section('moar_scripts')
+
 <script nonce="{{ csrf_token() }}">
   var $table = $('#contractsTable');
   function filterCompany() {

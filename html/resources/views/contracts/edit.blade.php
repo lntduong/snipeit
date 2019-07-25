@@ -9,10 +9,6 @@
 
 {{-- Page content --}}
 @section('inputFields')
-<!-- contract name-->
-@include ('partials.forms.edit.name', ['translated_name' => trans('admin/contracts/table.contract_name')])
-
-@include ('partials.forms.scope-selector-contract', ['scope_company_contract' => 'true','scope_store_contract' => 'true', 'scope_department_contract' => 'true'])
 
 <!-- Company-->
 @include ('partials.forms.edit.scope-company-contract', ['translated_name' => trans('general.company'), 'fieldname' => 'assigned_company', 'required'=>'true'])
@@ -22,6 +18,9 @@
 
 <!-- Department-->
 @include ('partials.forms.edit.scope-department-contract', ['translated_name' => trans('general.department'), 'fieldname' => 'assigned_department', 'required'=>'true'])
+
+<!-- contract name-->
+@include ('partials.forms.edit.name', ['translated_name' => trans('admin/contracts/table.contract_name')])
 
 <!-- Location-->
 @include ('partials.forms.edit.location-select-contract', ['translated_name' => trans('admin/contracts/table.location'), 'fieldname' => 'location_id', 'new' => 'no'])
@@ -83,49 +82,23 @@
  @if ($item->id)
  <script type="text/javascript">
     $("#hideForm").css("display","block"); 
+    $("#plzAddContract").css("display","block"); 
+    
+    @if($check <= 0)
+        $('html, body').animate({scrollTop:$(document).height()}, 4000)
+    @else 
+        $('html,body').stop();
+        $("#plzAddContract").css("display","none"); 
+    @endif  
  </script>
  @endif
-
+ <script>
+    
+</script>
 <script>
     var srcImg;
     var nameAsset;
 
-    $(".has-error").show();
-    if ( $('#assigned_store').hasClass("has-error") ) {
-            $(".c").removeClass("active");
-            $(".s").addClass("active");
-    }
-    if( $('#assigned_department').hasClass("has-error") ) {
-        $(".c").removeClass("active");
-        $(".s").removeClass("active");
-        $(".d").addClass("active");
-    }
-
-    $('input[name=checkout_to_type_contract]').on("change",function () {
-        var object_type = $('input[name=checkout_to_type_contract]:checked').val();
-        var object_id = $('#assigned_company option:selected').val();
-        if (object_type == 'company') {
-            $('#current_assets_box').fadeOut();
-            $('#assigned_company').show();
-            $('#assigned_store').hide();
-            $('#assigned_department').hide();
-            $('.notification-callout').fadeOut();
-        } else if (object_type == 'store') {
-            $('#current_assets_box').fadeOut();
-            $('#assigned_company').show();
-            $('#assigned_store').show();
-            $('#assigned_department').hide();
-            $('.notification-callout').fadeOut();
-        } else  {
-            $('#assigned_company').show();
-            $('#assigned_store').show();
-            $('#assigned_department').show();
-            if (object_id) {
-                $('#current_assets_box').fadeIn();
-            }
-            $('.notification-callout').fadeIn();
-        }
-    });
     //add contract assets action
     $(document).ready(function() {
         $table = $("#table_contract_assets");
@@ -144,6 +117,7 @@
                 },
                 dataType: "json",
                 success: function(data) {
+                    $("#plzAddContract").css("display","none");
                     $("#mgsContractAssets").css("display","block");
                     $("#mgsContractAssetsFailed").css("display","none");
                     $("#mgsContractAssetsDel").css("display","none");
@@ -240,6 +214,7 @@
             },
             dataType: "json",
             success: function(data) {
+                $("#plzAddContract").css("display","none");
                 $("#mgsContractAssetsDel").css("display","block");
                 $("#mgsContractAssets").css("display","none");
                 $("#mgsContractAssetsFailed").css("display","none");

@@ -7,14 +7,14 @@ use Illuminate\Support\Collection;
 
 class ContractsTransformer
 {
-    public function transformContractList(Collection $contractList,$total)
+    public function transformContractList(Collection $contractList)
     {
         $array = array();
       
         foreach ($contractList as $contract) {
             $array[] = self::transformContract($contract);
         }
-        return (new DatatablesTransformer)->transformDatatables($array, $total);
+        return (new DatatablesTransformer)->transformDatatables($array);
     }
 
     public function transformContract (Contract $contract)

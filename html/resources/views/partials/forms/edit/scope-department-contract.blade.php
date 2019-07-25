@@ -1,5 +1,5 @@
 
-<div id="assigned_department" class="form-group{{ $errors->has($fieldname) ? ' has-error' : '' }}"{!!  (isset($showDepartment)) && (isset($showStore)) ? '' : ' style="display:none"'  !!}>
+<div id="assigned_department" class="form-group{{ $errors->has($fieldname) ? ' has-error' : '' }}">
 
     {{ Form::label($fieldname, $translated_name, array('class' => 'col-md-3 control-label')) }}
 
