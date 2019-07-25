@@ -7,14 +7,14 @@ use Illuminate\Support\Collection;
 
 class ContractsTransformer
 {
-    public function transformContractList(Collection $contractList)
+    public function transformContractList(Collection $contractList,$total)
     {
         $array = array();
       
         foreach ($contractList as $contract) {
             $array[] = self::transformContract($contract);
         }
-        return (new DatatablesTransformer)->transformDatatables($array);
+        return (new DatatablesTransformer)->transformDatatables($array, $total);
     }
 
     public function transformContract (Contract $contract)
@@ -24,10 +24,10 @@ class ContractsTransformer
             'name' => $contract->name,
 
             'company' => (($contract->object_type == 'App\Models\Department') ? [
-                'id' => (int) $contract->department->id,
+                'id' => (int) $contract->department->company_id,
                 'name'=> e($contract->department->company_name)
             ] : (($contract->object_type == 'App\Models\Store') ?[
-                'id' => (int) $contract->store->id,
+                'id' => (int) $contract->store->company_id,
                 'name'=> e($contract->store->company_name),
             ] : (($contract->object_type == 'App\Models\Company') ? [
                 'id' => (int) $contract->company->id,
@@ -35,7 +35,7 @@ class ContractsTransformer
             ]  : null))),
 
             'store' => ($contract->object_type == 'App\Models\Department') ? [
-                'id' => (int) $contract->department->id,
+                'id' => (int) $contract->department->store_id,
                 'name'=> e($contract->department->store_name)
             ] : (($contract->object_type == 'App\Models\Store') ? [
                 'id' => (int) $contract->store->id,

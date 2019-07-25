@@ -89,6 +89,18 @@
 <script>
     var srcImg;
     var nameAsset;
+
+    $(".has-error").show();
+    if ( $('#assigned_store').hasClass("has-error") ) {
+            $(".c").removeClass("active");
+            $(".s").addClass("active");
+    }
+    if( $('#assigned_department').hasClass("has-error") ) {
+        $(".c").removeClass("active");
+        $(".s").removeClass("active");
+        $(".d").addClass("active");
+    }
+
     $('input[name=checkout_to_type_contract]').on("change",function () {
         var object_type = $('input[name=checkout_to_type_contract]:checked').val();
         var object_id = $('#assigned_company option:selected').val();

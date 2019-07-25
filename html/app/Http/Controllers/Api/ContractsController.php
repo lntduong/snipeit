@@ -71,15 +71,16 @@ class ContractsController extends Controller
         if ($request->has('search')) {
             $contract = $contract->TextSearch($request->input('search'));
         }
-        
+        $allowed_columns = ['location','store', 'user', 'user2', 'company', 'department'];
+        $offset = (($contract) && (request('offset') > $contract->count())) ? 0 : request('offset', 0);
         $limit = request('limit', 50);
-
-        
         $order = $request->input('order') === 'asc' ? 'asc' : 'desc';
+        $sort = in_array($request->input('sort'), $allowed_columns) ? e($request->input('sort')) : 'name';
+        
 
-        switch ($request->input('sort')) {
+        switch ($request->input('sort')) {  
             case 'location':
-                $contract = $contract->leftJoin('locations', 'locations.id', '=', 'contracts.locaiton_id')->orderBy('locations.name', $order);
+            $contract = $contract->leftJoin('locations', 'locations.id', '=', 'contracts.location_id')->orderBy('locations.name', $order);
             break;
         case 'store':
             $contract = $contract->leftJoin('stores', 'stores.id', '=', 'contracts.object_id')->orderBy('stores.name', $order);
@@ -97,14 +98,13 @@ class ContractsController extends Controller
             $contract = $contract->leftJoin('departments', 'departments.id', '=', 'contracts.object_id')->orderBy('departments.name', $order);
             break;
         default:
-            $allowed_columns = ['location','store', 'user', 'user2', 'company', 'department'];
-            $sort = in_array($request->input('sort'), $allowed_columns) ? e($request->input('sort')) : 'created_at';
             $contract = $contract->orderBy($sort, $order);
             break;
-    }
+        }
 
-        $contract = $contract->take($limit)->get();
-        return (new ContractsTransformer)->transformContractList($contract);
+        $total = $contract->count();
+        $contract = $contract->skip($offset)->take($limit)->get();
+        return (new ContractsTransformer)->transformContractList($contract, $total);
     }
 
     public function selectlist(Request $request)
