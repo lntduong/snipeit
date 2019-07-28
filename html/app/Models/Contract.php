@@ -114,4 +114,140 @@ final class Contract extends SnipeModel
     {
         return $this->hasMany('\App\Models\Actionlog', 'item_id')->where('item_type', Component::class)->orderBy('created_at', 'desc')->withTrashed();
     }
+
+    /*
+    * Filter Company, Store, Department
+    */
+
+    public function scopeFilterDepartmentInCompany($query, $input) {
+        return $query->where('contracts.object_type', '=', \DB::raw('"App\\\Models\\\Department"') )
+                ->whereIn('contracts.object_id', 
+                    Department::select('departments.id')
+                    ->join('stores','stores.id', '=', 'departments.store_id')
+                    ->join('companies','companies.id', '=', 'stores.company_id')
+                    ->where('companies.id','=',$input)
+                );
+    }
+
+    public function scopeFilterStoreInCompany($query, $input) {
+        return $query
+            ->where('contracts.object_type', '=', \DB::raw('"App\\\Models\\\Store"'))
+            ->whereIn('contracts.object_id', 
+                Store::select('stores.id')
+                ->join('companies','companies.id', '=', 'stores.company_id')
+                ->where('companies.id','=',$input)
+            );
+    }
+
+    public function scopeFilterCompanyInCompany($query, $input) {
+        return $query
+            ->where('contracts.object_type', '=', \DB::raw('"App\\\Models\\\Company"'))
+            ->where('contracts.object_id', '=', $input);
+    }
+
+    public function scopeFilterDepartmentInStore($query, $input) {
+        return $query
+            ->orWhere('contracts.object_type', '=', \DB::raw('"App\\\Models\\\Department"') )
+            ->whereIn('contracts.object_id', 
+                Department::select('departments.id')
+                ->join('stores','stores.id', '=', 'departments.store_id')
+                ->where('stores.id','=',$input)
+            );
+    }
+
+    public function scopeFilterStoreInStore($query, $input) {
+        return $query
+            ->where('contracts.object_type', '=', \DB::raw('"App\\\Models\\\Store"'))
+            ->where('contracts.object_id', '=', $input);
+    }
+
+    public function scopeFilterDepartmentInDepartment($query, $input) {
+        return $query
+            ->where('contracts.object_type', '=', \DB::raw('"App\\\Models\\\Department"') )
+            ->whereIn('contracts.object_id', 
+                Department::select('departments.id')
+                ->where('departments.id','=',$input)
+            );
+    }
+
+    /*
+    * Sort Company, Store, Department
+    */
+    public function scopeSortCompany($query, $order) {
+        return $query
+            ->join('companies', 'companies.id', '=', 
+            \DB::raw('(CASE WHEN contracts.object_type = "App\\\Models\\\Company" THEN contracts.object_id ELSE null END )' ))
+            ->union(
+                Contract::select('contracts.*', 'companies.name as companies', 'companies.id')
+                ->join('stores', 'stores.id', '=', 
+                \DB::raw('(CASE WHEN contracts.object_type = "App\\\Models\\\Store" THEN contracts.object_id ELSE null END )' ))
+                ->join('companies', 'stores.company_id', '=', 'companies.id')
+                )
+            ->union(
+                Contract::select('contracts.*', 'companies.name as companies', 'companies.id')
+                ->join('departments', 'departments.id', '=',  
+                \DB::raw('(CASE WHEN contracts.object_type = "App\\\Models\\\Department" THEN contracts.object_id ELSE null END )' ))
+                ->join('stores', 'stores.id', '=', 'departments.store_id')
+                ->join('companies', 'companies.id', '=', 'stores.company_id'))
+            ->orderBy('companies', $order);
+    }
+
+    public function scopeSortStore($query, $order) {
+        return $query
+            ->join('stores', 'stores.id', '=', 
+            \DB::raw('(CASE WHEN contracts.object_type = "App\\\Models\\\Store" THEN contracts.object_id ELSE null END )' ))
+            ->union(
+                Contract::select('contracts.*', \DB::raw('null as stores'),  \DB::raw('null as stores_id'))
+                ->join('companies', 'companies.id', '=', 
+                \DB::raw('(CASE WHEN contracts.object_type = "App\\\Models\\\Company" THEN contracts.object_id ELSE null END )' ))   
+                )
+            ->union(
+                Contract::select('contracts.*', 'stores.name as stores', 'stores.id as stores_id')
+                ->join('departments', 'departments.id', '=',  
+                \DB::raw('(CASE WHEN contracts.object_type = "App\\\Models\\\Department" THEN contracts.object_id ELSE null END )' ))
+                ->join('stores', 'stores.id', '=', 'departments.store_id')
+                )
+            ->orderBy('stores', $order);
+    }
+
+    public function scopeSortStoreCompany($query, $order, $input) {
+        return $query
+            ->join('stores', 'stores.id', '=', 
+                \DB::raw('(CASE WHEN contracts.object_type = "App\\\Models\\\Store" THEN contracts.object_id ELSE null END )' ))
+            ->join('companies', 'companies.id', '=', 'stores.company_id')
+            ->where('companies.id','=',$input)
+            ->union(
+                Contract::select('contracts.*', \DB::raw('null as stores'),  \DB::raw('null as stores_id'))
+                ->join('companies', 'companies.id', '=', 
+                \DB::raw('(CASE WHEN contracts.object_type = "App\\\Models\\\Company" THEN contracts.object_id ELSE null END )' ))
+                ->where('companies.id','=',$input)
+                )
+            ->union(
+                Contract::select('contracts.*', 'stores.name as stores', 'stores.id as stores_id')
+                ->join('departments', 'departments.id', '=',  
+                \DB::raw('(CASE WHEN contracts.object_type = "App\\\Models\\\Department" THEN contracts.object_id ELSE null END )' ))
+                ->join('stores', 'stores.id', '=', 'departments.store_id')
+                ->join('companies', 'companies.id', '=', 'stores.company_id')
+                ->where('companies.id','=',$input)
+                )
+            ->orderBy('stores', $order);
+    }
+
+    public function scopeSortDepartment($query, $order) {
+        return $query
+            ->join('departments', 'departments.id', '=',  
+            \DB::raw('(CASE WHEN contracts.object_type = "App\\\Models\\\Department" THEN contracts.object_id ELSE null END )' ))
+            ->join('stores', 'stores.id', '=', 'departments.store_id')
+        ->union(
+            Contract::select('contracts.*', \DB::raw('null as departments'),  \DB::raw('null as departments_id'))
+            ->join('companies', 'companies.id', '=', 
+            \DB::raw('(CASE WHEN contracts.object_type = "App\\\Models\\\Company" THEN contracts.object_id ELSE null END )' ))   
+            )
+        ->union(
+            Contract::select('contracts.*', \DB::raw('null as departments'),  \DB::raw('null as departments_id'))
+            ->join('companies', 'companies.id', '=', 
+            \DB::raw('(CASE WHEN contracts.object_type = "App\\\Models\\\Store" THEN contracts.object_id ELSE null END )' ))          
+            )
+        ->orderBy('departments', $order);
+    }
 }

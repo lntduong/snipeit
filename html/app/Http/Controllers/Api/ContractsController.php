@@ -17,54 +17,20 @@ class ContractsController extends Controller
     {      
 
         $this->authorize('view', Contract::class);
-        $contract = Contract::select(
-            'contracts.*'
-            )->with('company', 'store');
+
+        $contract = Contract::select('contracts.*')->with('company', 'store');
+
         if($request->has('department')) {
-            $contract = $contract
-            ->where('contracts.object_type', '=', \DB::raw('"App\\\Models\\\Department"') )
-            ->whereIn('contracts.object_id', 
-                Department::select('departments.id')
-                ->where('departments.id','=',$request->input('department'))
-            );
+            $contract = $contract->FilterDepartmentInDepartment($request->input('department'));
         } else {
             if ($request->has('store') ) {
-                    $contract = $contract
-                    ->orWhere('contracts.object_type', '=', \DB::raw('"App\\\Models\\\Department"') )
-                    ->whereIn('contracts.object_id', 
-                        Department::select('departments.id')
-                        ->join('stores','stores.id', '=', 'departments.store_id')
-                        ->where('stores.id','=',$request->input('store'))
-                    )
-                    ->union(
-                        Contract::select('contracts.*')
-                        ->where('contracts.object_type', '=', \DB::raw('"App\\\Models\\\Store"'))
-                        ->where('contracts.object_id', '=', $request->input('store'))
-                    );
-                }
+                $contract = $contract->FilterDepartmentInStore($request->input('store'))
+                ->union(Contract::select('contracts.*')->FilterStoreInStore($request->input('store')));
+            }
             else if($request->input('company')) {
-                $contract = $contract
-                ->where('contracts.object_type', '=', \DB::raw('"App\\\Models\\\Department"') )
-                ->whereIn('contracts.object_id', 
-                    Department::select('departments.id')
-                    ->join('stores','stores.id', '=', 'departments.store_id')
-                    ->join('companies','companies.id', '=', 'stores.company_id')
-                    ->where('companies.id','=',$request->input('company'))
-                )
-                ->union(
-                    Contract::select('contracts.*')
-                    ->where('contracts.object_type', '=', \DB::raw('"App\\\Models\\\Store"'))
-                    ->whereIn('contracts.object_id', 
-                        Store::select('stores.id')
-                        ->join('companies','companies.id', '=', 'stores.company_id')
-                        ->where('companies.id','=',$request->input('company'))
-                    )
-                )
-                ->union(
-                    Contract::select('contracts.*')
-                    ->where('contracts.object_type', '=', \DB::raw('"App\\\Models\\\Company"'))
-                    ->where('contracts.object_id', '=', $request->input('company'))
-                );
+                $contract = $contract->FilterDepartmentInCompany($request->input('company'))
+                ->union(Contract::select('contracts.*')->FilterStoreInCompany($request->input('company')))
+                ->union(Contract::select('contracts.*')->FilterCompanyInCompany($request->input('company')));
             }
         }
         
@@ -81,26 +47,10 @@ class ContractsController extends Controller
             case 'location':
             $contract = $contract->leftJoin('locations', 'locations.id', '=', 'contracts.location_id')->orderBy('locations.name', $order);
             break;
-        case 'store':
-            
-            $contract = ($request->input('company')) ? $contract: 
-            (Contract::select('contracts.*', 'stores.name as stores', 'stores.id as stores_id')
-            ->join('stores', 'stores.id', '=', 
-            \DB::raw('(CASE WHEN contracts.object_type = "App\\\Models\\\Store" THEN contracts.object_id ELSE null END )' ))
-            ->union(
-                Contract::select('contracts.*', \DB::raw('null as stores'),  \DB::raw('null as stores_id'))
-                ->join('companies', 'companies.id', '=', 
-                \DB::raw('(CASE WHEN contracts.object_type = "App\\\Models\\\Company" THEN contracts.object_id ELSE null END )' ))
-                
-                )
-            ->union(
-                Contract::select('contracts.*', 'stores.name as stores', 'stores.id as stores_id')
-                ->join('departments', 'departments.id', '=',  
-                \DB::raw('(CASE WHEN contracts.object_type = "App\\\Models\\\Department" THEN contracts.object_id ELSE null END )' ))
-                ->join('stores', 'stores.id', '=', 'departments.store_id')
-                // ->join('companies', 'companies.id', '=', 'stores.company_id')
-                )
-            ->orderBy('stores', $order));
+        case 'store':          
+            $contract = ($request->input('company')) ? 
+                Contract::select('contracts.*', 'stores.name as stores', 'stores.id as stores_id')->SortStoreCompany($order, $request->input('company')):
+                Contract::select('contracts.*', 'stores.name as stores', 'stores.id as stores_id')->SortStore($order);
             break;
         case 'user':
             $contract = $contract->leftJoin('users', 'users.id', '=', 'contracts.contact_id_1')->orderBy('users.name', $order);
@@ -109,25 +59,14 @@ class ContractsController extends Controller
             $contract = $contract->leftJoin('users', 'users.id', '=', 'contracts.contact_id_2')->orderBy('users.name', $order);
             break;
         case 'company':
-            $contract = ($request->input('company')) ? $contract : (Contract::select('contracts.*', 'companies.name as companies', 'companies.id')
-            ->join('companies', 'companies.id', '=', 
-            \DB::raw('(CASE WHEN contracts.object_type = "App\\\Models\\\Company" THEN contracts.object_id ELSE null END )' ))
-            ->union(
-                Contract::select('contracts.*', 'companies.name as companies', 'companies.id')
-                ->join('stores', 'stores.id', '=', 
-                \DB::raw('(CASE WHEN contracts.object_type = "App\\\Models\\\Store" THEN contracts.object_id ELSE null END )' ))
-                ->join('companies', 'stores.company_id', '=', 'companies.id')
-                )
-            ->union(
-                Contract::select('contracts.*', 'companies.name as companies', 'companies.id')
-                ->join('departments', 'departments.id', '=',  
-                \DB::raw('(CASE WHEN contracts.object_type = "App\\\Models\\\Department" THEN contracts.object_id ELSE null END )' ))
-                ->join('stores', 'stores.id', '=', 'departments.store_id')
-                ->join('companies', 'companies.id', '=', 'stores.company_id'))
-            ->orderBy('companies', $order));
+            $contract = ($request->input('company')) ? 
+                $contract : 
+                Contract::select('contracts.*', 'companies.name as companies', 'companies.id')->SortCompany($order);
             break;
         case 'department':
-            $contract = $contract->leftJoin('departments', 'departments.id', '=', 'contracts.object_id')->orderBy('departments.name', $order);
+        $contract = ($request->input('company')) ? 
+        $contract:
+        Contract::select('contracts.*', 'departments.name as departments', 'departments.id as departments_id')->SortDepartment($order);
             break;
         default:
             $contract = $contract->orderBy($sort, $order);
