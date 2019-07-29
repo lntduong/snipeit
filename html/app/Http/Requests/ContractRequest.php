@@ -23,42 +23,13 @@ class ContractRequest extends Request
      */
     public function rules()
     {
-        // if (request('checkout_to_type_contract')=='company') {
-        //     return [
-        //         'name' => 'required',
-        //         'start_date' => 'required',
-        //         'end_date'  => 'required|after:start_date',
-        //         'billing_date'  => 'required',
-        //         'assigned_company' => 'required'
-        //     ];      
-        // } elseif (request('checkout_to_type_contract')=='store') {
-        //     return [
-        //         'name' => 'required',
-        //         'start_date' => 'required',
-        //         'end_date'  => 'required|after:start_date',
-        //         'billing_date'  => 'required',
-        //         'assigned_company' => 'required',
-        //         'assigned_store' =>'required'
-        //     ];
-        // } elseif (request('checkout_to_type_contract')=='department') {
-        //     return [
-        //         'name' => 'required',
-        //         'start_date' => 'required',
-        //         'end_date'  => 'required|after:start_date',
-        //         'billing_date'  => 'required',
-        //         'assigned_company' => 'required',
-        //         'assigned_store' =>'required',
-        //         'assigned_department' =>'required'
-        //     ];
-        // } else {
-            return [
-                'name' => 'required',
-                'start_date' => 'required',
-                'end_date'  => 'required|after:start_date',
-                'billing_date'  => 'required',
-                'assigned_company' => 'required'
-            ];   
-        //}
+        return [
+            'name' => 'required',
+            'start_date' => 'required',
+            'end_date'  => 'required|after:start_date',
+            'billing_date'  => 'required',
+            'assigned_company' => 'required'
+        ];   
     }
 
     public function messages()

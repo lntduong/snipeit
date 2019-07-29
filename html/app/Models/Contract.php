@@ -57,7 +57,7 @@ final class Contract extends SnipeModel
         'terms_and_conditions' ,
         'notes'
     ];
-    public $sortable = ['id', 'name', 'company', 'department', 'store'];
+    public $sortable = ['id', 'name', 'company', 'department', 'store', 'location', 'user', 'user2'];
 
     public function user()
     {
@@ -249,5 +249,63 @@ final class Contract extends SnipeModel
             \DB::raw('(CASE WHEN contracts.object_type = "App\\\Models\\\Store" THEN contracts.object_id ELSE null END )' ))          
             )
         ->orderBy('departments', $order);
+    }
+
+    public function scopeSortCompanyDepartment($query, $order, $input) {
+        return $query
+            ->join('departments', 'departments.id', '=',  
+            \DB::raw('(CASE WHEN contracts.object_type = "App\\\Models\\\Department" THEN contracts.object_id ELSE null END )' ))
+            ->join('stores', 'stores.id', '=', 'departments.store_id')
+            ->join('companies', 'companies.id', '=', 'stores.company_id')
+            ->where('companies.id','=',$input)        
+            ->union(
+                Contract::select('contracts.*', \DB::raw('null as departments'),  \DB::raw('null as departments'))
+                ->join('companies', 'companies.id', '=', 
+                \DB::raw('(CASE WHEN contracts.object_type = "App\\\Models\\\Company" THEN contracts.object_id ELSE null END )' ))
+                ->where('companies.id','=',$input)
+                )
+            ->union(
+                Contract::select('contracts.*', \DB::raw('null as departments'),  \DB::raw('null as departments'))
+                ->join('stores', 'stores.id', '=', 
+                \DB::raw('(CASE WHEN contracts.object_type = "App\\\Models\\\Store" THEN contracts.object_id ELSE null END )' ))
+            ->join('companies', 'companies.id', '=', 'stores.company_id')
+            ->where('companies.id','=',$input)
+                )
+            ->orderBy('departments', $order);
+    }
+
+    public function scopeSortStoreDepartment($query, $order, $input) {
+        return $query
+            ->join('departments', 'departments.id', '=',  
+            \DB::raw('(CASE WHEN contracts.object_type = "App\\\Models\\\Department" THEN contracts.object_id ELSE null END )' ))
+            ->join('stores', 'stores.id', '=', 'departments.store_id')
+            ->where('stores.id','=',$input)        
+            ->union(
+                Contract::select('contracts.*', \DB::raw('null as departments'),  \DB::raw('null as departments'))
+                ->join('stores', 'stores.id', '=', 
+                \DB::raw('(CASE WHEN contracts.object_type = "App\\\Models\\\Store" THEN contracts.object_id ELSE null END )' ))
+            ->where('stores.id','=',$input)
+                )
+            ->orderBy('departments', $order);
+    }
+
+    public function scopeOrderLocation($query, $order)
+    {
+        return $query->leftJoin('locations', 'contracts.location_id', '=', 'locations.id')->orderBy('locations.name', $order);
+    }
+
+    public function scopeOrderContactOne($query, $order)
+    {
+        return $query->leftJoin('users', 'users.id', '=', 'contracts.contact_id_1')->orderBy('users.last_name', $order);
+    }
+
+    public function scopeOrderContactTwo($query, $order)
+    {
+        return $query->leftJoin('users', 'users.id', '=', 'contracts.contact_id_2')->orderBy('users.last_name', $order);
+    }
+
+    public function scopeOrderDate($query, $fields, $order)
+    {
+        return $query->orderBy($fields, $order);
     }
 }

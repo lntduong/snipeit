@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\Contract;
 use App\Models\Store;
 use App\Models\Department;
+use DB;
 /**
  * @version    v1.0
  * @author [Thinh.NP] 
@@ -18,7 +19,7 @@ class ContractsController extends Controller
 
         $this->authorize('view', Contract::class);
 
-        $contract = Contract::select('contracts.*')->with('company', 'store');
+        $contract = Contract::select('contracts.*')->with('company', 'store', 'location', 'user');
 
         if($request->has('department')) {
             $contract = $contract->FilterDepartmentInDepartment($request->input('department'));
@@ -37,44 +38,84 @@ class ContractsController extends Controller
         if ($request->has('search')) {
             $contract = $contract->TextSearch($request->input('search'));
         }
-        $allowed_columns = ['location','store', 'user', 'user2', 'company', 'department'];
+        
+        $allowed_columns = ['location_id','store', 'contact_id_1', 'contact_id_2', 'company', 'department'];
         $limit = request('limit', 50);
         $order = $request->input('order') === 'asc' ? 'asc' : 'desc';
         $sort = in_array($request->input('sort'), $allowed_columns) ? e($request->input('sort')) : 'name';
         
 
         switch ($request->input('sort')) {  
-            case 'location':
-            $contract = $contract->leftJoin('locations', 'locations.id', '=', 'contracts.location_id')->orderBy('locations.name', $order);
+            case 'company':
+                $contract = ($request->input('company')) ? 
+                        $contract : Contract::select('contracts.*', 'companies.name as companies', 'companies.id')->SortCompany($order);
             break;
-        case 'store':          
-            $contract = ($request->input('company')) ? 
-                Contract::select('contracts.*', 'stores.name as stores', 'stores.id as stores_id')->SortStoreCompany($order, $request->input('company')):
-                Contract::select('contracts.*', 'stores.name as stores', 'stores.id as stores_id')->SortStore($order);
+
+            case 'store':          
+                if($request->input('store')) {
+                    $contract = $contract;
+                }
+                else if($request->input('company')) {
+                    $contract = Contract::select('contracts.*', 'stores.name as stores', 'stores.id as stores_id')->SortStoreCompany($order, $request->input('company'));
+                } 
+                else {
+                    $contract = Contract::select('contracts.*', 'stores.name as stores', 'stores.id as stores_id')->SortStore($order);
+                }
             break;
-        case 'user':
-            $contract = $contract->leftJoin('users', 'users.id', '=', 'contracts.contact_id_1')->orderBy('users.name', $order);
+
+            case 'department':
+                if(($request->input('department'))) {
+                    $contract = $contract;
+                }
+                else if($request->input('store')) {
+                    $contract = Contract::select('contracts.*', 'departments.name as departments', 'departments.id as departments_id')->SortStoreDepartment($order, $request->input('store'));
+                }
+                else if($request->input('company')) {
+                    $contract = Contract::select('contracts.*', 'departments.name as departments', 'departments.id as departments_id')->SortCompanyDepartment($order, $request->input('company'));
+                } 
+                else {
+                    $contract = Contract::select('contracts.*', 'departments.name as departments', 'departments.id as departments_id')->SortDepartment($order);
+                }
             break;
-        case 'user2':
-            $contract = $contract->leftJoin('users', 'users.id', '=', 'contracts.contact_id_2')->orderBy('users.name', $order);
+
+            case 'location_id':
+                $contract = $contract->OrderLocation($order);
             break;
-        case 'company':
-            $contract = ($request->input('company')) ? 
-                $contract : 
-                Contract::select('contracts.*', 'companies.name as companies', 'companies.id')->SortCompany($order);
+
+            case 'contact_id_1':
+                $contract = $contract->OrderContactOne($order);
             break;
-        case 'department':
-        $contract = ($request->input('company')) ? 
-        $contract:
-        Contract::select('contracts.*', 'departments.name as departments', 'departments.id as departments_id')->SortDepartment($order);
+
+            case 'contact_id_2':
+                $contract = $contract->OrderContactTwo($order);
             break;
-        default:
-            $contract = $contract->orderBy($sort, $order);
+
+            case 'start_date':
+                $contract = $contract->OrderDate('start_date', $order);
+            break;
+
+            case 'end_date':
+                $contract = $contract->OrderDate('end_date', $order);
+            break;
+
+            case 'billing_date':
+                $contract = $contract->OrderDate('billing_date', $order);
+            break;
+
+            case 'payment_date':
+                $contract = $contract->OrderDate('payment_date', $order);
+            break;
+
+            default:
+                $contract = $contract->orderBy($sort, $order);
             break;
         }
-
+        
+        // $total = $contract->count();
+        $total = DB::table('contracts')->count();
         $contract = $contract->take($limit)->get();
-        return (new ContractsTransformer)->transformContractList($contract);
+        
+        return (new ContractsTransformer)->transformContractList($contract, $total);
     }
 
     public function selectlist(Request $request)
