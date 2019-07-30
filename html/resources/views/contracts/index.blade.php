@@ -49,7 +49,11 @@
                           data-toolbar="#toolbar"
                           id="contractsTable"
                           class="table table-striped snipe-table"
-                          data-url="{{ route('api.contracts.index') }}" >
+                          data-url="{{ route('api.contracts.index') }}" 
+                          data-export-options='{
+                            "fileName": "export-contracts-{{ date('Y-m-d') }}",
+                            "ignoreColumn": ["actions","image","change","checkbox","checkincheckout","icon"]
+                            }'>
                         </table>
                     </div>
                 <!-- /.row -->

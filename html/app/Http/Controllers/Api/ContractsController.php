@@ -38,9 +38,13 @@ class ContractsController extends Controller
         if ($request->has('search')) {
             $contract = $contract->TextSearch($request->input('search'));
         }
+
+        if ($request->has('billing_date')) {
+            $contract = Contract::select('contracts.*')->where('contracts.billing_date', 'LIKE', $request->input('billing_date').'-%');
+        }
         
         $allowed_columns = ['location_id','store', 'contact_id_1', 'contact_id_2', 'company', 'department'];
-        $limit = request('limit', 50);
+        $limit = $request->input('limit') ? $request->get('limit') : 20;
         $order = $request->input('order') === 'asc' ? 'asc' : 'desc';
         $sort = in_array($request->input('sort'), $allowed_columns) ? e($request->input('sort')) : 'name';
         
@@ -48,7 +52,7 @@ class ContractsController extends Controller
         switch ($request->input('sort')) {  
             case 'company':
                 $contract = ($request->input('company')) ? 
-                        $contract : Contract::select('contracts.*', 'companies.name as companies', 'companies.id')->SortCompany($order);
+                        $contract : Contract::select('contracts.*', 'companies.name as company_name')->SortCompany($order);
             break;
 
             case 'store':          
@@ -111,11 +115,9 @@ class ContractsController extends Controller
             break;
         }
         
-        // $total = $contract->count();
-        $total = DB::table('contracts')->count();
-        $contract = $contract->take($limit)->get();
-        
-        return (new ContractsTransformer)->transformContractList($contract, $total);
+        $offset = (($contract) && (request('offset') > Contract::count())) ? 0 : request('offset', 0);  
+        $contract = $contract->skip(10)->take(50)->get();
+        return (new ContractsTransformer)->transformContractList($contract);
     }
 
     public function selectlist(Request $request)
