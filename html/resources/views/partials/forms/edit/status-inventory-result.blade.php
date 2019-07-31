@@ -2,13 +2,13 @@
 <div id="{{ $fieldname }}" class="form-group{{ $errors->has($fieldname) ? ' has-error' : '' }}">
     {{ Form::label($fieldname, $translated_name, array('class' => 'col-md-3 control-label')) }}
     <div class="col-md-7">
-    <select class="js-data-ajax" data-endpoint="statuslabels" data-placeholder="{{ trans('admin/inventory/table.select_status') }}" name="{{ $fieldname }}" style="width: 100%" id="status_select">
+    <select class="js-data-ajax" data-endpoint="statuslabels" data-placeholder="{{ trans('admin/inventories/table.select_status') }}" name="{{ $fieldname }}" style="width: 100%" id="status_select">
             @if ($statusSelect = Input::old($fieldname, (isset($asset)) ? $asset->{$fieldname} : ''))
                 <option value="{{ $statusSelect }}" selected="selected">
                     {{ (\App\Models\Statuslabel::find($statusSelect)) ? \App\Models\Statuslabel::find($statusSelect)->name : '' }}
                 </option>
             @else
-                <option value="">{{ trans('admin/inventory/table.select_status') }}</option>
+                <option value="">{{ trans('admin/inventories/table.select_status') }}</option>
             @endif
         </select>
     </div>

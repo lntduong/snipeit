@@ -5,21 +5,21 @@ use App\Models\InventoryResult;
 use App\Helpers\Helper;
 use Gate;
 
-class InventoryResultTransformer
+class InventoryResultsTransformer
 {
-    public function transformInventoryresults($inventoryresults, $total)
+    public function transformInventoryresults($inventoryresults, $inventory_id)
     {
         $array = array();
         foreach ($inventoryresults as $inventoryresult) {
-            $array[] = self::transformInventoryresult($inventoryresult);
+            $array[] = self::transformInventoryresult($inventoryresult,$inventory_id);
         }
-        return (new DatatablesTransformer)->transformDatatables($array, $total);
+        return (new DatatablesTransformer)->transformDatatables($array, 0);
     }
 
-    public function transformInventoryresult($inventoryresult)
+    public function transformInventoryresult($inventoryresult,$inventory_id)
     {
         $array = [
-            'id'             => e($inventoryresult->id),
+            'id'             => $inventory_id,
             'deviece'        => e($inventoryresult->asset_id),
             'image'          => self::getImageUrl($inventoryresult->image,$inventoryresult->image_model),
             'asset_tag'      => e($inventoryresult->asset_tag),

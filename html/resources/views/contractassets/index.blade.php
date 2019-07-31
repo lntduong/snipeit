@@ -11,7 +11,7 @@
     data-sort-name="name"
     id="table_contract_assets"
     class="table table-striped snipe-table"
-    data-url="{{ route('contractAsset.storeAsset') }}" 
+    data-url="{{ route('contractassets.save') }}" 
     >
 </table>
 

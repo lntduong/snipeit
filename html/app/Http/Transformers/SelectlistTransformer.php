@@ -1,6 +1,7 @@
 <?php
 namespace App\Http\Transformers;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Database\Eloquent\Collection;
 
 /**
  * Class SelectlistTransformer
@@ -31,7 +32,6 @@ class SelectlistTransformer
             ];
 
         }
-
         $results = [
             'items' => $items_array,
             'pagination' =>
@@ -62,6 +62,35 @@ class SelectlistTransformer
 
         }
 
+        $results = [
+            'items' => $items_array,
+            'pagination' =>
+                [
+                    'more' => ($select_items->currentPage() >= $select_items->lastPage()) ? false : true,
+                    'per_page' => $select_items->perPage()
+                ],
+            'total_count' => $select_items->total(),
+            'page' => $select_items->currentPage(),
+            'page_count' => $select_items->lastPage()
+        ];
+
+        return $results;
+
+    }
+    public function transformSelectlistContract (LengthAwarePaginator $select_items)
+    {
+        $items_array=[];
+
+        // Loop through the paginated collection to set the array values
+        foreach ($select_items as $select_item) {
+            $items_array[]= [
+                'id' => $select_item['id'],
+                'text' => $select_item['name'],
+                'image' => (isset($select_item['image'])) ? $select_item['image']   : null,
+
+            ];
+
+        }
         $results = [
             'items' => $items_array,
             'pagination' =>

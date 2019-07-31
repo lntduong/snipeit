@@ -48,6 +48,16 @@ class InventoryPresenter extends Presenter
                 "switchable" => true,
                 "title" => trans('general.contract'),
                 "visible" => true,
+                "formatter" => 'contractsLinkObjFormatter',
+            ],
+            [
+                "field" => "department",
+                "searchable" => true,
+                "sortable" => true,
+                "switchable" => true,
+                "title" => trans('general.department'),
+                "visible" => true,
+                "formatter" => 'departmentsLinkObjFormatter',
              
             ],
             [
@@ -63,7 +73,7 @@ class InventoryPresenter extends Presenter
                 "field" => "name",
                 "searchable" => true,
                 "sortable" => true,
-                "title" => trans('admin/inventory/table.inventory'),
+                "title" => trans('admin/inventories/table.inventory'),
                 "visible" => true,
                
             ],

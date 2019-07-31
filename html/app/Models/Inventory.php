@@ -30,8 +30,7 @@ class Inventory extends SnipeModel
     // * Category validation rules
     // */
     public $rules = array(
-        'inventory_date'      => 'required',
-        'contract_id'  => 'required|integer',
+        'inventory_date'    => 'required',
     );
 
     /**
@@ -50,7 +49,8 @@ class Inventory extends SnipeModel
      * @var array
      */
     protected $fillable = [
-        'contract_id',
+        'object_type',
+        'object_id',
         'inventory_date',
         'name',
         'notes',
@@ -81,7 +81,19 @@ class Inventory extends SnipeModel
   
     public function contract()
     {
-    	return $this->belongsTo('\App\Models\Contract','contract_id');
+    	return $this->belongsTo('\App\Models\Contract','object_id');
+    }
+    public function company()
+    {
+    	return $this->belongsTo('\App\Models\Company','object_id');
+    }
+    public function store()
+    {
+    	return $this->belongsTo('\App\Models\Store','object_id');
+    }
+    public function department()
+    {
+    	return $this->belongsTo('\App\Models\Department','object_id');
     }
     public function inventoryresult()
     {

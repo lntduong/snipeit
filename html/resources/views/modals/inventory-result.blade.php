@@ -6,10 +6,10 @@
     <div class="modal-content">
         <div class="modal-header">
             <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-            <h4 class="modal-title">{{trans('admin/inventory/table.inventory_result_edit')}}</h4>
+            <h4 class="modal-title">{{trans('admin/inventories/table.inventory_result_edit')}}</h4>
         </div>
             <div class="modal-body">
-                <form action="{{ route('api.inventoryresult.store') }}" onsubmit="return false">
+                <form action="{{ route('api.inventoryresults.store') }}" onsubmit="return false">
                     <div class="alert alert-danger" id="modal_error_msg" style="display:none">
                     </div>
             
@@ -21,11 +21,11 @@
                     </div>
                     <div class="dynamic-form-row">
                         <div class="col-md-4 col-xs-12">
-                            <label for="modal-last_name">{{trans('admin/inventory/table.unrecognized_flag')}}</label></div>
+                            <label for="modal-last_name">{{trans('admin/inventories/table.unrecognized_flag')}}</label></div>
               
                         <div class="col-md-6 col-xs-12">
-                            <div id="Unknown"  class="col-md-6 btn {{isset($familiar) ? ($familiar == 0 ? 'btn-danger' : 'btn-default' ) :'btn-danger'}}">{{trans('admin/inventory/table.unknown')}} <input type="radio" class="custom-control-input" id="Unknown_radio" name="checked" hidden="true" value='0' {{isset($familiar) ? ($familiar == 0 ? 'checked' : '' ) :''}}></div>
-                            <div id="Familiar" class="col-md-6 btn {{isset($familiar) ? ($familiar == 1 ? 'btn-danger' : 'btn-default' ) :'btn-default'}}">{{trans('admin/inventory/table.familiar')}}<input type="radio" class="custom-control-input" id="Farmilar_radio" name="checked" hidden="true" value='1' {{isset($familiar) ? ($familiar == 1 ? 'checked' : '' ) :''}}></div>
+                            <div id="Unknown"  class="col-md-6 btn {{isset($familiar) ? ($familiar == 0 ? 'btn-danger' : 'btn-default' ) :'btn-danger'}}">{{trans('admin/inventories/table.unknown')}} <input type="radio" class="custom-control-input" id="Unknown_radio" name="checked" hidden="true" value='0' {{isset($familiar) ? ($familiar == 0 ? 'checked' : '' ) :''}}></div>
+                            <div id="Familiar" class="col-md-6 btn {{isset($familiar) ? ($familiar == 1 ? 'btn-danger' : 'btn-default' ) :'btn-default'}}">{{trans('admin/inventories/table.familiar')}}<input type="radio" class="custom-control-input" id="Farmilar_radio" name="checked" hidden="true" value='1' {{isset($familiar) ? ($familiar == 1 ? 'checked' : '' ) :''}}></div>
                         </div>
                     </div>
                     <input type="text" class="custom-control-input" id="inventoryid" name="inventory_id" value="{{isset($inventory_id) ? $inventory_id :''}}" hidden>
@@ -55,7 +55,7 @@
       var inventory_id=$('#inventory_select').val();
 
       $.ajax({
-      url:"{{ route('api.inventoryresult.checkasset') }}", // đường dẫn khi gửi dữ liệu đi 'search' là tên route mình đặt bạn mở route lên xem là hiểu nó là cái j.
+      url:"{{ route('api.inventoryresults.checkasset') }}", // đường dẫn khi gửi dữ liệu đi 'search' là tên route mình đặt bạn mở route lên xem là hiểu nó là cái j.
       method:"POST", 
       headers: {
             "X-Requested-With": 'XMLHttpRequest',
@@ -63,7 +63,7 @@
         },
       data:{
         asset_id:asset_id,
-        contract_id:contract_id,
+        inventory_id:inventory_id,
         },
       success:function(data){ //dữ liệu nhận về
         elem.append($('<option>', { 

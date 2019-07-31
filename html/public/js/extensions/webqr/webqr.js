@@ -7,13 +7,6 @@ var webkit = false;
 var moz = false;
 var v = null;
 
-var imghtml = '<div id="qrfile"><canvas id="out-canvas" width="320" height="240"></canvas>'+
-              '<div id="imghelp">drag and drop a QRCode here'+
-              '<br>or select a file'+
-              '<input type="file" onchange="handleFiles(this.files)"/>'+
-              '</div>'+
-            '</div>';
-
 var vidhtml = '<video id="v" autoplay></video>';
 
 function dragenter(e) {
@@ -187,4 +180,18 @@ function setwebcam2(options)
 
     stype=1;
     setTimeout(captureToCanvas, 500);
+}
+
+function stopCamera()
+{
+    v.pause();
+    v.srcObject.getTracks()[0].stop();
+    gCtx = null;
+    gCanvas = null;
+    c = 0;
+    stype = 0;
+    gUM = false;
+    webkit = false;
+    moz = false;
+    v = null;
 }

@@ -41,6 +41,7 @@ class DepartmentsTransformer
                     'name' => e($department->location->name)
                 ] : null,
                 'users_count' => e($department->users_count),
+                'contract_count' => e($department->contract_count),
                 'created_at' => Helper::getFormattedDateObject($department->created_at, 'datetime'),
                 'updated_at' => Helper::getFormattedDateObject($department->updated_at, 'datetime'),
             ];

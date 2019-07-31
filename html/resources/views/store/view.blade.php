@@ -6,24 +6,25 @@
       <div class="nav-tabs-custom">
          <ul class="nav nav-tabs">
             <li class="active">
-               <a href="#asset_tab" data-toggle="tab">
+                     <a href="#contracts_tab" data-toggle="tab">
+                     <span class="hidden-lg hidden-md">
+                     <i class="fa fa-floppy-o"></i>
+                     </span>
+                     <span class="hidden-xs hidden-sm">{{ trans('general.contract') }}</span>
+                     </a>
+            </li>
+            <li >
+               <a href="#departments_tab" data-toggle="tab">
                <span class="hidden-lg hidden-md">
                <i class="fa fa-barcode"></i>
-               </span>
-               <span class="hidden-xs hidden-sm">{{ trans('general.contract') }}</span>
-               </a>
-            </li>
-            <li>
-               <a href="#licenses_tab" data-toggle="tab">
-               <span class="hidden-lg hidden-md">
-               <i class="fa fa-floppy-o"></i>
                </span>
                <span class="hidden-xs hidden-sm">{{ trans('general.departments') }}</span>
                </a>
             </li>
+           
          </ul>
          <div class="tab-content">
-            <div class="tab-pane fade in active" id="asset_tab">
+            <div class="tab-pane fade in active" id="contracts_tab">
                <!-- checked out assets table -->
                <div class="table-responsive">
                   <table 
@@ -45,7 +46,6 @@
                         data-url="{{ route('api.contracts.index',['store_id'=>$store->id]) }}">
                         <thead>
                               <tr>
-                                 
                                  <th data-sortable="true" data-field="id" data-visible="false" data-searchable="false">{{ trans('general.id') }}</th>
                                  <th data-sortable="true" data-field="name" data-visible="true" data-searchable="true">{{ trans('admin/contracts/table.contract_name') }}</th>
                                  <th data-sortable="true" data-field="location_id" data-visible="true" data-searchable="false" data-formatter="locationsLinkObjFormatter">{{ trans('admin/contracts/table.location') }}</th>
@@ -62,7 +62,7 @@
                </div>
             </div>
             <!-- /asset_tab -->
-            <div class="tab-pane" id="licenses_tab">
+            <div class="tab-pane" id="departments_tab">
                <div class="table-responsive">
                   <table 
                         data-cookie-id-table="departmentsTable" 
@@ -102,5 +102,7 @@
       <!-- nav-tabs-custom -->
    </div>
 </div>
-@stop @section('moar_scripts') @include ('partials.bootstrap-table') @stop
+@stop 
+@section('moar_scripts') 
+@include ('partials.bootstrap-table') @stop
 

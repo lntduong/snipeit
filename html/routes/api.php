@@ -72,17 +72,6 @@ Route::group(['prefix' => 'v1','namespace' => 'Api', 'middleware' => 'api'], fun
 
     }); // Categories group
 
-    Route::group(['prefix' => 'contracts'], function () {
-
-        Route::get('selectlist',
-            [
-                'as' => 'api.contracts.selectlist',
-                'uses' => 'ContractsController@selectlist'
-            ]
-        );
-
-    }); // contractuser group
-
     Route::group(['prefix' => 'stores'], function () {
 
         Route::get('selectlist',
@@ -94,13 +83,14 @@ Route::group(['prefix' => 'v1','namespace' => 'Api', 'middleware' => 'api'], fun
 
     }); // store group
 
-    Route::group(['prefix' => 'contract'], function () {
-        Route::get('{contract_id}/{asset_scan}/checkasset',
-        [
-            'as' => 'api.contracts.checkasset',
-            'uses' => 'ContractsController@checkAssetExitInContracts'
-        ]
-    );
+    Route::group(['prefix' => 'contracts'], function () {
+
+        Route::get('selectlist',
+            [
+                'as' => 'api.contracts.selectlist',
+                'uses' => 'ContractsController@selectlist'
+            ]
+        );
 
     }); // contracts group
 
@@ -126,19 +116,12 @@ Route::group(['prefix' => 'v1','namespace' => 'Api', 'middleware' => 'api'], fun
                 'uses' => 'InventoriesController@offlineDataSync'
             ]
     );
-    Route::post('checkasset',
-            [
-                'as' => 'api.inventories.checkasset',
-                'uses' => 'InventoriesController@create'
-            ] 
-        
-        );
 
     Route::post('savelist',
             [
                 'as' => 'api.inventories.savelist',
                 'uses' => 'InventoriesController@savelist'
-            ] 
+            ]
 
         );
 
@@ -146,11 +129,11 @@ Route::group(['prefix' => 'v1','namespace' => 'Api', 'middleware' => 'api'], fun
             [
                 'as' => 'api.inventories.selectlist',
                 'uses' => 'InventoriesController@selectlist'
-            ] 
+            ]
 
         );
 
-    }); // inventory group
+    });
 
     /*--- Companies API ---*/
 
@@ -187,10 +170,10 @@ Route::group(['prefix' => 'v1','namespace' => 'Api', 'middleware' => 'api'], fun
                 'as' => 'api.departments.selectlist',
                 'uses' => 'DepartmentsController@selectlist'
             ]
-        );  
+        );
     }); // Departments group
 
-   
+
 
 
 
@@ -450,6 +433,7 @@ Route::group(['prefix' => 'v1','namespace' => 'Api', 'middleware' => 'api'], fun
         ]
     ); // Hardware resource
 
+    /*--- Contracts API ---*/
     Route::resource('contracts', 'ContractsController',
         [
             'names' =>
@@ -465,7 +449,7 @@ Route::group(['prefix' => 'v1','namespace' => 'Api', 'middleware' => 'api'], fun
         ]
     ); // Contracts resource
 
-    
+
 
 
     /*--- Imports API ---*/
@@ -519,7 +503,7 @@ Route::group(['prefix' => 'v1','namespace' => 'Api', 'middleware' => 'api'], fun
         ]
     ); // Licenses resource
 
-    
+
 
     /*--- Locations API ---*/
 
@@ -550,8 +534,8 @@ Route::group(['prefix' => 'v1','namespace' => 'Api', 'middleware' => 'api'], fun
             'as' => 'locations.selectlist',
             'uses' => 'LocationsController@selectlist'
         ]);
-       
-    }); 
+
+    });
 
     Route::resource('locations', 'LocationsController',
         [
@@ -608,36 +592,6 @@ Route::group(['prefix' => 'v1','namespace' => 'Api', 'middleware' => 'api'], fun
             [
                 'as' => 'api.models.selectlist',
                 'uses'=> 'AssetModelsController@selectlist'
-            ]
-        );
-    }); // Models group
-    Route::group(['prefix' => 'inventory'], function () {
-
-        // Route::get('assets',
-        //     [
-        //         'as' => 'api.models.assets',
-        //         'uses'=> 'AssetModelsController@assets'
-        //     ]
-        // );
-        Route::get('selectlist',
-            [
-                'as' => 'api.inventories.selectlist',
-                'uses'=> 'InventoryController@selectlist'
-            ]
-        );
-    }); // Models group
-    Route::group(['prefix' => 'contract'], function () {
-
-        // Route::get('assets',
-        //     [
-        //         'as' => 'api.models.assets',
-        //         'uses'=> 'AssetModelsController@assets'
-        //     ]
-        // );
-        Route::get('selectlist',
-            [
-                'as' => 'api.stores.selectlist',
-                'uses'=> 'ContractsController@selectlist'
             ]
         );
     }); // Models group
@@ -763,32 +717,32 @@ Route::group(['prefix' => 'v1','namespace' => 'Api', 'middleware' => 'api'], fun
         );
     }); // Suppliers group
 
-    /*--- ContractAsset API ---*/
-    Route::group(['prefix' => 'contractAsset'], function () {
+    /*--- ContractAssets API ---*/
+    Route::group(['prefix' => 'contractAssets'], function () {
 
         Route::post('storeAsset',
             [
-                'as'=>'contractAsset.storeAsset',
+                'as'=>'contractassets.save',
                 'uses'=>'ContractAssetController@storeAsset'
             ]
         );
 
         Route::post('deleteAssetContracts',
             [
-                'as'=>'contractAsset.deleteAssetContracts',
+                'as'=>'contractassets.delete',
                 'uses'=>'ContractAssetController@deleteAssetContracts'
             ]
         );
 
         Route::get('getAssetContractByIdContract',
             [
-                'as'=>'contractAsset.getAssetContractByIdContract',
+                'as'=>'contractassets.show',
                 'uses'=>'ContractAssetController@getAssetContractByIdContract'
             ]
         );
 
-       
-    }); // ContractAsset group
+
+    }); // ContractAssets group
 
 
     Route::resource('suppliers', 'SuppliersController',
@@ -837,7 +791,7 @@ Route::group(['prefix' => 'v1','namespace' => 'Api', 'middleware' => 'api'], fun
                 'uses' => 'UsersController@selectList'
             ]
         );
-        
+
 
         Route::get('{user}/assets',
             [
@@ -884,73 +838,79 @@ Route::group(['prefix' => 'v1','namespace' => 'Api', 'middleware' => 'api'], fun
     /*--- Store API ---*/
     Route::resource('stores', 'StoresController',
     [
-        'names' =>
-         [
-             'index' => 'api.stores.index',
-             'show' => 'api.stores.show',
-             'store' => 'api.stores.store',
-             'update' => 'api.stores.update',
-             'destroy' => 'api.stores.destroy'
-         ],
-        'except' => ['create', 'edit'],
-        'parameters' => ['store' => 'store_id']
+            'names' =>
+            [
+                'index' => 'api.stores.index',
+                'show' => 'api.stores.show',
+                'store' => 'api.stores.store',
+                'update' => 'api.stores.update',
+                'destroy' => 'api.stores.destroy'
+            ],
+            'except' => ['create', 'edit'],
+            'parameters' => ['store' => 'store_id']
     ]
     ); // Store resource
-    /*--- Store API ---*/
-/*--- Inventory API ---*/
-Route::resource('inventories', 'InventoryController',
-[
-    'names' =>
-        [
-            'index' => 'api.inventories.index',
-            'show' => 'api.inventories.show',
-            'store' => 'api.inventories.store',
-            'update' => 'api.inventories.update',
-            'destroy' => 'api.inventories.destroy'
-        ],
-    'except' => ['create', 'edit'],
-    'parameters' => ['inventory' => 'inventory_id']
-]
-); // Inventory resource
-/*--- InventoryResult API ---*/
-Route::resource('inventoryresult', 'InventoryResultController',
-[
- 'names' =>
-     [
-         'index' => 'api.inventoryresult.index',
-         'show' => 'api.inventoryresult.show',
-         'store' => 'api.inventoryresult.store',
-         'update' => 'api.inventoryresult.update',
-         'destroy' => 'api.inventoryresult.destroy'
-     ],
- 'except' => ['create', 'edit'],
- 'parameters' => ['inventoryresult' => 'inventoryresult_id']
-]
-); // InventoryResult resource
-/*--- Suppliers API ---*/
-Route::group(['prefix' => 'inventoryresult'], function () {
-    /*--- Contract Assets API ---*/
-    Route::resource('contractasset', 'ContractAssetController',
+        /*--- Store API ---*/
+    /*--- Inventory API ---*/
+    Route::resource('inventories', 'InventoriesController',
     [
         'names' =>
             [
-                'index' => 'api.contractasset.index', 
-                'show' => 'api.contractasset.show',
-                'store' => 'api.contractasset.store',
-                'update' => 'api.contractasset.update',
-                'destroy' => 'api.contractasset.destroy'
+                'index' => 'api.inventories.index',
+                'show' => 'api.inventories.show',
+                'store' => 'api.inventories.store',
+                'update' => 'api.inventories.update',
+                'destroy' => 'api.inventories.destroy'
             ],
         'except' => ['create', 'edit'],
-        'parameters' => ['asset' => 'asset_id']
+        'parameters' => ['inventory' => 'inventory_id']
     ]
-); // Contracts resource
-
-Route::post('list',
+    ); // Inventory resource
+    /*--- InventoryResult API ---*/
+    Route::resource('inventoryresults', 'InventoryResultsController',
     [
-        'as'=>'api.inventoryresult.checkasset',
-        'uses'=>'InventoryResultController@checkasset'
+    'names' =>
+        [
+            'index' => 'api.inventoryresults.index',
+            'show' => 'api.inventoryresults.show',
+            'store' => 'api.inventoryresults.store',
+            'update' => 'api.inventoryresults.update',
+            'destroy' => 'api.inventoryresults.destroy',
+            'scan' => 'api.inventoryresults.scan'
+        ],
+    'except' => ['create', 'edit'],
+    'parameters' => ['inventoryresult' => 'inventoryresult_id']
     ]
-);
-}); // Suppliers group
+    ); // InventoryResult resource
+    /*--- Suppliers API ---*/
+    Route::group(['prefix' => 'inventoryresults'], function () {
+        /*--- Contract Assets API ---*/
+        Route::resource('contractasset', 'ContractAssetController',
+        [
+            'names' =>
+                [
+                    'index' => 'api.contractasset.index',
+                    'show' => 'api.contractasset.show',
+                    'store' => 'api.contractasset.store',
+                    'update' => 'api.contractasset.update',
+                    'destroy' => 'api.contractasset.destroy'
+                ],
+            'except' => ['create', 'edit'],
+            'parameters' => ['asset' => 'asset_id']
+        ]); // Contracts resource
+
+        Route::post('list',
+        [
+            'as'=>'api.inventoryresults.checkasset',
+            'uses'=>'InventoryResultsController@checkasset'
+        ]);
+
+        Route::post('scan',
+        [
+            'as'=>'api.inventoryresults.scan',
+            'uses'=>'InventoryResultsController@scan'
+        ]);
+
+    }); // Suppliers group
 
 });

@@ -93,7 +93,15 @@ class Store extends SnipeModel
     }
     public function contract()
     {
-        return $this->belongsTo('\App\Models\Contract', 'id','store_id');
+        return $this->hasMany('\App\Models\Contract', 'object_id','id')
+        ->select(['contracts.*'])
+        ->where("contracts.object_type","=",\DB::raw('"App\\\Models\\\Store"'));
+        // ->where("contracts.object_type","=",\DB::raw('"App\\\Models\\\Department"'));
+        // ->where("store.id",'contracts.object_id')
+        // ->select(['contracts.*', 'companies.name as company_name', 'companies.id as company_id'])
+        // ->leftJoin('contracts','stores.id', '=' , 
+        // \DB::raw('(CASE WHEN contracts.object_type = "App\\\Models\\\Store" THEN contracts.object_id ELSE null END )' ))
+        // ->leftJoin('companies','companies.id', '=' , 'stores.company_id');
     }
     /**
     * Get action logs for this consumable

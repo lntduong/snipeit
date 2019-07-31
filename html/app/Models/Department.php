@@ -67,10 +67,16 @@ class Department extends SnipeModel
     {
         return $this->belongsTo('\App\Models\Store', 'store_id');
     }
+    public function contract()
+    {
+        return $this->hasMany('\App\Models\Contract', 'object_id', 'id')
+        ->select(['contracts.*'])
+        ->where("contracts.object_type","=",\DB::raw('"App\\\Models\\\Department"'));
+    }
 
     /**
      * Even though we allow allow for checkout to things beyond users
-     * this method is an easy way of seeing if we are checked out to a user.
+     * this method is an easy way    of seeing if we are checked out to a user.
      * @return mixed
      */
     public function users()

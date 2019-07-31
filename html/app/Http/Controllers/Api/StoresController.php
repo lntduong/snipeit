@@ -24,8 +24,9 @@ class StoresController extends Controller
     public function index(Request $request)
     {
         $this->authorize('view', Store::class);
+        $allowed_columns = ['location','company','contract_count','department_count'];
         $store = Store::select('stores.*')
-            ->with('company', 'location');
+            ->with('company', 'location')->with('department')->withCount('department')->withCount('contract');
         if ($request->has('search')) {
             $store = $store->TextSearch($request->input('search'));
         }
@@ -33,7 +34,7 @@ class StoresController extends Controller
         $offset = (($store) && (request('offset') > $store->count())) ? 0 : request('offset', 0);
         $limit = request('limit', 50);
 
-        $allowed_columns = ['location','company'];
+
         $order = $request->input('order') === 'asc' ? 'asc' : 'desc';
         $sort = in_array($request->input('sort'), $allowed_columns) ? $request->input('sort') : 'created_at';
 
@@ -48,7 +49,6 @@ class StoresController extends Controller
                 $store = $store->orderBy($sort, $order);
                 break;
         }
-
         $total = $store->count();
         $store = $store->skip($offset)->take($limit)->get();
         return (new StoreTransformer)->transformStores($store, $total);

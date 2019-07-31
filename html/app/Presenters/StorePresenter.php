@@ -54,7 +54,22 @@ class StorePresenter extends Presenter
                 "sortable" => true,
                 "title" => trans('general.location'),
                 "formatter" => "locationsLinkObjFormatter"
-            ], 
+            ],
+            [
+                "field" => "contract_count",
+                "searchable" => true,
+                "sortable" => true,
+                "title" => trans('general.contracts'),
+                
+            ],
+            [
+                "field" => "department_count",
+                "searchable" => true,
+                "sortable" => true,
+                "title" => trans('general.departments'),
+                
+            ],
+
         ];
         $layout[] = [
             "field" => "actions",

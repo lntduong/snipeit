@@ -105,7 +105,7 @@
         $('#add_asset').click(function(e){
             e.preventDefault();
             $.ajax({
-                url: '{{route('contractAsset.storeAsset')}}',
+                url: '{{route('contractassets.save')}}',
                 headers: {
                     "X-Requested-With": 'XMLHttpRequest',
                     "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr('content')
@@ -161,7 +161,7 @@
     $(document).ready(function() {
         $table = $("#table_contract_assets");
         $.ajax({
-            url:'{{ route('contractAsset.getAssetContractByIdContract') }}',
+            url:'{{ route('contractassets.show') }}',
             headers: {
                 "X-Requested-With": 'XMLHttpRequest',
                 "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr('content')
@@ -202,7 +202,7 @@
     //remove contract asset
     function removeAsset(idAsset) {
         $.ajax({
-            url: baseUrl + 'api/v1/contractAsset/deleteAssetContracts',
+            url: '{{ route('contractassets.delete') }}',
             headers: {
                 "X-Requested-With": 'XMLHttpRequest',
                 "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr('content')

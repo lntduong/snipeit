@@ -175,7 +175,7 @@
    ajax: {
    
      // the baseUrl includes a trailing slash
-     url: baseUrl + 'api/v1/contract/selectlist',
+     url: baseUrl + 'api/v1/contracts/selectlist',
      dataType: 'json',
      delay: 250,
      headers: {

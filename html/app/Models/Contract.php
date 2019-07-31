@@ -5,7 +5,7 @@ use App\Models\SnipeModel;
 use Watson\Validating\ValidatingTrait;
 use App\Models\Traits\Searchable;
 use Illuminate\Database\Eloquent\SoftDeletes;
-
+use DB;
 final class Contract extends SnipeModel
 {
     protected $table = 'contracts';
@@ -244,14 +244,15 @@ final class Contract extends SnipeModel
         $company = Contract::select('contracts.*', \DB::raw('null as departments'),  \DB::raw('null as departments_id'))
                 ->join('companies', 'companies.id', '=', $this->conditionCompany);  
 
-        $department = Contract::select('contracts.*', \DB::raw('null as departments'),  \DB::raw('null as departments_id'))
-                ->join('companies', 'companies.id', '=', $this->conditionStore);
+        $store = Contract::select('contracts.*', \DB::raw('null as departments'),  \DB::raw('null as departments_id'))
+            ->join('stores', 'stores.id', '=', $this->conditionStore)    
+            ->join('companies', 'companies.id', '=', 'stores.company_id');
 
         return $query
             ->join('departments', 'departments.id', '=', $this->conditionDepartment)
             ->join('stores', 'stores.id', '=', 'departments.store_id')
             ->union($company)
-            ->union($department)
+            ->union($store)
             ->orderBy('departments', $order);
     }
 
@@ -293,10 +294,113 @@ final class Contract extends SnipeModel
         return $query->leftJoin('locations', 'contracts.location_id', '=', 'locations.id')->orderBy('locations.name', $order);
     }
 
+    public function scopeOrderLocationCompany($query, $order, $input)
+    {
+
+        $company = Contract::select('contracts.*', \DB::raw('locations.name AS location_name'))
+                ->join('companies', 'companies.id', '=', $this->conditionCompany)
+                ->leftJoin('locations', 'contracts.location_id', '=', 'locations.id')
+                ->where('companies.id','=',$input);
+
+        $store = Contract::select('contracts.*', \DB::raw('locations.name AS location_name'))
+                ->join('stores', 'stores.id', '=', $this->conditionStore)
+                ->join('companies', 'companies.id', '=', 'stores.company_id')
+                ->leftJoin('locations', 'contracts.location_id', '=', 'locations.id')
+                ->where('companies.id','=',$input);
+
+        return $query
+            ->join('departments', 'departments.id', '=', $this->conditionDepartment)
+            ->join('stores', 'stores.id', '=', 'departments.store_id')
+            ->join('companies', 'companies.id', '=', 'stores.company_id')
+            ->leftJoin('locations', 'contracts.location_id', '=', 'locations.id')
+            ->where('companies.id','=',$input)     
+            ->union($company)
+            ->union($store)
+            ->orderBy('location_name', $order);
+    }
+
+    public function scopeOrderLocationStore($query, $order, $input)
+    {
+        $store = Contract::select('contracts.*', \DB::raw('locations.name AS location_name'))
+                ->join('stores', 'stores.id', '=', $this->conditionStore)
+                ->join('companies', 'companies.id', '=', 'stores.company_id')
+                ->leftJoin('locations', 'contracts.location_id', '=', 'locations.id')
+                ->where('stores.id','=',$input);
+
+        return $query
+            ->join('departments', 'departments.id', '=', $this->conditionDepartment)
+            ->join('stores', 'stores.id', '=', 'departments.store_id')
+            ->leftJoin('locations', 'contracts.location_id', '=', 'locations.id')
+            ->where('stores.id','=',$input)     
+            ->union($store)
+            ->orderBy('location_name', $order);
+    }
+
+    public function scopeOrderLocationDepartment($query, $order, $input)
+    {
+        return $query
+            ->join('departments', 'departments.id', '=', $this->conditionDepartment)
+            ->leftJoin('locations', 'contracts.location_id', '=', 'locations.id')
+            ->where('departments.id','=',$input)     
+            ->orderBy('location_name', $order);
+    }
+
     public function scopeOrderContactOne($query, $order)
     {
         return $query->leftJoin('users', 'users.id', '=', 'contracts.contact_id_1')->orderBy('users.last_name', $order);
     }
+
+    public function scopeOrderContactCompany($query, $field, $order, $input)
+    {
+
+        $company = Contract::select('contracts.*', \DB::raw('users.last_name AS last_name'))
+                ->join('companies', 'companies.id', '=', $this->conditionCompany)
+                ->leftJoin('users', 'users.id', '=', $field)
+                ->where('companies.id','=',$input);
+
+        $store = Contract::select('contracts.*', \DB::raw('users.last_name AS last_name'))
+                ->join('stores', 'stores.id', '=', $this->conditionStore)
+                ->join('companies', 'companies.id', '=', 'stores.company_id')
+                ->leftJoin('users', 'users.id', '=', $field)
+                ->where('companies.id','=',$input);
+
+        return $query
+            ->join('departments', 'departments.id', '=', $this->conditionDepartment)
+            ->join('stores', 'stores.id', '=', 'departments.store_id')
+            ->join('companies', 'companies.id', '=', 'stores.company_id')
+            ->leftJoin('users', 'users.id', '=', $field)
+            ->where('companies.id','=',$input)     
+            ->union($company)
+            ->union($store)
+            ->orderBy('last_name', $order);
+    }
+
+    public function scopeOrderContactStore($query, $field, $order, $input)
+    {
+        $store = Contract::select('contracts.*', \DB::raw('users.last_name AS last_name'))
+                ->join('stores', 'stores.id', '=', $this->conditionStore)
+                ->join('companies', 'companies.id', '=', 'stores.company_id')
+                ->leftJoin('users', 'users.id', '=', $field)
+                ->where('stores.id','=',$input);
+
+        return $query
+            ->join('departments', 'departments.id', '=', $this->conditionDepartment)
+            ->join('stores', 'stores.id', '=', 'departments.store_id')
+            ->leftJoin('users', 'users.id', '=', $field)
+            ->where('stores.id','=',$input)     
+            ->union($store)
+            ->orderBy('last_name', $order);
+    }
+
+    public function scopeOrderContactDepartment($query, $field, $order, $input)
+    {
+        return $query
+            ->join('departments', 'departments.id', '=', $this->conditionDepartment)
+            ->leftJoin('users', 'users.id', '=', $field)
+            ->where('departments.id','=',$input)     
+            ->orderBy('last_name', $order);
+    }
+
 
     public function scopeOrderContactTwo($query, $order)
     {
@@ -307,4 +411,28 @@ final class Contract extends SnipeModel
     {
         return $query->orderBy($fields, $order);
     }
+
+    public function scopeTotalCompany($query, $field, $input)
+    {
+        return $query ->join('companies', 'companies.id', '=', $this->conditionCompany)
+            ->where($field, '=', $input);
+    }
+
+    public function scopeTotalStore($query, $field, $input)
+    {
+        return $query 
+            ->join('stores', 'stores.id', '=', $this->conditionStore)
+            ->join('companies', 'companies.id', '=', 'stores.company_id')
+            ->where($field, '=', $input);
+    }
+
+    public function scopeTotalDepartment($query, $field, $input)
+    {
+        return $query 
+            ->join('departments', 'departments.id', '=', $this->conditionDepartment)
+            ->join('stores', 'stores.id', '=', 'departments.store_id')
+            ->join('companies', 'companies.id', '=', 'stores.company_id')
+            ->where($field, '=', $input);
+    }
+
 }

@@ -23,7 +23,7 @@ class DepartmentsController extends Controller
     public function index(Request $request)
     {
         $this->authorize('view', Department::class);
-        $allowed_columns = ['id','name','image','users_count'];
+        $allowed_columns = ['id','name','image','users_count','contract_count'];
 
         $departments = Department::select([
             'departments.id',
@@ -34,7 +34,7 @@ class DepartmentsController extends Controller
             'departments.created_at',
             'departments.updated_at',
             'departments.image'
-        ])->with('users')->with('location')->with('manager')->with('store')->withCount('users');
+        ])->with('users')->with('location')->with('manager')->with('store')->withCount('users')->withCount('contract');
         
         if ($request->has('store_id')) {
             $departments=$departments->where('store_id',$request->input('store_id'));
@@ -148,6 +148,9 @@ class DepartmentsController extends Controller
 
         if ($request->has('search')) {
             $departments = $departments->where('name', 'LIKE', '%'.$request->get('search').'%');
+        }
+        if ($request->input('store_id')) {
+            $departments = $departments->where('store_id', '=',$request->get('store_id'));
         }
 
         if ($request->get('store_id')) {

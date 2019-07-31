@@ -8,7 +8,9 @@ Route::group(['middleware' => 'auth'], function () {
     Route::resource('companies', 'CompaniesController', [
         'parameters' => ['company' => 'company_id']
     ]);
-
+    Route::resource('stores', 'StoresController', [
+        'parameters' => ['stores' => 'store_id']
+    ]);
     /*
     * Categories
     */
@@ -30,10 +32,7 @@ Route::group(['middleware' => 'auth'], function () {
 
     Route::group(['middleware' => ['auth']], function () {
 
-        Route::get('contracts/billing', [
-            'as' => 'contracts.billing',
-            'uses' => 'ContractsController@billing'
-        ]);
+        Route::get('contracts/billing', [ 'as' => 'contracts.billing', 'uses' => 'ContractsController@billing']);
     });
 
     Route::resource('contracts', 'ContractsController', [
@@ -88,8 +87,17 @@ Route::group(['middleware' => 'auth'], function () {
     Route::resource('departments', 'DepartmentsController', [
         'parameters' => ['department' => 'department_id']
     ]);
-
-
+    Route::resource('inventories', 'InventoriesController', [
+        'parameters' => ['inventory' => 'inventory_id']
+    ]);
+    Route::resource('inventoryresults', 'InventoryResultsController', [
+        'middleware' => ['auth'],
+        'parameters' => ['inventoryresult' => 'inventoryresult_id']
+    ]);
+    Route::get('inventoryresults_sp', [
+        'as' => 'inventoryresults_sp',
+        'uses' => 'InventoryResultsController@create'
+    ]);   
 });
 
 
@@ -487,21 +495,8 @@ Route::group(['middleware' => 'web'], function () {
     );
 
 });
-Route::resource('stores', 'StoresController', [
-    'middleware' => ['auth'],
-    'parameters' => ['stores' => 'store_id']
-]);
-Route::resource('inventories', 'InventoryController', [
-    'middleware' => ['auth'],
-    'parameters' => ['inventory' => 'inventory_id']
-]);
-Route::get('inventory/{inventoryId}/result', [
-    'middleware' => ['auth'],
-    'as' => 'result/inventory',
-    'uses' => 'InventoryController@getResult'
-]);
-Route::resource('inventoryresults', 'InventoryResultController', [
-    'middleware' => ['auth'],
-    'parameters' => ['inventoryresult' => 'inventoryresult_id']
-]);
+
+
+
+
 Auth::routes();

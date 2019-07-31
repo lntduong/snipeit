@@ -22,7 +22,7 @@
     </div>
 
     <!-- Company-->
-    @include ('partials.forms.edit.company-select', ['translated_name' => "Companies", 'fieldname' => 'company_id'])
+    @include ('partials.forms.edit.company-select', ['translated_name' => "Company", 'fieldname' => 'company_id'])
     <!-- Store-->
     @include ('partials.forms.edit.store-select', ['translated_name' => trans('admin/contracts/table.store'), 'fieldname' => 'store_id'])
     <!-- Contract-->
@@ -62,12 +62,16 @@
       </div>
       <div class="form-group alert-message" id="alert-asset"></div>
       <button type="button" onclick="load()" class="btn btn-primary">ReScan</button>
-      <button type="button" onclick="sendOnline()" class="btn btn-success">Send</button>
+      <button type="button" onclick="sendOnline()" class="btn btn-success" id="send-btn">Send</button>
     </div>
     <br>
     <div id="scan-result" class="col-md-8">
-       <p> Scan Result :</p>
-       <p id="scan-data-result"></p>
+        <div class="alert">
+            <button type="button" class="close" data-dismiss="alert">×</button>
+            <i class="fa fa-check faa-pulse animated"></i>
+            <strong>Scan Result: </strong>
+            <span id="scan-data-result"> You have successfully logged in. </span>
+        </div>
     </div>
     <!-- set mode -->
     <input type="hidden" id="get-mode" value="online" />
@@ -124,17 +128,13 @@
       }
 
       function sendOnline() {
-          if ($('#status_select_id').val() === null || $('#status_select_id').val() === '') {
-              showErrorMsg($('#alert-asset'), '{{ trans('admin/inventory/api.error_required') }}', 'error');
-              return;
-          }
           var content_scan = $('#input-scan').val();
           if (content_scan === null || content_scan === '') {
-              showErrorMsg($('#alert-asset'), '{{ trans('admin/inventory/api.error_required') }}', 'error');
+              showErrorMsg($('#alert-asset'), '{{ trans('admin/inventories/api.error_required') }}', 'error');
               return;
           }
           $.ajax({
-              url: baseUrl + 'api/v1/inventories/checkasset',
+              url: baseUrl + 'api/v1/inventoryresult/scan',
               type: 'POST',
               headers: {
                   "X-Requested-With": 'XMLHttpRequest',
@@ -150,14 +150,31 @@
               dataType: 'json',
               success: function(data, status, xhr) {
                   $('.alert-message').hide();
-                  if (data.success_scan != undefined) {
-                      document.getElementById("scan-data-result").style.color = "blue";
-                      document.getElementById("scan-data-result").innerHTML = '-' + data.success_scan;
+                  $('#scan-result div:first').removeClass('alert-success alert-warning alert-error');
+                  $('#scan-result i').removeClass('fa-check fa-warning fa-bug');
+                  if (data.status == 'success') {
+                      if (data.payload.familiar == true) {
+                          $('#scan-result div:first').addClass('alert-success');
+                          $('#scan-result i').addClass('fa-check');
+                      } else {
+                          $('#scan-result div:first').addClass('alert-warning');
+                          $('#scan-result i').addClass('fa-warning');
+                      }
+                      document.getElementById("scan-data-result").innerHTML = data.payload.message;
+                  } else {
+                      $('#scan-result div:first').addClass('alert-error');
+                      $('#scan-result i').addClass('fa-bug');
+                      document.getElementById("scan-data-result").innerHTML = data.message;
                   }
-                  if (data.unrecognized_scan != undefined) {
-                      document.getElementById("scan-data-result").style.color = "red";
-                      document.getElementById("scan-data-result").innerHTML = '-' + data.unrecognized_scan;
-                  }
+                  $("#scan-result").show();
+                  $("#send-btn").attr("disabled", true);
+              },
+              error: function (xhr, ajaxOptions, thrownError) {
+                  $("#send-btn").attr("disabled", true);
+                  $("#status_select_id").attr("disabled", true);
+                  $('#scan-result div:first').addClass('alert-error');
+                  $('#scan-result i').addClass('fa-bug');
+                  document.getElementById("scan-data-result").innerHTML = xhr.responseJSON.messages;
                   $("#scan-result").show();
               }
           });
@@ -475,7 +492,7 @@
           //inventory select
           $(".inventory_select").select2({
               ajax: {
-                  url: baseUrl + 'api/v1/inventory/selectlist',
+                  url: baseUrl + 'api/v1/inventories/selectlist',
                   dataType: 'json',
                   delay: 250,
                   headers: {
@@ -600,6 +617,7 @@
       $("#contract_select").on({
           "change": function(e) {
               $("#inventory_select").val('');
+              $("#inventory_select").html('');
               $("#body-asset tbody").html('');
               if ($('#get-mode').val() === 'offline') {
                   changeInputOffline();
@@ -615,6 +633,15 @@
                   loadingTableAsset();
               }
               setScanBtn();
+          }
+      });
+
+      $("#status_select_id").on({
+          "change": function(e) {
+              if ($("#send-btn").is('[disabled=disabled]')) {
+                  $("#send-btn").attr("disabled", false);
+              }
+              $("#scan-result").hide();
           }
       });
 
@@ -709,8 +736,11 @@
       }
 
       function scanCallback(a) {
-          if (a.includes(assetTag) && $('#inventory_select').val() !== '') {
+          if (assetTag != '' && assetTag != null && a.includes(assetTag) && $('#inventory_select').val() !== '') {
               $("#body-asset tbody").html('');
+              $("#send-btn").attr("disabled", false);
+              $("#status_select_id").attr("disabled", false);
+              $("#scan-result").hide();
               if ($('#get-mode').val() === 'online') {
                   $("#input-scan").val(a);
                   document.getElementById('result-div').style.display = "block";
@@ -719,10 +749,21 @@
               } else if ($('#get-mode').val() === 'offline') {
                   offline(a);
                   $("#body-asset").show();
-                  $("#scan-result").hide();
               }
+          } else {
+              $("#input-scan").val(a);
+              $("#body-asset").hide();
+              $("#send-btn").attr("disabled", true);
+              $("#status_select_id").attr("disabled", true);
+              if (assetTag == '' || assetTag == null) {
+                  showErrorMsg($('#alert-asset'), '{{ trans('admin/inventories/api.error_assettag_setting') }}', 'error');
+              } else {
+                  showErrorMsg($('#alert-asset'), '{{ trans('admin/inventories/api.error_assettag_inventory') }}', 'error');
+              }
+              document.getElementById('result-div').style.display = "block";
           }
           $("#outdiv").hide();
+          stopCamera();
           //setwebcam();
       }
 
@@ -747,14 +788,18 @@
               success: function(data, status, xhr) {
                   if (data.status !== 'error') {
                     $("#status_select_id option[value="+data.status_label.id+"]").attr('selected','selected');
-                    $("#status_select_id").html($("#status_select_id").text);
+                    $("#select2-status_select_id-container").html($("#status_select_id option:selected").html());
                 } else {
                     $("#status_select_id").val('');
-                    showErrorMsg($('#alert-asset'), data.messages, 'warning');
+                    $("#send-btn").attr("disabled", true);
+                    $("#status_select_id").attr("disabled", true);
+                    showErrorMsg($('#alert-asset'), data.messages, 'error');
                 }
               },
               error: function (xhr, ajaxOptions, thrownError) {
-                  showErrorMsg($('#alert-asset'), '{{ trans('admin/inventory/api.error_asset_request_failed') }}', 'error');
+                  $("#send-btn").attr("disabled", true);
+                  $("#status_select_id").attr("disabled", true);
+                  showErrorMsg($('#alert-asset'), '{{ trans('admin/inventories/api.error_asset_request_failed') }}', 'error');
               }
           });
       }

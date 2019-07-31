@@ -6,7 +6,7 @@ use App\Presenters\Presentable;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Watson\Validating\ValidatingTrait;
 
-/** 
+/**
  * Model for Components.
  *
  * @version    v1.0
@@ -27,11 +27,12 @@ class InventoryResult extends SnipeModel
 
     public $rules = array(
         'asset_id'      => 'required',
+        'inventory_id'      => 'required',
     );
 
     protected $injectUniqueIdentifier = true;
     use ValidatingTrait;
-  
+
     /**
      * The attributes that are mass assignable.
      *
@@ -47,14 +48,14 @@ class InventoryResult extends SnipeModel
     ];
 
     use Searchable;
-    
+
     /**
      * The attributes that should be included when searching the model.
-     * 
+     *
      * @var array
      */
-       
-  
+
+
     public function inventories()
     {
     	return $this->belongsTo('\App\Models\Inventory','inventory_id');
@@ -64,5 +65,5 @@ class InventoryResult extends SnipeModel
     	return $this->belongsTo('\App\Models\Asset','asset_id');
     }
 
-    
+
 }

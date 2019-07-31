@@ -21,10 +21,12 @@
                      @include ('partials.forms.edit.company-select', ['translated_name' => trans('general.company'), 'fieldname' => 'company_id'])
                      {{-- Store-Name --}}
                      @include ('partials.forms.edit.store-select', ['translated_name' => trans('admin/contracts/table.store'), 'fieldname' => 'store_id'])
+                     {{-- Department-Name --}}
+                     @include ('partials.forms.edit.department-select', ['translated_name' => trans('general.department'), 'fieldname' => 'department_id','class' => 'department_select'])
                      {{-- Contract-Name --}}
-                     @include ('partials.forms.edit.contract', ['translated_name' => trans('general.contract'), 'fieldname' => 'contract_id'])
+                     @include ('partials.forms.edit.contract', ['translated_name' => trans('general.contract'), 'fieldname' => 'assigned_contract'])
                      {{-- Inventory-Name --}}
-                     @include ('partials.forms.edit.inventory', ['translated_name' => trans('admin/inventory/table.inventory'), 'fieldname' => 'inventory_id'])
+                     @include ('partials.forms.edit.inventory', ['translated_name' => trans('admin/inventories/table.inventory'), 'fieldname' => 'inventory_id'])
                   </div>
                   <!-- /.col -->
                   <table
@@ -37,7 +39,7 @@
                      data-sort-name="name"
                      id="inventoryresultTable"
                      class="table table-striped snipe-table"
-                     data-url="{{ route('api.inventoryresult.index',['inventory_id' => $item->inventory_id]) }}"
+                     data-url="{{ route('api.inventoryresults.index',['inventory_id' => $item->inventory_id]) }}"
                      >
                   </table>
                   <div class="box-footer text-right">
@@ -69,7 +71,7 @@
        $('#addasset').prop('disabled', false);
      }
      var temp = {
-       url: '{{ route('api.inventoryresult.index',['inventory_id' => '']) }}' + inventory_id
+       url: '{{ route('api.inventoryresults.index',['inventory_id' => '']) }}' + inventory_id
      };
      $table.bootstrapTable('refresh', temp);
    });   
@@ -119,51 +121,97 @@
      templateResult: formatDatalist,
      templateSelection: formatDataSelection
    });
-   $(".contract_select").select2({
+   $(".department_select").select2({
+       
+       /**
+        * Adds an empty placeholder, allowing every select2 instance to be cleared.
+        * This placeholder can be overridden with the "data-placeholder" attribute.
+        */
+       placeholder: '',
+       allowClear: true,
+       
+       ajax: {
+       
+           // the baseUrl includes a trailing slash
+           url: baseUrl + 'api/v1/departments/selectlist',
+           dataType: 'json',
+           delay: 250,
+           headers: {
+               "X-Requested-With": 'XMLHttpRequest',
+               "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr('content')
+           },
+           data: function (params) {
+               var data = {
+                   search: params.term,
+                   store_id:($("#store_select").val()) ? $("#store_select").val() : "-1",
+                   page: params.page || 1,
+               };
+               return data;
+           },
+           processResults: function (data, params) {
+       
+               params.page = params.page || 1;
+       
+               var answer =  {
+                   results: data.items,
+                   pagination: {
+                       more: "true" //(params.page  < data.page_count)
+                   }
+               };
+       
+               return answer;
+           },
+           cache: true
+       },
+            escapeMarkup: function (markup) { return markup; }, // let our custom formatter work
+            templateResult: formatDatalist,
+            templateSelection: formatDataSelection
+       });
+       $(".contract_select").select2({
    
    /**
-   * Adds an empty placeholder, allowing every select2 instance to be cleared.
-   * This placeholder can be overridden with the "data-placeholder" attribute.
-   */
+    * Adds an empty placeholder, allowing every select2 instance to be cleared.
+    * This placeholder can be overridden with the "data-placeholder" attribute.
+    */
    placeholder: '',
    allowClear: true,
    
    ajax: {
    
-     // the baseUrl includes a trailing slash
-     url: baseUrl + 'api/v1/contract/selectlist',
-     dataType: 'json',
-     delay: 250,
-     headers: {
-         "X-Requested-With": 'XMLHttpRequest',
-         "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr('content')
-     },
-     data: function (params) {
-         var data = {
-             search: params.term,
-             store_id:$("#store_select").val(),
-             page: params.page || 1,
-         };
-         return data;
-     },
-     processResults: function (data, params) {
+       // the baseUrl includes a trailing slash
+       url: baseUrl + 'api/v1/contracts/selectlist',
+       dataType: 'json',
+       delay: 250,
+       headers: {
+           "X-Requested-With": 'XMLHttpRequest',
+           "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr('content')
+       },
+       data: function (params) {
+           var data = {
+               search: params.term,
+               data:($("#company_select").val() ? $("#company_select").val() : "" )  + '_' + ($("#store_select").val() ? $("#store_select").val() : "") + '_' + ($("#department_select").val() ? $("#department_select").val() : "") ,
+               page: params.page || 1,
+           };
+           return data;
+       },
+       processResults: function (data, params) {
    
-         params.page = params.page || 1;
+           params.page = params.page || 1;
    
-         var answer =  {
-             results: data.items,
-             pagination: {
-                 more: "true" //(params.page  < data.page_count)
-             }
-         };
+           var answer =  {
+               results: data.items,
+               pagination: {
+                   more: "true" //(params.page  < data.page_count)
+               }
+           };
    
-         return answer;
-     },
-     cache: true
-   },
-   escapeMarkup: function (markup) { return markup; }, // let our custom formatter work
-   templateResult: formatDatalist,
-   templateSelection: formatDataSelection
+           return answer;
+       },
+       cache: true
+   },   
+        escapeMarkup: function (markup) { return markup; }, // let our custom formatter work
+        templateResult: formatDatalist,
+        templateSelection: formatDataSelection
    });
    $(".inventory_select").select2({
    
@@ -177,7 +225,7 @@
    ajax: {
    
      // the baseUrl includes a trailing slash
-     url: baseUrl + 'api/v1/inventory/selectlist',
+     url: baseUrl + 'api/v1/inventories/selectlist',
      dataType: 'json',
      delay: 250,
      headers: {
@@ -187,7 +235,7 @@
      data: function (params) {
          var data = {
              search: params.term,
-             contract_id:$("#contract_select").val(),
+             data:($("#company_select").val() ? $("#company_select").val() : "" )  + '_' + ($("#store_select").val() ? $("#store_select").val() : "") + '_' + ($("#department_select").val() ? $("#department_select").val() : "") + '_' + ($("#contract_select").val() ? $("#contract_select").val() : ""),
              page: params.page || 1,
          };
          return data;
@@ -213,21 +261,31 @@
    });
    $('#company_select').change(function () { 
        $("#store_select").html('');
-       $("#store_select").val('');
+       $("#store_select").val("");
        $("#contract_select").html('');
-       $("#contract_select").val('');
+       $("#contract_select").val("");
+       $("#department_select").html('');
+       $("#department_select").val("");
        $("#inventory_select").html('');
-       $("#inventory_select").val('');
+       $("#inventory_select").val("");
    }); 
    $('#store_select').change(function () { 
        $("#contract_select").html('');
-       $("#contract_select").val('');
+       $("#contract_select").val("");
+       $("#department_select").html('');
+       $("#department_select").val("");
        $("#inventory_select").html('');
-       $("#inventory_select").val('');
+       $("#inventory_select").val("");
+   }); 
+   $('#department_select').change(function () { 
+       $("#contract_select").html('');
+       $("#contract_select").val("");
+       $("#inventory_select").html('');
+       $("#inventory_select").val("");
    }); 
    $('#contract_select').change(function () { 
        $("#inventory_select").html('');
-       $("#inventory_select").val('');
+       $("#inventory_select").val("");
    });  
 </script>
 @stop
