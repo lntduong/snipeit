@@ -126,9 +126,7 @@ class InventoryResultsController extends Controller
      */
     public function destroy($inventoryresultId)
     {
-        $splitName = explode('_', $inventoryresultId, 2);
-        $InventoryResult_id=InventoryResult::select('id')->where('inventory_id',$splitName[0])->where('asset_id',$splitName[1])->first();
-        if (is_null($inventoryresult = InventoryResult::find($InventoryResult_id->id))) {
+        if (is_null($inventoryresult = InventoryResult::find($inventoryresultId))) {
             return redirect()->back()->with('error', trans('admin/inventories/message.result.does_not_exist'));
         }
         $this->authorize('delete', $inventoryresult);

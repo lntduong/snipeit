@@ -39,17 +39,16 @@ class ModalController extends Controller
         return view('modals.manufacturer');
     }
     function inventory_result(Request $request) {
-        if ($request->get('inventory_id')) {
-            $splitName = explode('_', $request->get('inventory_id'), 3);
-         
-            $inventory_id=$splitName[0];
-            
-            switch($splitName[2])
+
+            $inventory_id=$request->get('inventory_id');
+            $device_id=$request->get('device_id');
+            $familiar=$request->get('familiar');
+            switch($familiar)
             {
                 case '0':{
                     $item = InventoryResult::select('assets.id','inventory_results.status_id')
                     ->join('assets', 'inventory_results.asset_id', '=', 'assets.id')
-                    ->where('assets.id',$splitName[1])
+                    ->where('assets.id',$device_id)
                     ->where('inventory_results.inventory_id',$inventory_id)
                     ->first();
                     $familiar=0;
@@ -58,7 +57,7 @@ class ModalController extends Controller
                 case '1':{
                     $item = InventoryResult::select('assets.id','inventory_results.status_id')
                     ->join('assets', 'inventory_results.asset_id', '=', 'assets.id')
-                    ->where('assets.id',$splitName[1])
+                    ->where('assets.id',$device_id)
                     ->where('inventory_results.inventory_id',$inventory_id)
                     ->first();
                     $familiar=1;
@@ -66,15 +65,13 @@ class ModalController extends Controller
                 }
                 case "":{
                     $item = Asset::select('assets.*')
-                    ->where('id',$splitName[1])
+                    ->where('id',$device_id)
                     ->first();
                     $familiar=1;
                     break;
                 }
             }
             return view('modals.inventory-result',['asset'=>$item,'inventory_id'=>$inventory_id,'familiar'=>$familiar]);
-        }
-        return view('modals.inventory-result');
     }
 
 }

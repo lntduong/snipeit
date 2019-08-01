@@ -5,7 +5,8 @@ use App\Models\Traits\Searchable;
 use App\Presenters\Presentable;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Watson\Validating\ValidatingTrait;
-
+use App\Models\Department;
+use App\Models\Contract;
 /**
  * Model for Components.
  *
@@ -93,15 +94,15 @@ class Store extends SnipeModel
     }
     public function contract()
     {
-        return $this->hasMany('\App\Models\Contract', 'object_id','id')
-        ->select(['contracts.*'])
+        $contract = $this->hasMany('\App\Models\Contract', 'object_id','id')
         ->where("contracts.object_type","=",\DB::raw('"App\\\Models\\\Store"'));
-        // ->where("contracts.object_type","=",\DB::raw('"App\\\Models\\\Department"'));
-        // ->where("store.id",'contracts.object_id')
-        // ->select(['contracts.*', 'companies.name as company_name', 'companies.id as company_id'])
-        // ->leftJoin('contracts','stores.id', '=' , 
-        // \DB::raw('(CASE WHEN contracts.object_type = "App\\\Models\\\Store" THEN contracts.object_id ELSE null END )' ))
-        // ->leftJoin('companies','companies.id', '=' , 'stores.company_id');
+        $department = Contract::Select("*")
+            ->where("contracts.object_type","=",\DB::raw('"App\\\Models\\\Department"'))
+            ->whereIn("contracts.object_id", 
+                Department::select('departments.id')
+                ->join('stores','stores.id', '=', 'departments.store_id')
+                ->where('stores.id',$this->id));
+        return $contract->union($department);
     }
     /**
     * Get action logs for this consumable
@@ -136,5 +137,18 @@ class Store extends SnipeModel
     public function scopeOrderCompany($query, $order)
     {
         return $query->leftJoin('companies', 'stores.company_id', '=', 'companies.id')->orderBy('companies.name', $order);
+    }
+
+     /**
+    * Query builder scope to order on company
+    *
+    * @param  Illuminate\Database\Query\Builder  $query  Query builder instance
+    * @param  text                              $order       Order
+    *
+    * @return Illuminate\Database\Query\Builder          Modified query builder
+    */
+    public function scopeOrderStore($query, $order)
+    {
+        return $query->orderBy('stores.name', $order);
     }
 }

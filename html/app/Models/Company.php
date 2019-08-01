@@ -8,6 +8,9 @@ use Auth;
 use DB;
 use Illuminate\Database\Eloquent\Model;
 use Watson\Validating\ValidatingTrait;
+use App\Models\Contract;
+use App\Models\Store;
+use App\Models\Department;
 
 /**
  * Model for Companies.
@@ -207,5 +210,24 @@ final class Company extends SnipeModel
     public function components()
     {
         return $this->hasMany(Component::class, 'company_id');
+    }
+    public function contract()
+    {
+        $contract = $this->hasMany('\App\Models\Contract', 'object_id','id')
+        ->where("contracts.object_type","=",\DB::raw('"App\\\Models\\\Company"'));
+        $department = Contract::select('*')
+            ->where('contracts.object_type', '=', \DB::raw('"App\\\Models\\\Department"') )
+            ->whereIn('contracts.object_id', 
+                Department::select('departments.id')
+                ->join('stores','stores.id', '=', 'departments.store_id')
+                ->join('companies','companies.id', '=', 'stores.company_id')
+                ->where('companies.id','=',$this->id));
+        $store = Contract::select('*')
+            ->where('contracts.object_type', '=', \DB::raw('"App\\\Models\\\Store"'))
+            ->whereIn('contracts.object_id', 
+                Store::select('stores.id')
+                ->join('companies','companies.id', '=', 'stores.company_id')
+                ->where('companies.id','=',$this->id));
+        return $contract->union($department)->union($store);
     }
 }

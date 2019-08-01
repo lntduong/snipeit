@@ -29,7 +29,11 @@ class InventoryResult extends SnipeModel
         'asset_id'      => 'required',
         'inventory_id'      => 'required',
     );
-
+    protected $searchableAttributes = [
+        'name',
+        'notes',
+        'inventory_date'
+       ];
     protected $injectUniqueIdentifier = true;
     use ValidatingTrait;
 

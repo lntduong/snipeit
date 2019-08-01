@@ -32,7 +32,7 @@
                   
                              
                               <button style="position:absolute;bottom:0;" type="submit" id="filterCompany" class="btn btn-primary" onclick="filterCompany()">Go</button>
-                         </div>
+                        </div>
                   <table
                   data-columns="{{ \App\Presenters\InventoryPresenter::dataTableLayout() }}"
                   data-cookie-id-table="inventoryTable"
@@ -52,7 +52,7 @@
                   data-url="{{ route('api.inventories.index') }}"
                   data-export-options='{
                   "fileName": "export-components-{{ date('Y-m-d') }}",
-                  "ignoreColumn": ["actions","image","change","checkbox","checkincheckout","icon"]
+                  "ignoreColumn": ["actions","image"]
                   }'>
                   </table>
                </div>
@@ -71,10 +71,10 @@
 <script>
    $table = $('#inventoryTable')
     function filterCompany() {
-        var company_id=$('#company_select').val();
-        var store_id=$('#store_select').val();
-        var department_id=$('#department_select').val();
-        var contract_id=$('#contract_select').val();
+        var company_id=($("#company_select").val() ? $("#company_select").val() : "" );
+        var store_id=($("#store_select").val() ? $("#store_select").val() : "");
+        var department_id=($("#department_select").val() ? $("#department_select").val() : "");
+        var contract_id=($('#contract_select').val() ? $('#contract_select').val() : "");
         if(company_id == "" && store_id == "" && department_id == "" && contract_id == ""){
             var url= '{{ route('api.inventories.index')}}'
         } else {
@@ -123,7 +123,7 @@
            data: function (params) {
                var data = {
                    search: params.term,
-                   company_id: ($("#company_select").val()) ? $("#company_select").val() : "-1",
+                   company_id: $("#company_select").val(),
                    page: params.page || 1,
                };
                return data;
@@ -169,7 +169,9 @@
        data: function (params) {
            var data = {
                search: params.term,
-               data:$("#company_select").val() + '_' + $("#store_select").val() + '_' + $("#department_select").val() ,
+               company:($("#company_select").val() ? $("#company_select").val() : "" ),
+               store:($("#store_select").val() ? $("#store_select").val() : ""),
+               department:($("#department_select").val() ? $("#department_select").val() : ""),
                page: params.page || 1,
            };
            return data;
@@ -215,7 +217,7 @@
        data: function (params) {
            var data = {
                search: params.term,
-               store_id:($("#store_select").val()) ? $("#store_select").val() : "-1",
+               store_id:$("#store_select").val(),
                page: params.page || 1,
            };
            return data;
@@ -239,7 +241,24 @@
         templateResult: formatDatalist,
         templateSelection: formatDataSelection
    });  
-   
+   $('#company_select').change(function () { 
+       $("#store_select").html('');
+       $("#store_select").val("");
+       $("#contract_select").html('');
+       $("#contract_select").val("");
+       $("#department_select").html('');
+       $("#department_select").val("");
+   }); 
+   $('#store_select').change(function () { 
+       $("#contract_select").html('');
+       $("#contract_select").val("");
+       $("#department_select").html('');
+       $("#department_select").val("");
+   }); 
+   $('#department_select').change(function () { 
+       $("#contract_select").html('');
+       $("#contract_select").val("");
+   }); 
 </script>
 @stop
 

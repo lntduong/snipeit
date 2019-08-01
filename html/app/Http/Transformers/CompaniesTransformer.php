@@ -33,12 +33,13 @@ class CompaniesTransformer
                 "accessories_count" => (int) $company->accessories_count,
                 "consumables_count" => (int) $company->consumables_count,
                 "components_count" => (int) $company->components_count,
-                "users_count" => (int) $company->users_count
+                "users_count" => (int) $company->users_count,
+                "contracts_count" => e($company->contract->count())
             ];
 
             $permissions_array['available_actions'] = [
                 'update' => Gate::allows('update', Company::class) ? true : false,
-                'delete' => (Gate::allows('delete', Company::class) && ($company->assets_count == 0) && ($company->accessories_count == 0) && ($company->consumables_count == 0) && ($company->components_count == 0) && ($company->users_count == 0)) ? true : false,
+                'delete' => (Gate::allows('delete', Company::class) && ($company->contract->count() !=0 ? false : true) && ($company->assets_count == 0) && ($company->accessories_count == 0) && ($company->consumables_count == 0) && ($company->components_count == 0) && ($company->users_count == 0)) ? true : false,
             ];
 
             $array += $permissions_array;

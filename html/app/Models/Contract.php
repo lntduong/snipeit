@@ -37,8 +37,8 @@ final class Contract extends SnipeModel
     protected $searchableRelations = [
         'store'      => ['name'],
         'location'   => ['name'],
-        'user'       => ['last_name'],
-        'user2'      => ['last_name'],
+        'user'       => ['first_name', 'last_name', 'username'],
+        'user2'      => ['first_name', 'last_name', 'username'],
         'company'    => ['name'],
         'department'  => ['name']
     ];   
@@ -55,7 +55,8 @@ final class Contract extends SnipeModel
         'billing_date' ,
         'payment_date' ,
         'terms_and_conditions' ,
-        'notes'
+        'notes',
+        'deleted_at'
     ];
     public $sortable = ['id', 'name', 'company', 'department', 'store', 'location', 'user', 'user2'];
     protected $conditionCompany;
@@ -140,6 +141,7 @@ final class Contract extends SnipeModel
                     ->join('stores','stores.id', '=', 'departments.store_id')
                     ->join('companies','companies.id', '=', 'stores.company_id')
                     ->where('companies.id', '=', $input)
+                    ->whereNull('contracts.deleted_at')
                 );
     }
 
@@ -150,13 +152,15 @@ final class Contract extends SnipeModel
                 Store::select('stores.id')
                 ->join('companies','companies.id', '=', 'stores.company_id')
                 ->where('companies.id', '=', $input)
+                ->whereNull('contracts.deleted_at')
             );
     }
 
     public function scopeFilterCompanyInCompany($query, $input) {
         return $query
             ->where('contracts.object_type', '=', $this->objectTypeCompany)
-            ->where('contracts.object_id', '=', $input);
+            ->where('contracts.object_id', '=', $input)
+            ->whereNull('contracts.deleted_at');
     }
 
     public function scopeFilterDepartmentInStore($query, $input) {
@@ -166,13 +170,15 @@ final class Contract extends SnipeModel
                 Department::select('departments.id')
                 ->join('stores','stores.id', '=', 'departments.store_id')
                 ->where('stores.id', '=', $input)
+                ->whereNull('contracts.deleted_at')
             );
     }
 
     public function scopeFilterStoreInStore($query, $input) {
         return $query
             ->where('contracts.object_type', '=', $this->objectTypeStore)
-            ->where('contracts.object_id', '=', $input);
+            ->where('contracts.object_id', '=', $input)
+            ->whereNull('contracts.deleted_at');
     }
 
     public function scopeFilterDepartmentInDepartment($query, $input) {
@@ -181,6 +187,7 @@ final class Contract extends SnipeModel
             ->whereIn('contracts.object_id', 
                 Department::select('departments.id')
                 ->where('departments.id', '=', $input)
+                ->whereNull('contracts.deleted_at')
             );
     }
 
@@ -190,45 +197,53 @@ final class Contract extends SnipeModel
     public function scopeSortCompany($query, $order) {
         $store = Contract::select('contracts.*', 'companies.name as company_name')
                 ->join('stores', 'stores.id', '=', $this->conditionStore)               
-                ->join('companies', 'stores.company_id', '=', 'companies.id');
+                ->join('companies', 'stores.company_id', '=', 'companies.id')
+                ->whereNull('contracts.deleted_at');
         
         $department = Contract::select('contracts.*', 'companies.name as company_name')
                 ->join('departments', 'departments.id', '=',  $this->conditionDepartment)
                 ->join('stores', 'stores.id', '=', 'departments.store_id')
-                ->join('companies', 'companies.id', '=', 'stores.company_id');
+                ->join('companies', 'companies.id', '=', 'stores.company_id')
+                ->whereNull('contracts.deleted_at');
 
         return $query
             ->join('companies', 'companies.id', '=', $this->conditionCompany)
             ->union($store)
             ->union($department)
+            ->whereNull('contracts.deleted_at')
             ->orderBy('company_name', $order);
     }
 
     public function scopeSortStore($query, $order) {
         $company = Contract::select('contracts.*', \DB::raw('null as stores'),  \DB::raw('null as stores_id'))
-            ->join('companies', 'companies.id', '=', $this->conditionCompany);
+            ->join('companies', 'companies.id', '=', $this->conditionCompany)
+            ->whereNull('contracts.deleted_at');
 
         $department = Contract::select('contracts.*', 'stores.name as stores', 'stores.id as stores_id')
             ->join('departments', 'departments.id', '=', $this->conditionDepartment)
-            ->join('stores', 'stores.id', '=', 'departments.store_id');
+            ->join('stores', 'stores.id', '=', 'departments.store_id')
+            ->whereNull('contracts.deleted_at');
 
         return $query
             ->join('stores', 'stores.id', '=', $this->conditionStore)
             ->union($company)
             ->union($department)
+            ->whereNull('contracts.deleted_at')
             ->orderBy('stores', $order);
     }
 
     public function scopeSortStoreCompany($query, $order, $input) {
         $company = Contract::select('contracts.*', \DB::raw('null as stores'),  \DB::raw('null as stores_id'))
                 ->join('companies', 'companies.id', '=', $this->conditionCompany)
-                ->where('companies.id','=',$input);
+                ->where('companies.id','=',$input)
+                ->whereNull('contracts.deleted_at');
 
         $department = Contract::select('contracts.*', 'stores.name as stores', 'stores.id as stores_id')
                 ->join('departments', 'departments.id', '=', $this->conditionDepartment)
                 ->join('stores', 'stores.id', '=', 'departments.store_id')
                 ->join('companies', 'companies.id', '=', 'stores.company_id')
-                ->where('companies.id','=',$input);
+                ->where('companies.id','=',$input)
+                ->whereNull('contracts.deleted_at');
 
         return $query
             ->join('stores', 'stores.id', '=', $this->conditionStore)
@@ -236,35 +251,41 @@ final class Contract extends SnipeModel
             ->where('companies.id','=',$input)
             ->union($company)
             ->union($department)
+            ->whereNull('contracts.deleted_at')
             ->orderBy('stores', $order);
     }
 
     public function scopeSortDepartment($query, $order) {
 
         $company = Contract::select('contracts.*', \DB::raw('null as departments'),  \DB::raw('null as departments_id'))
-                ->join('companies', 'companies.id', '=', $this->conditionCompany);  
+                ->join('companies', 'companies.id', '=', $this->conditionCompany)
+                ->whereNull('contracts.deleted_at');  
 
         $store = Contract::select('contracts.*', \DB::raw('null as departments'),  \DB::raw('null as departments_id'))
             ->join('stores', 'stores.id', '=', $this->conditionStore)    
-            ->join('companies', 'companies.id', '=', 'stores.company_id');
+            ->join('companies', 'companies.id', '=', 'stores.company_id')
+            ->whereNull('contracts.deleted_at');
 
         return $query
             ->join('departments', 'departments.id', '=', $this->conditionDepartment)
             ->join('stores', 'stores.id', '=', 'departments.store_id')
             ->union($company)
             ->union($store)
+            ->whereNull('contracts.deleted_at')
             ->orderBy('departments', $order);
     }
 
     public function scopeSortCompanyDepartment($query, $order, $input) {
         $company = Contract::select('contracts.*', \DB::raw('null as departments'),  \DB::raw('null as departments'))
                 ->join('companies', 'companies.id', '=', $this->conditionCompany)
-                ->where('companies.id','=',$input);
+                ->where('companies.id','=',$input)
+                ->whereNull('contracts.deleted_at');
 
         $store = Contract::select('contracts.*', \DB::raw('null as departments'),  \DB::raw('null as departments'))
                 ->join('stores', 'stores.id', '=', $this->conditionStore)
                 ->join('companies', 'companies.id', '=', 'stores.company_id')
-                ->where('companies.id','=',$input);
+                ->where('companies.id','=',$input)
+                ->whereNull('contracts.deleted_at');
 
         return $query
             ->join('departments', 'departments.id', '=', $this->conditionDepartment)
@@ -273,19 +294,22 @@ final class Contract extends SnipeModel
             ->where('companies.id','=',$input)        
             ->union($company)
             ->union($store)
+            ->whereNull('contracts.deleted_at')
             ->orderBy('departments', $order);
     }
 
     public function scopeSortStoreDepartment($query, $order, $input) {
         $store =  Contract::select('contracts.*', \DB::raw('null as departments'),  \DB::raw('null as departments'))
                 ->join('stores', 'stores.id', '=', $this->conditionStore)
-                ->where('stores.id', '=', $input);
+                ->where('stores.id', '=', $input)
+                ->whereNull('contracts.deleted_at');
 
         return $query
             ->join('departments', 'departments.id', '=', $this->conditionDepartment)
             ->join('stores', 'stores.id', '=', 'departments.store_id')
             ->where('stores.id', '=', $input)        
             ->union($store)
+            ->whereNull('contracts.deleted_at')
             ->orderBy('departments', $order);
     }
 
@@ -300,13 +324,15 @@ final class Contract extends SnipeModel
         $company = Contract::select('contracts.*', \DB::raw('locations.name AS location_name'))
                 ->join('companies', 'companies.id', '=', $this->conditionCompany)
                 ->leftJoin('locations', 'contracts.location_id', '=', 'locations.id')
-                ->where('companies.id','=',$input);
+                ->where('companies.id','=',$input)
+                ->whereNull('contracts.deleted_at');
 
         $store = Contract::select('contracts.*', \DB::raw('locations.name AS location_name'))
                 ->join('stores', 'stores.id', '=', $this->conditionStore)
                 ->join('companies', 'companies.id', '=', 'stores.company_id')
                 ->leftJoin('locations', 'contracts.location_id', '=', 'locations.id')
-                ->where('companies.id','=',$input);
+                ->where('companies.id','=',$input)
+                ->whereNull('contracts.deleted_at');
 
         return $query
             ->join('departments', 'departments.id', '=', $this->conditionDepartment)
@@ -316,6 +342,7 @@ final class Contract extends SnipeModel
             ->where('companies.id','=',$input)     
             ->union($company)
             ->union($store)
+            ->whereNull('contracts.deleted_at')
             ->orderBy('location_name', $order);
     }
 
@@ -325,7 +352,8 @@ final class Contract extends SnipeModel
                 ->join('stores', 'stores.id', '=', $this->conditionStore)
                 ->join('companies', 'companies.id', '=', 'stores.company_id')
                 ->leftJoin('locations', 'contracts.location_id', '=', 'locations.id')
-                ->where('stores.id','=',$input);
+                ->where('stores.id','=',$input)
+                ->whereNull('contracts.deleted_at');
 
         return $query
             ->join('departments', 'departments.id', '=', $this->conditionDepartment)
@@ -333,6 +361,7 @@ final class Contract extends SnipeModel
             ->leftJoin('locations', 'contracts.location_id', '=', 'locations.id')
             ->where('stores.id','=',$input)     
             ->union($store)
+            ->whereNull('contracts.deleted_at')
             ->orderBy('location_name', $order);
     }
 
@@ -341,7 +370,8 @@ final class Contract extends SnipeModel
         return $query
             ->join('departments', 'departments.id', '=', $this->conditionDepartment)
             ->leftJoin('locations', 'contracts.location_id', '=', 'locations.id')
-            ->where('departments.id','=',$input)     
+            ->where('departments.id','=',$input)   
+            ->whereNull('contracts.deleted_at')  
             ->orderBy('location_name', $order);
     }
 
@@ -356,13 +386,15 @@ final class Contract extends SnipeModel
         $company = Contract::select('contracts.*', \DB::raw('users.last_name AS last_name'))
                 ->join('companies', 'companies.id', '=', $this->conditionCompany)
                 ->leftJoin('users', 'users.id', '=', $field)
-                ->where('companies.id','=',$input);
+                ->where('companies.id','=',$input)
+                ->whereNull('contracts.deleted_at');
 
         $store = Contract::select('contracts.*', \DB::raw('users.last_name AS last_name'))
                 ->join('stores', 'stores.id', '=', $this->conditionStore)
                 ->join('companies', 'companies.id', '=', 'stores.company_id')
                 ->leftJoin('users', 'users.id', '=', $field)
-                ->where('companies.id','=',$input);
+                ->where('companies.id','=',$input)
+                ->whereNull('contracts.deleted_at');
 
         return $query
             ->join('departments', 'departments.id', '=', $this->conditionDepartment)
@@ -372,6 +404,7 @@ final class Contract extends SnipeModel
             ->where('companies.id','=',$input)     
             ->union($company)
             ->union($store)
+            ->whereNull('contracts.deleted_at')
             ->orderBy('last_name', $order);
     }
 
@@ -381,7 +414,8 @@ final class Contract extends SnipeModel
                 ->join('stores', 'stores.id', '=', $this->conditionStore)
                 ->join('companies', 'companies.id', '=', 'stores.company_id')
                 ->leftJoin('users', 'users.id', '=', $field)
-                ->where('stores.id','=',$input);
+                ->where('stores.id','=',$input)
+                ->whereNull('contracts.deleted_at');
 
         return $query
             ->join('departments', 'departments.id', '=', $this->conditionDepartment)
@@ -389,6 +423,7 @@ final class Contract extends SnipeModel
             ->leftJoin('users', 'users.id', '=', $field)
             ->where('stores.id','=',$input)     
             ->union($store)
+            ->whereNull('contracts.deleted_at')
             ->orderBy('last_name', $order);
     }
 
@@ -397,7 +432,8 @@ final class Contract extends SnipeModel
         return $query
             ->join('departments', 'departments.id', '=', $this->conditionDepartment)
             ->leftJoin('users', 'users.id', '=', $field)
-            ->where('departments.id','=',$input)     
+            ->where('departments.id','=',$input)
+            ->whereNull('contracts.deleted_at')     
             ->orderBy('last_name', $order);
     }
 
@@ -415,7 +451,8 @@ final class Contract extends SnipeModel
     public function scopeTotalCompany($query, $field, $input)
     {
         return $query ->join('companies', 'companies.id', '=', $this->conditionCompany)
-            ->where($field, '=', $input);
+            ->where($field, '=', $input)
+            ->whereNull('contracts.deleted_at');
     }
 
     public function scopeTotalStore($query, $field, $input)
@@ -423,7 +460,8 @@ final class Contract extends SnipeModel
         return $query 
             ->join('stores', 'stores.id', '=', $this->conditionStore)
             ->join('companies', 'companies.id', '=', 'stores.company_id')
-            ->where($field, '=', $input);
+            ->where($field, '=', $input)
+            ->whereNull('contracts.deleted_at');
     }
 
     public function scopeTotalDepartment($query, $field, $input)
@@ -432,7 +470,52 @@ final class Contract extends SnipeModel
             ->join('departments', 'departments.id', '=', $this->conditionDepartment)
             ->join('stores', 'stores.id', '=', 'departments.store_id')
             ->join('companies', 'companies.id', '=', 'stores.company_id')
-            ->where($field, '=', $input);
+            ->where($field, '=', $input)
+            ->whereNull('contracts.deleted_at');
     }
 
+    public function scopeDeleted($query)
+    {
+        return $query->whereNotNull('contracts.deleted_at');
+    }
+
+    public function scopeContractSearch($query, $search)
+    {
+        $search = explode(' OR ', $search);
+
+        return $query->leftJoin('users as assets_users',function ($leftJoin) {
+            $leftJoin->on("assets_users.id", "=", "contracts.contact_id_1");
+        })->leftJoin('locations as assets_locations',function ($leftJoin) {
+            $leftJoin->on("assets_locations.id","=","contracts.location_id");
+        })->leftJoin('stores as store_contract',function ($leftJoin) {
+            $leftJoin->on('store_contract.id', '=', $this->conditionStore);
+        })->leftJoin('departments as department_contract',function ($leftJoin) {
+            $leftJoin->on('department_contract.id', '=', $this->conditionDepartment);
+        })->leftJoin('companies as company_contract',function ($leftJoin) {
+            $leftJoin->on('company_contract.id', '=', $this->conditionCompany);
+        })->where(function ($query) use ($search) {
+            foreach ($search as $search) {
+                $query->whereHas('store', function ($query) use ($search) {
+                    $query->where(function ($query) use ($search) {
+                        $query->where('stores.name', 'LIKE', '%'.$search.'%');
+                    });
+                })
+                ->orWhereHas('department', function ($query) use ($search) {
+                        $query->where(function ($query) use ($search) {
+                            $query->where('departments.name', 'LIKE', '%'.$search.'%');
+                        });
+                    })
+                ->orWhereHas('company', function ($query) use ($search) {     
+                        $query->where(function ($query) use ($search) {
+                            $query->where('companies.name', 'LIKE', '%'.$search.'%');
+                    });
+                })
+                ->orWhere('contracts.name', 'LIKE', '%'.$search.'%')
+                    ->orWhere('contracts.start_date', 'LIKE', '%'.$search.'%')
+                    ->orWhere('contracts.end_date', 'LIKE', '%'.$search.'%');
+            }
+        })
+        ->whereNull("contracts.deleted_at");
+    }
+        
 }

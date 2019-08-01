@@ -24,9 +24,9 @@ class StoresController extends Controller
     public function index(Request $request)
     {
         $this->authorize('view', Store::class);
-        $allowed_columns = ['location','company','contract_count','department_count'];
+        $allowed_columns = ['location','company','department_count'];
         $store = Store::select('stores.*')
-            ->with('company', 'location')->with('department')->withCount('department')->withCount('contract');
+            ->with('company', 'location')->with('department')->withCount('department');
         if ($request->has('search')) {
             $store = $store->TextSearch($request->input('search'));
         }
@@ -44,6 +44,9 @@ class StoresController extends Controller
                 break;
             case 'company':
                 $store = $store->OrderCompany($order);
+                break;
+            case 'store':
+                $store = $store->OrderStore($order);
                 break;
             default:
                 $store = $store->orderBy($sort, $order);

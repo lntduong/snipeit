@@ -77,7 +77,7 @@
                         data-toolbar="#toolbar" 
                         id="contractsTable" 
                         class="table table-striped snipe-table" 
-                        data-url="{{ route('api.contracts.index',['department_id'=> $department->id]) }}">
+                        data-url="{{ route('api.contracts.index',['department'=> $department->id]) }}">
                         <thead>
                             <tr>
                                 <th data-sortable="true" data-field="id" data-visible="false" data-searchable="false">{{ trans('general.id') }}</th>

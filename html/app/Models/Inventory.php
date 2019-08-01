@@ -64,16 +64,23 @@ class Inventory extends SnipeModel
      * 
      * @var array
      */
-     protected $searchableAttributes = ['name','notes'];
-
+     protected $searchableAttributes = [
+         'name',
+         'notes',
+         'inventory_date'
+        ];
+      
     /**
      * The relations and their attributes that should be included when searching the model.
      * 
      * @var array
      */
     protected $searchableRelations = [
-        'contract'     => ['name'],
-    ];      
+        'store'      => ['name'],
+        'company'    => ['name'],
+        'department' => ['name'],
+        'contract'   => ['name']
+    ];       
   
     // /**
     // * get contract
@@ -85,15 +92,27 @@ class Inventory extends SnipeModel
     }
     public function company()
     {
-    	return $this->belongsTo('\App\Models\Company','object_id');
+        return $this->belongsTo('\App\Models\Company','object_id')
+        ->select(['companies.*'])
+        ->join('inventories','companies.id', '=' , 
+        \DB::raw('(CASE WHEN inventories.object_type = "App\\\Models\\\Company" THEN inventories.object_id ELSE null END )' ));
     }
     public function store()
     {
-    	return $this->belongsTo('\App\Models\Store','object_id');
+        return $this->belongsTo('\App\Models\Store','object_id')
+        ->select(['stores.*', 'companies.name as company_name', 'companies.id as company_id'])
+        ->leftJoin('inventories','stores.id', '=' , 
+        \DB::raw('(CASE WHEN inventories.object_type = "App\\\Models\\\Store" THEN inventories.object_id ELSE null END )' ))
+        ->leftJoin('companies','companies.id', '=' , 'stores.company_id');
     }
     public function department()
     {
-    	return $this->belongsTo('\App\Models\Department','object_id');
+        return $this->belongsTo('\App\Models\Department','object_id')
+        ->select(['departments.*', 'stores.name as store_name', 'stores.id as store_id', 'companies.name as company_name', 'companies.id as company_id'])
+        ->join('inventories','departments.id', '=' , 'inventories.object_id')
+        ->join('stores','stores.id', '=' , 'departments.store_id')
+        ->join('companies','stores.company_id', '=' , 'companies.id')
+        ->where("inventories.object_type","=",\DB::raw('"App\\\Models\\\Department"'));
     }
     public function inventoryresult()
     {

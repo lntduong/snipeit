@@ -439,7 +439,7 @@
                   },
                   data: function(params) {
                       var data = {
-                          company_id: ($("#company_select").val()) ? $("#company_select").val() : "-1",
+                          company_id: $("#company_select").val(),
                       };
                       return data;
                   },

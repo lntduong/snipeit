@@ -23,7 +23,7 @@ class StoreTransformer
             'id'       => (int) $store->id,
             'name'     => e($store->name),
             'image'    =>   ($store->image) ? e(url('/').'/uploads/store/'.e($store->image)) : null,
-            'contract_count' => e($store->contract_count),
+            'contract_count' => e($store->contract->count()),
             'department_count' => e($store->department_count),
             'location' => ($store->location) ? [
                 'id'   => (int) $store->location->id,
@@ -37,7 +37,7 @@ class StoreTransformer
         ];
         $permissions_array['available_actions'] = [
             'update'   => (bool) Gate::allows('update', Store::class),
-            'delete'   => ((bool) Gate::allows('delete', Store::class) && ($store->department ? false : true) && ($store->deleted_at=='')) ? true : false,
+            'delete'   => ((bool) Gate::allows('delete', Store::class) && ($store->department ? false : true) && ($store->contract->count() !=0 ? false : true) && ($store->deleted_at=='')) ? true : false,
         ];
         $array += $permissions_array;
         return $array;

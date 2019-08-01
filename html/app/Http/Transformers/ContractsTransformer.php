@@ -52,11 +52,11 @@ class ContractsTransformer
             ]  : null,
             'contact_id_1' => ($contract->contact_id_1) ? [
                 'id' => (int) $contract->user->id,
-                'name'=> e($contract->user->last_name)
+                'name'=> e($contract->user->first_name).' '.e($contract->user->last_name)
             ]  : null,
             'contact_id_2' =>  ($contract->contact_id_2) ? [
                 'id' => (int) $contract->user2->id,
-                'name'=> e($contract->user2->last_name)
+                'name'=> e($contract->user2->first_name).' '.e($contract->user2->last_name)
             ]  : null,
             'start_date' => $contract->start_date,
             'end_date' =>  $contract->end_date,

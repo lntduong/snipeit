@@ -4,22 +4,24 @@ namespace App\Http\Transformers;
 use App\Models\InventoryResult;
 use App\Helpers\Helper;
 use Gate;
+use Illuminate\Database\Eloquent\Collection;
 
 class InventoryResultsTransformer
 {
-    public function transformInventoryresults($inventoryresults, $inventory_id)
+    public function transformInventoryresults($inventoryresults, $inventory_id,$total)
     {
         $array = array();
         foreach ($inventoryresults as $inventoryresult) {
             $array[] = self::transformInventoryresult($inventoryresult,$inventory_id);
         }
-        return (new DatatablesTransformer)->transformDatatables($array, 0);
+        return (new DatatablesTransformer)->transformDatatables($array,$total);
     }
 
     public function transformInventoryresult($inventoryresult,$inventory_id)
     {
         $array = [
-            'id'             => $inventory_id,
+            'id'             => e($inventoryresult->id),
+            'inventory_id'   => $inventory_id,
             'deviece'        => e($inventoryresult->asset_id),
             'image'          => self::getImageUrl($inventoryresult->image,$inventoryresult->image_model),
             'asset_tag'      => e($inventoryresult->asset_tag),

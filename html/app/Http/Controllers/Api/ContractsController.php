@@ -38,7 +38,7 @@ class ContractsController extends Controller
         }
         
         if ($request->has('search')) {
-            $contract = $contract->TextSearch($request->input('search'));
+            $contract = $contract->ContractSearch($request->input('search'));
         }
 
         if($request->input('department')) {
@@ -53,6 +53,9 @@ class ContractsController extends Controller
             $store = Contract::select('contracts.*')->TotalStore('companies.id', $request->input('company'))->count();
             $department = Contract::select('contracts.*')->TotalDepartment('companies.id', $request->input('company'))->count();
             $countSort = $company + $store + $department;
+        } else if($request->input('billing_date')) {
+            $countSort = Contract::select('contracts.*')
+            ->where('contracts.billing_date', 'LIKE', $request->input('billing_date').'-%')->whereNull('contracts.deleted_at')->count();
         } else {
             $countSort = $contract->count();
         }
@@ -65,12 +68,21 @@ class ContractsController extends Controller
 
         switch ($request->input('sort')) {  
             case 'company':
-                $contract = ($request->input('company')) ? 
-                        $contract : Contract::select('contracts.*', 'companies.name as company_name')->SortCompany($order);
+                if($request->input('department')) {
+                    $contract = $contract;
+                } else if($request->input('store')) {
+                    $contract = $contract;
+                } else if($request->input('company')) {
+                    $contract = $contract;
+                } else {
+                    $contract = Contract::select('contracts.*', 'companies.name as company_name')->SortCompany($order);
+                }
             break;
 
-            case 'store':          
-                if($request->input('store')) {
+            case 'store':     
+                if($request->input('department')) {
+                    $contract = $contract;
+                } else if($request->input('store')) {
                     $contract = $contract;
                 } else if($request->input('company')) {
                     $contract = Contract::select('contracts.*', 'stores.name as stores', 'stores.id as stores_id')->SortStoreCompany($order, $request->input('company'));
@@ -160,19 +172,22 @@ class ContractsController extends Controller
             $store = Contract::select('contracts.*')->TotalStore('companies.id', $request->input('company'))->count();
             $department = Contract::select('contracts.*')->TotalDepartment('companies.id', $request->input('company'))->count();
             $total = $company + $store + $department;
+        } else if($request->input('billing_date')) {
+            $total = Contract::select('contracts.*')
+            ->where('contracts.billing_date', 'LIKE', $request->input('billing_date').'-%')->whereNull('contracts.deleted_at')->count();
         } else {
-            $total = Contract::select('contract.*')->count();
+            $total = Contract::select('contract.*')->whereNull('contracts.deleted_at')->count();
         }
 
         if ($request->has('billing_date')) {
-            if($request->input('sort') == 'company' ) {
-                $contract = $contract->where('contracts.billing_date', 'LIKE', $request->input('billing_date').'-%');
+            if($request->input('sort') == 'company' || $request->input('sort') == 'store' || $request->input('sort') == 'department' ) {
+                $contract = Contract::where('contracts.billing_date', 'LIKE', $request->input('billing_date').'-%');
             } else {
                 $contract = $contract->where('contracts.billing_date', 'LIKE', $request->input('billing_date').'-%');
             }
         }
         
-        $contract = $contract->skip($offset)->take($limit)->get();
+        $contract = $contract->skip($offset)->take($limit)->whereNull('contracts.deleted_at')->get();
         return (new ContractsTransformer)->transformContractList($contract, $total);
     }
 
@@ -185,10 +200,10 @@ class ContractsController extends Controller
             'contracts.name',
             'contracts.start_date',
         ]);
-        $splitName = explode('_', $request->get('data'), 3);
-        $company=$splitName[0];
-        $store=$splitName[1];
-        $department=$splitName[2];
+     
+        $company=$request->get('company');
+        $store=$request->get('store');
+        $department=$request->get('department');
         if($department) {
             $listContract = $listContract
             ->where('contracts.object_type', '=', \DB::raw('"App\\\Models\\\Department"') )

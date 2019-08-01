@@ -23,13 +23,24 @@ class ContractRequest extends Request
      */
     public function rules()
     {
-        return [
-            'name' => 'required',
-            'start_date' => 'required',
-            'end_date'  => 'required|after:start_date',
-            'billing_date'  => 'required',
-            'assigned_company' => 'required'
-        ];   
+        if (request('assigned_company') === null && request('assigned_store') === null && request('assigned_department') === null) {
+            return [
+                'name' => 'required',
+                'start_date' => 'required',
+                'end_date'  => 'required|after:start_date',
+                'billing_date'  => 'required',
+                'assigned_company' => 'required'
+            ];      
+        } else {
+            return [
+                'name' => 'required',
+                //'name' => ['required', 'unique:servers,ip,'.$this->id.','.$request->input('id').',id,hostname,'.$request->input('hostname')],
+                'start_date' => 'required',
+                'end_date'  => 'required|after:start_date',
+                'billing_date'  => 'required',
+                'assigned_company' => 'unique:contracts,name'
+            ];  
+        }  
     }
 
     public function messages()

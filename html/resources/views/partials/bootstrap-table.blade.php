@@ -217,7 +217,7 @@
             if ((row.available_actions) && (row.available_actions.update === true)) {
                 if(destination == 'inventoryresults')
                 {
-                    actions += '<a href="{{ route('modal.inventory-result',['inventory_id' => '']) }}'+ row.id + '_'+ row.deviece + '_' + row.familiar +'" data-toggle="modal"  data-target="#createModal" data-select="assigned_user_select" class="btn btn-sm btn-warning" id="addasset" data-tooltip="true" title="Update"><i class="fa fa-pencil"></i></a>&nbsp;';
+                    actions += '<a href="{{ route('modal.inventory-result') }}'+ '?inventory_id=' +row.inventory_id + '&device_id=' + row.deviece + '&familiar=' + row.familiar +'" data-toggle="modal"  data-target="#createModal" data-select="assigned_user_select" class="btn btn-sm btn-warning" id="addasset" data-tooltip="true" title="Update"><i class="fa fa-pencil"></i></a>&nbsp;';
                 }
                 else
                 {
@@ -230,7 +230,7 @@
                 {
                     if(row.checked)
                     {
-                        actions += '<a href="{{ url('/') }}/' + dest + '/' + row.id + '_' + row.deviece +  '" '
+                        actions += '<a href="{{ url('/') }}/' + dest + '/' + row.id +   '" '
                     + ' class="btn btn-danger btn-sm delete-asset"  data-tooltip="true"  '
                     + ' data-toggle="modal" '
                     + ' data-content="{{ trans('general.sure_to_delete') }} ' + row.name + '?" '
@@ -255,7 +255,7 @@
                 actions += '<a href="{{ url('/') }}/' + dest + '/' + row.id + '/restore" class="btn btn-sm btn-warning" data-tooltip="true" title="Restore"><i class="fa fa-retweet"></i></a>&nbsp;';
             }
             if ((row.available_actions) && (row.available_actions.result === true)) {
-                actions += '<a href="{{ url('/') }}/inventoryresults/' + row.id + '" class="btn btn-sm btn-info" data-tooltip="true" title="Result"><i class="fa fa-copy"></i></a>&nbsp;';
+                actions += '<a href="{{ url('/') }}/inventoryresults/' + row.id + '" class="btn btn-sm btn-info" data-tooltip="true" title="Result"><i class="fa fa-indent"></i></a>&nbsp;';
             }
             actions +='</nobr>';
             return actions;

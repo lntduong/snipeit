@@ -102,20 +102,21 @@
 <script>
    $table = $('#activityContractReport') 
     function searchContractReport() {
-        //alert($('.contract_select').val());
-        if($('.contract_select').val() == null) {
+        if($('.store_select').val()) {
+            $table.bootstrapTable('refresh', {
+                url: '{{ route('api.activity.index',['store_id' => '']) }}'+ $(".store_select").val()
+            });
+        } else if($('.contract_select').val() == null) {
             $table.bootstrapTable('refresh', {
                 url: '{{ route('api.activity.index',['contract_type' => 'contract']) }}'
                 
             });
-            }
-            else if ($('.contract_select').val() == '') {
+        } else if ($('.contract_select').val() == '') {
                 $table.bootstrapTable('refresh', {
                 url: '{{ route('api.activity.index',['contract_type' => 'contract']) }}'
                 
             });
-            }
-            else {
+        } else {
             $table.bootstrapTable('refresh', {
                 url: '{{ route('api.activity.index',['contract_id' => '']) }}'+ $(".contract_select").val()
             });
@@ -139,7 +140,7 @@
          data: function (params) {
              var data = {
                  search: params.term,
-                 company_id:($("#company_select").val()) ? $("#company_select").val() : "-1",
+                 company_id:$("#company_select").val(),
                  page: params.page || 1,
              };
              return data;

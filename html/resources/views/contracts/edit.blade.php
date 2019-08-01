@@ -272,7 +272,7 @@
         data: function (params) {
             var data = {
                 search: params.term,
-                company_id: ($("#company_select").val()) ? $("#company_select").val() : "-1",
+                company_id: $("#company_select").val(),
                 page: params.page || 1,
                 assetStatusType: $(".js-data-ajax-company").data("asset-status-type"),
             };
@@ -315,7 +315,7 @@
          data: function (params) {
              var data = {
                  search: params.term,
-                 store_id:($("#store_select").val()) ? $("#store_select").val() : "-1",
+                 store_id:$("#store_select").val(),
                  page: params.page || 1,
              };
              return data;

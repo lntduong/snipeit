@@ -32,20 +32,31 @@
                   <table
                      data-columns="{{ \App\Presenters\InventoryResultPresenter::dataTableLayout() }}"
                      data-cookie-id-table="inventoryresultTable"
+                     data-toolbar="#toolbar"
+                     data-pagination="true"
                      data-id-table="inventoryresultTable"
+                     data-search="true"
                      data-side-pagination="server"
+                     data-show-columns="true"
+                     data-show-export="true"
                      data-show-footer="true"
+                     data-show-refresh="true"
                      data-sort-order="asc"
                      data-sort-name="name"
                      id="inventoryresultTable"
                      class="table table-striped snipe-table"
                      data-url="{{ route('api.inventoryresults.index',['inventory_id' => $item->inventory_id]) }}"
-                     >
+                     data-export-options='{
+                        "fileName": "export-components-{{ date('Y-m-d') }}",
+                        "ignoreColumn": ["actions","image"]
+                        }'>
+                     
                   </table>
                   <div class="box-footer text-right">
                      <button href='{{ route('modal.inventory-result') }}' data-toggle="modal"  data-target="#createModal" data-select='assigned_user_select' type="button" class="btn btn-success" id="addasset"><i class=""></i> Add Unknow Asset</button>
                   </div>
                </div>
+        
                <!-- /.row -->
             </div>
             <!-- /.row -->
@@ -62,18 +73,21 @@
    $table = $('#inventoryresultTable')
    $('#inventory_select').change(function () {
      var inventory_id=$('#inventory_select').val();
-     if(inventory_id == null)
+     if(inventory_id == null || inventory_id == "")
      {
-       $('#addasset').prop('disabled', true);
+       var temp = {
+       url: '{{ route('api.inventoryresults.index',['inventory_id' => '']) }}'
+        };
+       $table.bootstrapTable('refresh', temp);
      }
      else
      {
-       $('#addasset').prop('disabled', false);
-     }
-     var temp = {
+       var temp = {
        url: '{{ route('api.inventoryresults.index',['inventory_id' => '']) }}' + inventory_id
-     };
-     $table.bootstrapTable('refresh', temp);
+        };
+       $table.bootstrapTable('refresh', temp);
+     }
+    
    });   
    $(".store_select").select2({
    
@@ -97,7 +111,7 @@
          data: function (params) {
              var data = {
                  search: params.term,
-                 company_id: ($("#company_select").val()) ? $("#company_select").val() : "-1",
+                 company_id: $("#company_select").val(),
                  page: params.page || 1,
              };
              return data;
@@ -143,7 +157,7 @@
            data: function (params) {
                var data = {
                    search: params.term,
-                   store_id:($("#store_select").val()) ? $("#store_select").val() : "-1",
+                   store_id:$("#store_select").val(),
                    page: params.page || 1,
                };
                return data;
@@ -189,7 +203,9 @@
        data: function (params) {
            var data = {
                search: params.term,
-               data:($("#company_select").val() ? $("#company_select").val() : "" )  + '_' + ($("#store_select").val() ? $("#store_select").val() : "") + '_' + ($("#department_select").val() ? $("#department_select").val() : "") ,
+               company:($("#company_select").val() ? $("#company_select").val() : "" ),
+               store:($("#store_select").val() ? $("#store_select").val() : ""),
+               department:($("#department_select").val() ? $("#department_select").val() : ""),
                page: params.page || 1,
            };
            return data;
@@ -235,7 +251,10 @@
      data: function (params) {
          var data = {
              search: params.term,
-             data:($("#company_select").val() ? $("#company_select").val() : "" )  + '_' + ($("#store_select").val() ? $("#store_select").val() : "") + '_' + ($("#department_select").val() ? $("#department_select").val() : "") + '_' + ($("#contract_select").val() ? $("#contract_select").val() : ""),
+             company:($("#company_select").val() ? $("#company_select").val() : "" ),
+             store:($("#store_select").val() ? $("#store_select").val() : ""),
+             department:($("#department_select").val() ? $("#department_select").val() : ""),
+             contract:($("#contract_select").val() ? $("#contract_select").val() : ""),
              page: params.page || 1,
          };
          return data;

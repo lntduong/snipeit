@@ -77,6 +77,12 @@ class CompanyPresenter extends Presenter
                 "visible" => true,
                 "title" => ' <span class="hidden-xs"><i class="fa fa-hdd-o"></i></span><span class="hidden-md hidden-lg">'.trans('general.components').'</span>',
             ],[
+                "field" => "contracts_count",
+                "searchable" => false,
+                "sortable" => true,
+                "visible" => true,
+                "title" => ' <span class="hidden-xs"><i class="fa fa-file-text"></i></span><span class="hidden-md hidden-lg">'.trans('general.components').'</span>',
+            ],[
                 "field" => "updated_at",
                 "searchable" => false,
                 "sortable" => true,

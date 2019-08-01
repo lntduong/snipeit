@@ -28,12 +28,21 @@ class ReportsController extends Controller
 
         if (($request->has('contract_id'))) {
             $actionlogs = $actionlogs->where('item_id','=',$request->input('contract_id'))
-            ->where('item_type','=',"App\\Models\\".ucwords('contract'));;
+            ->where('item_type','=',"App\\Models\\".ucwords('contract'));
         } 
 
         if (($request->has('contract_type'))) {
             $actionlogs = $actionlogs->where('item_type','=',"App\\Models\\".ucwords($request->input('contract_type')));
         } 
+
+        if(($request->has('store_id'))) {
+            $actionlogs = $actionlogs
+            ->join('contracts', 'contracts.id', '=', 'action_logs.item_id')
+            ->join('stores', 'stores.id')
+            ->where('item_type', '=', \DB::raw('"App\\\Models\\\Contract"'))
+            ->where('contracts.object_type', '=', \DB::raw('"App\\\Models\\\Store"'))
+            ->where('contracts.object_id', '=', ($request->has('store_id')));
+        }
 
         if (($request->has('target_type')) && ($request->has('target_id'))) {
             $actionlogs = $actionlogs->where('target_id','=',$request->input('target_id'))
@@ -46,23 +55,23 @@ class ReportsController extends Controller
         }
 
         if ($request->has('action_type')) {
-            $actionlogs = $actionlogs->where('action_type','=',$request->input('action_type'))->orderBy('created_at', 'desc');
+            $actionlogs = $actionlogs->where('action_type','=',$request->input('action_type'))->orderBy('action_logs.created_at', 'desc');
         }
 
         if ($request->has('uploads')) {
-            $actionlogs = $actionlogs->whereNotNull('filename')->orderBy('created_at', 'desc');
+            $actionlogs = $actionlogs->whereNotNull('filename')->orderBy('action_logs.created_at', 'desc');
         }
 
         $allowed_columns = [
             'id',
-            'created_at',
+            'action_logs.created_at',
             'target_id',
             'user_id',
             'action_type',
             'note'
         ];
         
-        $sort = in_array($request->input('sort'), $allowed_columns) ? e($request->input('sort')) : 'created_at';
+        $sort = in_array($request->input('sort'), $allowed_columns) ? e($request->input('sort')) : 'action_logs.created_at';
         $order = ($request->input('order') == 'asc') ? 'asc' : 'desc';
         $offset = request('offset', 0);
         $limit = request('limit', 50);

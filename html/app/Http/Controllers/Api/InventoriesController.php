@@ -24,6 +24,11 @@ use Input;
  */
 class InventoriesController extends Controller
 {
+    /**
+     * Display a listing of the resource.
+     *
+     * @return list Tableinventory
+     */
     public function index(Request $request)
     {
         $this->authorize('view', Inventory::class);
@@ -40,31 +45,27 @@ class InventoriesController extends Controller
         $department=$request->input('department_id');
         $contract=$request->input('contract_id');
         $inventory=self::filter($company,$store,$department,$contract,$inventory);
+        
+        $offset = (($inventory) && (request('offset') > $inventory->count())) ? 0 : request('offset', 0);
         $limit = request('limit', 50);
         $order = $request->input('order') === 'asc' ? 'asc' : 'desc';
+
         $allowed_columns = [
            'name'
         ];
         $sort = in_array($request->input('sort'), $allowed_columns) ? $request->input('sort') : 'created_at';
+        $total = $inventory->count();
         $inventory->orderBy($sort, $order);
-        $inventory = $inventory->take($limit)->get();
-        return (new InventoriesTransformer)->transformInventories($inventory, 0);
-    }
-    public function offlineDataSync()
-    {
-        $listAllCompany = Company::select('id','name')->orderBy('name', 'ASC')->paginate();
-        $listAllStore = Store::select('id','name','company_id')->orderBy('name', 'ASC')->paginate();
-        $listAllContract = Contract::select('id','name','store_id')->orderBy('name', 'ASC')->paginate();
-        $listAllInventory = Inventories::select('id','name','contract_id', 'inventory_date')->orderBy('name', 'ASC')->paginate();
 
-        return response()->json([
-                                'listCompany'  => $listAllCompany,
-                                'listStore'    => $listAllStore,
-                                'listContract' => $listAllContract,
-                                'listInventory' => $listAllInventory
-        ]);
+        $inventory = $inventory->skip($offset)->take($limit)->get();
+        return (new InventoriesTransformer)->transformInventories($inventory, $total);
     }
-
+    
+    /**
+     * Display all assets attached to a component
+     * @param Request $request
+     * @return List Selectlistinventory
+    */
     public function selectlist(Request $request)
     {
         $page = Input::get('page', 1);
@@ -72,11 +73,10 @@ class InventoriesController extends Controller
         $inventories = Inventory::select([
             'inventories.*'
         ]);
-        $splitName = explode('_', $request->get('data'), 4);
-        $company=$splitName[0];
-        $store=$splitName[1];
-        $department=$splitName[2];
-        $contract=$splitName[3];
+        $company=$request->get('company');
+        $store=$request->get('store');
+        $department=$request->get('data');
+        $contract=$request->get('data');
         $inventories=self::filter($company,$store,$department,$contract,$inventories);
         if ($request->input('search')) {
             $inventories = $inventories->where('inventories.name', 'LIKE', '%'.$request->get('search').'%');
@@ -86,7 +86,6 @@ class InventoriesController extends Controller
         $result = new \Illuminate\Pagination\LengthAwarePaginator($slice, count($inventories), $paginate);
         return (new SelectlistTransformer)->transformSelectlistContract($result);
     }
-
     /**
      * fillter inventory
      * @param company,store,department,contract,inventory
@@ -291,6 +290,20 @@ class InventoriesController extends Controller
         }
         return $inventory;
     }
+    public function offlineDataSync()
+    {
+        $listAllCompany = Company::select('id','name')->orderBy('name', 'ASC')->paginate();
+        $listAllStore = Store::select('id','name','company_id')->orderBy('name', 'ASC')->paginate();
+        $listAllContract = Contract::select('id','name','store_id')->orderBy('name', 'ASC')->paginate();
+        $listAllInventory = Inventories::select('id','name','contract_id', 'inventory_date')->orderBy('name', 'ASC')->paginate();
+
+        return response()->json([
+                                'listCompany'  => $listAllCompany,
+                                'listStore'    => $listAllStore,
+                                'listContract' => $listAllContract,
+                                'listInventory' => $listAllInventory
+        ]);
+    } 
 
     public function savelist(Request $request)
     {

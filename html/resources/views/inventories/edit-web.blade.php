@@ -47,7 +47,7 @@
                data: function (params) {
                    var data = {
                        search: params.term,
-                       company_id: ($("#company_select").val()) ? $("#company_select").val() : "-1",
+                       company_id:$("#company_select").val(),
                        page: params.page || 1,
                    };
                    return data;
@@ -93,7 +93,9 @@
        data: function (params) {
            var data = {
                search: params.term,
-               data:($("#company_select").val() ? $("#company_select").val() : "" )  + '_' + ($("#store_select").val() ? $("#store_select").val() : "") + '_' + ($("#department_select").val() ? $("#department_select").val() : "") ,
+               company:($("#company_select").val() ? $("#company_select").val() : "" ),
+               store:($("#store_select").val() ? $("#store_select").val() : ""),
+               department:($("#department_select").val() ? $("#department_select").val() : ""),
                page: params.page || 1,
            };
            return data;
@@ -139,7 +141,7 @@
            data: function (params) {
                var data = {
                    search: params.term,
-                   store_id:($("#store_select").val()) ? $("#store_select").val() : "-1",
+                   store_id:$("#store_select").val(),
                    page: params.page || 1,
                };
                return data;

@@ -23,13 +23,18 @@ class InventoryRequest extends Request
      */
     public function rules()
     {
-        $rules = [
-            "company_id"                => 'required_without:contract_id',
-            'contract_id'               => 'required_without:company_id',
-            'inventory_date'            => 'required',
-      
-            
-        ];
-        return $rules;
+        if (request('company_id') === null && request('store_id') === null && request('department_id') === null && request('contract_id') === null) {
+            return [
+                "company_id"                => 'required',
+                "store_id"                  => 'required',
+                "department_id"             => 'required',
+                'contract_id'               => 'required',
+                'inventory_date'            => 'required',
+            ];      
+        } else {
+            return [
+                'inventory_date'            => 'required',
+            ];  
+        }
     }
 }
