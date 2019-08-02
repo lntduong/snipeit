@@ -16,7 +16,7 @@ use App\Models\License;
 use App\Models\Accessory;
 use App\Models\Consumable;
 use App\Models\Component;
-
+use App\Models\Contract;
 
 /**
  * This service provider handles a few custom validation rules.
@@ -83,6 +83,33 @@ class ValidationServiceProvider extends ServiceProvider
 
         });
 
+        Validator::extend('duplicate_name', function ($attribute, $value, $parameters, $validator) {
+            $all_data = $validator->getData();
+            if(isset($all_data['id'])) {
+                $id = $all_data['id'];
+            } else {
+                $id = 0;
+            }
+            if (count($parameters)) {
+                $count = DB::table($parameters[0])
+                    ->select('contracts.*');
+                    if(request('assigned_department')) {
+                        $count = $count->where('object_id', request('assigned_department'))
+                        ->where('object_type', \DB::raw('"App\\\Models\\\Department"'));
+                    } else if(request('assigned_store')) {
+                        $count = $count->where('object_id', request('assigned_store'))
+                        ->where('object_type', \DB::raw('"App\\\Models\\\Store"'));
+                    } else if(request('assigned_company')) {
+                        $count = $count->where('object_id', request('assigned_company'))
+                        ->where('object_type', \DB::raw('"App\\\Models\\\Company"'));
+                    }
+                    $count = $count->where('name', request('name'))
+                    ->whereNull('deleted_at')
+                    ->where('id', '!=', $id)
+                    ->count();
+                return $count < 1;
+            }
+        });
 
         // Yo dawg. I heard you like validators.
         // This validates the custom validator regex in custom fields.

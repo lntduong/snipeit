@@ -3,7 +3,8 @@
 namespace App\Http\Requests;
 
 use App\Http\Requests\Request;
-
+use Illuminate\Validation\Rule;
+use App\Models\Contract;
 class ContractRequest extends Request
 {
     /**
@@ -23,6 +24,7 @@ class ContractRequest extends Request
      */
     public function rules()
     {
+        $contract = new Contract();
         if (request('assigned_company') === null && request('assigned_store') === null && request('assigned_department') === null) {
             return [
                 'name' => 'required',
@@ -33,12 +35,10 @@ class ContractRequest extends Request
             ];      
         } else {
             return [
-                'name' => 'required',
-                //'name' => ['required', 'unique:servers,ip,'.$this->id.','.$request->input('id').',id,hostname,'.$request->input('hostname')],
+                'name' => 'required|duplicate_name:contracts', 
                 'start_date' => 'required',
                 'end_date'  => 'required|after:start_date',
                 'billing_date'  => 'required',
-                'assigned_company' => 'unique:contracts,name'
             ];  
         }  
     }
@@ -48,7 +48,8 @@ class ContractRequest extends Request
         return [
             'assigned_company.required' => 'The company field is required.',
             'assigned_store.required' => 'The store field is required.',
-            'assigned_department.required' => 'The department field is required.'
+            'assigned_department.required' => 'The department field is required.',
+            'duplicate_name' => 'The name already added.'
         ];
     }
 

@@ -35,13 +35,14 @@ class ReportsController extends Controller
             $actionlogs = $actionlogs->where('item_type','=',"App\\Models\\".ucwords($request->input('contract_type')));
         } 
 
-        if(($request->has('store_id'))) {
+        if(($request->input('store_id'))) {
             $actionlogs = $actionlogs
             ->join('contracts', 'contracts.id', '=', 'action_logs.item_id')
-            ->join('stores', 'stores.id')
+            ->join('stores', 'stores.id', '=',
+            \DB::raw('(CASE WHEN contracts.object_type = "App\\\Models\\\Store" THEN contracts.object_id ELSE null END )' ))
             ->where('item_type', '=', \DB::raw('"App\\\Models\\\Contract"'))
-            ->where('contracts.object_type', '=', \DB::raw('"App\\\Models\\\Store"'))
-            ->where('contracts.object_id', '=', ($request->has('store_id')));
+            //->where('contracts.object_type', '=', \DB::raw('"App\\\Models\\\Store"'))
+            ->where('contracts.object_id', '=', $request->input('store_id'));
         }
 
         if (($request->has('target_type')) && ($request->has('target_id'))) {
