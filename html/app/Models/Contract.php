@@ -6,6 +6,7 @@ use Watson\Validating\ValidatingTrait;
 use App\Models\Traits\Searchable;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use DB;
+use Illuminate\Database\Eloquent\Builder;
 final class Contract extends SnipeModel
 {
     protected $table = 'contracts';
@@ -479,43 +480,67 @@ final class Contract extends SnipeModel
         return $query->whereNotNull('contracts.deleted_at');
     }
 
-    public function scopeContractSearch($query, $search)
-    {
-        $search = explode(' OR ', $search);
+    public function advancedTextSearch(Builder $query, array $terms) {
+      
+        /**
+         *  Users
+         */
+        $query = $query->leftJoin('users as contracts_users',function ($leftJoin) {
+            $leftJoin->on("contracts_users.id", "=", "contracts.contact_id_1");
+        });
 
-        return $query->leftJoin('users as assets_users',function ($leftJoin) {
-            $leftJoin->on("assets_users.id", "=", "contracts.contact_id_1");
-        })->leftJoin('locations as assets_locations',function ($leftJoin) {
-            $leftJoin->on("assets_locations.id","=","contracts.location_id");
-        })->leftJoin('stores as store_contract',function ($leftJoin) {
-            $leftJoin->on('store_contract.id', '=', $this->conditionStore);
-        })->leftJoin('departments as department_contract',function ($leftJoin) {
-            $leftJoin->on('department_contract.id', '=', $this->conditionDepartment);
-        })->leftJoin('companies as company_contract',function ($leftJoin) {
-            $leftJoin->on('company_contract.id', '=', $this->conditionCompany);
-        })->where(function ($query) use ($search) {
-            foreach ($search as $search) {
-                $query->whereHas('store', function ($query) use ($search) {
-                    $query->where(function ($query) use ($search) {
-                        $query->where('stores.name', 'LIKE', '%'.$search.'%');
-                    });
-                })
-                ->orWhereHas('department', function ($query) use ($search) {
-                        $query->where(function ($query) use ($search) {
-                            $query->where('departments.name', 'LIKE', '%'.$search.'%');
-                        });
-                    })
-                ->orWhereHas('company', function ($query) use ($search) {     
-                        $query->where(function ($query) use ($search) {
-                            $query->where('companies.name', 'LIKE', '%'.$search.'%');
-                    });
-                })
-                ->orWhere('contracts.name', 'LIKE', '%'.$search.'%')
-                    ->orWhere('contracts.start_date', 'LIKE', '%'.$search.'%')
-                    ->orWhere('contracts.end_date', 'LIKE', '%'.$search.'%');
-            }
-        })
-        ->whereNull("contracts.deleted_at");
-    }
+        foreach($terms as $term) {
+
+            $query = $query
+            ->orWhere('contracts_users.first_name', 'LIKE', '%'.$term.'%')
+            ->orWhere('contracts_users.last_name', 'LIKE', '%'.$term.'%')
+            ->orWhere('contracts_users.username', 'LIKE', '%'.$term.'%')
+            ->orWhereRaw('CONCAT('.DB::getTablePrefix().'contracts_users.first_name," ",'.DB::getTablePrefix().'contracts_users.last_name) LIKE ?', ["%$term%", "%$term%"]);      
+
+        }
+
+        /**
+         *  Companies
+         */
+        $query = $query->leftJoin('companies as contracts_companies',function ($leftJoin) {
+              $leftJoin->on("contracts_companies.id", "=", "contracts.object_id")
+                  ->where("contracts.object_type", "=", $this->objectTypeCompany );
+        });
+  
+        foreach($terms as $term) {
+  
+          $query = $query
+            ->orWhere('contracts_companies.name', 'LIKE', '%'.$term.'%');
+        }
+
+        /**
+         *  Stores
+         */
+        $query = $query->leftJoin('stores as contracts_store',function ($leftJoin) {
+            $leftJoin->on("contracts_store.id", "=", "contracts.object_id")
+                ->where("contracts.object_type", "=", $this->objectTypeStore );
+        });
+
+        foreach($terms as $term) {
+
+            $query = $query
+            ->orWhere('contracts_store.name', 'LIKE', '%'.$term.'%');
+        }
+
+        /**
+         *  Departments
+         */
+        $query = $query->leftJoin('departments as contracts_department',function ($leftJoin) {
+            $leftJoin->on("contracts_department.id", "=", "contracts.object_id")
+                ->where("contracts.object_type", "=", $this->objectTypeDepartment );
+        });
+
+        foreach($terms as $term) {
+
+            $query = $query
+            ->orWhere('contracts_department.name', 'LIKE', '%'.$term.'%');
+        }
+        return $query;
+      }
         
 }

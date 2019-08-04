@@ -38,7 +38,11 @@ class ContractsController extends Controller
         }
         
         if ($request->has('search')) {
-            $contract = $contract->ContractSearch($request->input('search'));
+            // if($request->input('sort') == 'company' || $request->input('sort') == 'store' || $request->input('sort') == 'department' ) {
+            //     $contract = $contract->TextSearch($request->input('search'));
+            // } else {
+                $contract = $contract->TextSearch($request->input('search'));
+            // }
         }
 
         if($request->input('department')) {
