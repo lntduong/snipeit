@@ -5,6 +5,7 @@ namespace App\Http\Requests;
 use App\Http\Requests\Request;
 use Illuminate\Validation\Rule;
 use App\Models\Contract;
+
 class ContractRequest extends Request
 {
     /**
@@ -24,7 +25,6 @@ class ContractRequest extends Request
      */
     public function rules()
     {
-        $contract = new Contract();
         if (request('assigned_company') === null && request('assigned_store') === null && request('assigned_department') === null) {
             return [
                 'name' => 'required',
@@ -32,15 +32,16 @@ class ContractRequest extends Request
                 'end_date'  => 'required|after:start_date',
                 'billing_date'  => 'required',
                 'assigned_company' => 'required'
-            ];      
+            ];
         } else {
             return [
-                //'name' => 'required|duplicate_name:contracts', 
+                'name' => 'required|duplicate_name:contracts',
+                //'name' => 'required|unique:contracts,name,' . \Request::instance()->id,
                 'start_date' => 'required',
                 'end_date'  => 'required|after:start_date',
                 'billing_date'  => 'required',
-            ];  
-        }  
+            ];
+        }
     }
 
     public function messages()

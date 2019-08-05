@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
+
 use App\Models\Company;
 use App\Models\Store;
 use App\Models\Department;
@@ -12,26 +13,27 @@ use App\Http\Requests\ImageUploadRequest;
 use Request;
 use DB;
 use Auth;
+
 /**
  * @author [Thinh.NP],[Duong.lnt]
  * @content: Changed store method
  */
 class ContractsController extends Controller
 {
-     /**
-    * @since [v1.0]
-    * @return \Illuminate\Contracts\View\View
+    /**
+     * @since [v1.0]
+     * @return \Illuminate\Contracts\View\View
      */
     public function index()
     {
         $listCompany = Company::all();
-        return view('contracts/index')->with('listCompany',$listCompany);
+        return view('contracts/index')->with('listCompany', $listCompany);
     }
 
     public function billing()
     {
         $listCompany = Company::all();
-        return view('contracts/billing')->with('listCompany',$listCompany);
+        return view('contracts/billing')->with('listCompany', $listCompany);
     }
 
     public function show($contractId = null)
@@ -39,44 +41,55 @@ class ContractsController extends Controller
         if ($item = Contract::find($contractId)) {
             $scope = $item->object_type;
             $check = ContractAsset::where('contract_assets.contract_id', '=', $item->id)->count();
-            if($scope == Company::class) {
+            if ($scope == Company::class) {
                 $item = $item
-                ->select('contracts.*', 'companies.id AS assigned_company')
-                ->join('companies', 'companies.id', '=', 
-                \DB::raw('(CASE WHEN contracts.object_type = "App\\\Models\\\Company" THEN contracts.object_id ELSE null END )' ))
-                ->where('contracts.id', '=', $contractId)
-                ->first();
-            } else if($scope == Store::class) {
+                    ->select('contracts.*', 'companies.id AS assigned_company')
+                    ->join(
+                        'companies',
+                        'companies.id',
+                        '=',
+                        \DB::raw('(CASE WHEN contracts.object_type = "App\\\Models\\\Company" THEN contracts.object_id ELSE null END )')
+                    )
+                    ->where('contracts.id', '=', $contractId)
+                    ->first();
+            } else if ($scope == Store::class) {
                 $item = $item
-                ->select('contracts.*', 'stores.id AS assigned_store', 'companies.id AS assigned_company')
-                ->join('stores', 'stores.id', '=', 
-                \DB::raw('(CASE WHEN contracts.object_type = "App\\\Models\\\Store" THEN contracts.object_id ELSE null END )' ))      
-                ->join('companies','stores.company_id', '=' , 'companies.id')
-                ->where('contracts.id', '=', $contractId)
-                ->first();
-            } else if($scope == Department::class) {
+                    ->select('contracts.*', 'stores.id AS assigned_store', 'companies.id AS assigned_company')
+                    ->join(
+                        'stores',
+                        'stores.id',
+                        '=',
+                        \DB::raw('(CASE WHEN contracts.object_type = "App\\\Models\\\Store" THEN contracts.object_id ELSE null END )')
+                    )
+                    ->join('companies', 'stores.company_id', '=', 'companies.id')
+                    ->where('contracts.id', '=', $contractId)
+                    ->first();
+            } else if ($scope == Department::class) {
                 $item = $item
-                ->select('contracts.*','departments.id AS assigned_department', 'stores.id AS assigned_store', 'companies.id AS assigned_company')
-                ->join('departments', 'departments.id', '=', 
-                \DB::raw('(CASE WHEN contracts.object_type = "App\\\Models\\\Department" THEN contracts.object_id ELSE null END )' ))
-                ->join('stores','stores.id', '=', 'departments.store_id')
-                ->join('companies','stores.company_id', '=' , 'companies.id')
-                ->where('contracts.id', '=', $contractId)
-                ->first();
+                    ->select('contracts.*', 'departments.id AS assigned_department', 'stores.id AS assigned_store', 'companies.id AS assigned_company')
+                    ->join(
+                        'departments',
+                        'departments.id',
+                        '=',
+                        \DB::raw('(CASE WHEN contracts.object_type = "App\\\Models\\\Department" THEN contracts.object_id ELSE null END )')
+                    )
+                    ->join('stores', 'stores.id', '=', 'departments.store_id')
+                    ->join('companies', 'stores.company_id', '=', 'companies.id')
+                    ->where('contracts.id', '=', $contractId)
+                    ->first();
             }
 
             $this->authorize('update', $item);
 
-            return view('contracts/edit',compact('item', 'check'));
+            return view('contracts/edit', compact('item', 'check'));
         }
         return redirect()->route('contracts.index')->with('error', trans('admin/contracts/message.does_not_exist'));
-    
     }
 
 
     /**
-    * @since [v1.0]
-    * @return \Illuminate\Contracts\View\View
+     * @since [v1.0]
+     * @return \Illuminate\Contracts\View\View
      */
     public function create()
     {
@@ -84,8 +97,8 @@ class ContractsController extends Controller
     }
 
     /**
-    * @since [v1.0]
-    * @return \Illuminate\Http\RedirectResponse
+     * @since [v1.0]
+     * @return \Illuminate\Http\RedirectResponse
      */
     public function store(ContractRequest $request)
     {
@@ -113,59 +126,70 @@ class ContractsController extends Controller
             $contract->object_type = Company::class;
         }
         if ($contract->save()) {
-            $key=$contract->id;
+            $key = $contract->id;
             return redirect()->route('contracts.edit', ['id' => $key])->with('success', trans('admin/contracts/message.create.success'));
         }
         return redirect()->back()->withInput()->withErrors($contract->getErrors());
     }
 
-     /**
+    /**
      * @param $permissions
      * @return View
      * @internal param int $id
      */
     public function edit($contractId = null)
     {
-           
+
         if (is_null($item = Contract::find($contractId))) {
             return redirect()->back()->with('error', trans('admin/contracts/message.not_found'));
         }
         if ($item = Contract::find($contractId)) {
             $scope = $item->object_type;
             $check = ContractAsset::where('contract_assets.contract_id', '=', $item->id)->count();
-            if($scope == Company::class) {
+            if ($scope == Company::class) {
                 $item = $item
-                ->select('contracts.*', 'companies.id AS assigned_company')
-                ->join('companies', 'companies.id', '=', 
-                \DB::raw('(CASE WHEN contracts.object_type = "App\\\Models\\\Company" THEN contracts.object_id ELSE null END )' ))
-                ->where('contracts.id', '=', $contractId)
-                ->first();
-            } else if($scope == Store::class) {
+                    ->select('contracts.*', 'companies.id AS assigned_company')
+                    ->join(
+                        'companies',
+                        'companies.id',
+                        '=',
+                        \DB::raw('(CASE WHEN contracts.object_type = "App\\\Models\\\Company" THEN contracts.object_id ELSE null END )')
+                    )
+                    ->where('contracts.id', '=', $contractId)
+                    ->first();
+            } else if ($scope == Store::class) {
                 $item = $item
-                ->select('contracts.*', 'stores.id AS assigned_store', 'companies.id AS assigned_company')
-                ->join('stores', 'stores.id', '=', 
-                \DB::raw('(CASE WHEN contracts.object_type = "App\\\Models\\\Store" THEN contracts.object_id ELSE null END )' ))      
-                ->join('companies','stores.company_id', '=', 'companies.id')
-                ->where('contracts.id', '=', $contractId)
-                ->first();
-            } else if($scope == Department::class) {
+                    ->select('contracts.*', 'stores.id AS assigned_store', 'companies.id AS assigned_company')
+                    ->join(
+                        'stores',
+                        'stores.id',
+                        '=',
+                        \DB::raw('(CASE WHEN contracts.object_type = "App\\\Models\\\Store" THEN contracts.object_id ELSE null END )')
+                    )
+                    ->join('companies', 'stores.company_id', '=', 'companies.id')
+                    ->where('contracts.id', '=', $contractId)
+                    ->first();
+            } else if ($scope == Department::class) {
                 $item = $item
-                ->select('contracts.*','departments.id AS assigned_department', 'stores.id AS assigned_store', 'companies.id AS assigned_company')
-                ->join('departments', 'departments.id', '=', 
-                \DB::raw('(CASE WHEN contracts.object_type = "App\\\Models\\\Department" THEN contracts.object_id ELSE null END )' ))
-                ->join('stores','stores.id', '=', 'departments.store_id')
-                ->join('companies','stores.company_id', '=', 'companies.id')
-                ->where('contracts.id', '=', $contractId)
-                ->first();
+                    ->select('contracts.*', 'departments.id AS assigned_department', 'stores.id AS assigned_store', 'companies.id AS assigned_company')
+                    ->join(
+                        'departments',
+                        'departments.id',
+                        '=',
+                        \DB::raw('(CASE WHEN contracts.object_type = "App\\\Models\\\Department" THEN contracts.object_id ELSE null END )')
+                    )
+                    ->join('stores', 'stores.id', '=', 'departments.store_id')
+                    ->join('companies', 'stores.company_id', '=', 'companies.id')
+                    ->where('contracts.id', '=', $contractId)
+                    ->first();
             }
 
             $this->authorize('update', $item);
-           
-        return view('contracts/edit', compact('check','item'));
+            return view('contracts/edit', compact('check', 'item'));
         }
     }
 
-     /**
+    /**
      * @param UpdateUserRequest $request
      * @param  int $id
      * @return \Illuminate\Http\RedirectResponse
@@ -197,7 +221,7 @@ class ContractsController extends Controller
             $contract->object_id   = $request->input('assigned_company');
             $contract->object_type = Company::class;
         }
-        
+
         if ($contract->save()) {
             return redirect()->route('contracts.index')->with('success', trans('admin/contracts/message.update.success'));
         }
@@ -217,5 +241,4 @@ class ContractsController extends Controller
         $contract->delete();
         return redirect()->route('contracts.index')->with('success', trans('admin/contracts/message.delete.success'));
     }
-
 }

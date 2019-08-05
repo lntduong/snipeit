@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Providers;
 
 use Validator;
@@ -43,18 +44,17 @@ class ValidationServiceProvider extends ServiceProvider
             $array = explode(',', $value);
 
             foreach ($array as $email) { //loop over values
-                $email_to_validate['alert_email'][]=$email;
+                $email_to_validate['alert_email'][] = $email;
             }
 
-            $rules = array('alert_email.*'=>'email');
+            $rules = array('alert_email.*' => 'email');
             $messages = array(
-                'alert_email.*'=>trans('validation.email_array')
+                'alert_email.*' => trans('validation.email_array')
             );
 
             $validator = Validator::make($email_to_validate, $rules, $messages);
 
             return $validator->passes();
-
         });
 
 
@@ -67,25 +67,23 @@ class ValidationServiceProvider extends ServiceProvider
                 $count = DB::table($parameters[0])->select('id')->where($attribute, '=', $value)->whereNull('deleted_at')->where('id', '!=', $parameters[1])->count();
                 return $count < 1;
             }
-
         });
         Validator::extend('unsame_name', function ($attribute, $value, $parameters, $validator) {
-            $all_form_data=$validator->getData();
-            if(isset($all_form_data['id'])) {
-                $id=$all_form_data['id'];
-            }else{
-                $id=0;
+            $all_form_data = $validator->getData();
+            if (isset($all_form_data['id'])) {
+                $id = $all_form_data['id'];
+            } else {
+                $id = 0;
             }
             if (count($parameters)) {
                 $count = DB::table($parameters[0])->select('id')->where($attribute, '=', $value)->whereNull('deleted_at')->where($parameters[1], '=', $all_form_data[$parameters[1]])->where('id', '!=', $id)->count();
                 return $count < 1;
             }
-
         });
 
         Validator::extend('duplicate_name', function ($attribute, $value, $parameters, $validator) {
             $all_data = $validator->getData();
-            if(isset($all_data['id'])) {
+            if (isset($all_data['id'])) {
                 $id = $all_data['id'];
             } else {
                 $id = 0;
@@ -93,17 +91,17 @@ class ValidationServiceProvider extends ServiceProvider
             if (count($parameters)) {
                 $count = DB::table($parameters[0])
                     ->select('contracts.*');
-                    if(request('assigned_department')) {
-                        $count = $count->where('object_id', request('assigned_department'))
+                if (request('assigned_department')) {
+                    $count = $count->where('object_id', request('assigned_department'))
                         ->where('object_type', \DB::raw('"App\\\Models\\\Department"'));
-                    } else if(request('assigned_store')) {
-                        $count = $count->where('object_id', request('assigned_store'))
+                } else if (request('assigned_store')) {
+                    $count = $count->where('object_id', request('assigned_store'))
                         ->where('object_type', \DB::raw('"App\\\Models\\\Store"'));
-                    } else if(request('assigned_company')) {
-                        $count = $count->where('object_id', request('assigned_company'))
+                } else if (request('assigned_company')) {
+                    $count = $count->where('object_id', request('assigned_company'))
                         ->where('object_type', \DB::raw('"App\\\Models\\\Company"'));
-                    }
-                    $count = $count->where('name', request('name'))
+                }
+                $count = $count->where($attribute, '=', $value)
                     ->whereNull('deleted_at')
                     ->where('id', '!=', $id)
                     ->count();
@@ -119,7 +117,7 @@ class ValidationServiceProvider extends ServiceProvider
         Validator::extend('valid_regex', function ($attribute, $value, $parameters, $validator) {
 
             // Make sure it's not just an ANY format
-            if ($value!='') {
+            if ($value != '') {
 
                 //  Check that the string starts with regex:
                 if (strpos($value, 'regex:') === false) {
@@ -129,7 +127,7 @@ class ValidationServiceProvider extends ServiceProvider
                 $test_string = 'My hovercraft is full of eels';
 
                 // We have to stip out the regex: part here to check with preg_match
-                $test_pattern = str_replace('regex:','', $value);
+                $test_pattern = str_replace('regex:', '', $value);
 
                 try {
                     preg_match($test_pattern, $test_string);
@@ -137,12 +135,9 @@ class ValidationServiceProvider extends ServiceProvider
                 } catch (\Exception $e) {
                     return false;
                 }
-
             }
             return true;
-
         });
-
     }
 
     /**
@@ -151,7 +146,5 @@ class ValidationServiceProvider extends ServiceProvider
      * @return void
      */
     public function register()
-    {
-
-    }
+    { }
 }
