@@ -75,6 +75,19 @@ class ContractsController extends Controller
         $offset = (($contract) && (request('offset') > $countSort)) ? 0 : request('offset', 0);
         $limit = $request->input('limit', 50);
 
+        $sub = Contract::select(
+            'contracts.*',
+            'departments.name as d',
+            'stores.name as s',
+            'companies.name  as c'
+        )->SearchCompany($request->input('search'))
+            ->union(Contract::select('contracts.*')->SearchStore($request->input('search'))->whereNull('contracts.deleted_at'))
+            ->union(Contract::select('contracts.*')->SearchDepartment($request->input('search'))->whereNull('contracts.deleted_at'));
+
+        $search = DB::table(DB::raw("({$sub->toSql()}) as sub"))
+            ->mergeBindings($sub->getQuery())
+            ->orderBy('c', $order);
+
         switch ($request->input('sort')) {
             case 'company':
                 if ($request->input('department')) {
@@ -84,7 +97,7 @@ class ContractsController extends Controller
                 } else if ($request->input('company')) {
                     $contract = $contract;
                 } else if ($request->input('search')) {
-                    $contract = $contract;
+                    $search = $search;
                 } else {
                     $contract = Contract::select('contracts.*', 'companies.name as company_name')->SortCompany($order);
                 }
