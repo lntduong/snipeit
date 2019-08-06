@@ -36,7 +36,6 @@ class ContractRequest extends Request
         } else {
             return [
                 'name' => 'required|duplicate_name:contracts',
-                //'name' => 'required|unique:contracts,name,' . \Request::instance()->id,
                 'start_date' => 'required',
                 'end_date'  => 'required|after:start_date',
                 'billing_date'  => 'required',

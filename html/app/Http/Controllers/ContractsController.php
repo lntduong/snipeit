@@ -194,7 +194,7 @@ class ContractsController extends Controller
      * @param  int $id
      * @return \Illuminate\Http\RedirectResponse
      */
-    public function update(ContractRequest $request,  $contractId = null)
+    public function update(ImageUploadRequest $request,  $contractId = null)
     {
         if (is_null($contract = Contract::find($contractId))) {
             return redirect()->route('contract.index')->with('error', trans('admin/contracts/message.does_not_exist'));

@@ -40,9 +40,12 @@ class ContractsController extends Controller
         }
 
         if ($request->input('search')) {
-            $contract = $contract->SearchCompany($request->input('search'))
+            $contract = $contract->SearchCompany($request->input('search'))->whereNull('contracts.deleted_at')
                 ->union(Contract::select('contracts.*')->SearchStore($request->input('search'))->whereNull('contracts.deleted_at'))
-                ->union(Contract::select('contracts.*')->SearchDepartment($request->input('search'))->whereNull('contracts.deleted_at'));
+                ->union(Contract::select('contracts.*')->SearchDepartment($request->input('search'))->whereNull('contracts.deleted_at'))
+                ->union(Contract::select('contracts.*')->SearchLocation($request->input('search'))->whereNull('contracts.deleted_at'))
+                ->union(Contract::select('contracts.*')->SearchUser($request->input('search'))->whereNull('contracts.deleted_at'))
+                ->union(Contract::select('contracts.*')->SearchContract($request->input('search'))->whereNull('contracts.deleted_at'));
         }
 
         if ($request->input('department')) {
@@ -75,19 +78,6 @@ class ContractsController extends Controller
         $offset = (($contract) && (request('offset') > $countSort)) ? 0 : request('offset', 0);
         $limit = $request->input('limit', 50);
 
-        $sub = Contract::select(
-            'contracts.*',
-            'departments.name as d',
-            'stores.name as s',
-            'companies.name  as c'
-        )->SearchCompany($request->input('search'))
-            ->union(Contract::select('contracts.*')->SearchStore($request->input('search'))->whereNull('contracts.deleted_at'))
-            ->union(Contract::select('contracts.*')->SearchDepartment($request->input('search'))->whereNull('contracts.deleted_at'));
-
-        $search = DB::table(DB::raw("({$sub->toSql()}) as sub"))
-            ->mergeBindings($sub->getQuery())
-            ->orderBy('c', $order);
-
         switch ($request->input('sort')) {
             case 'company':
                 if ($request->input('department')) {
@@ -97,7 +87,8 @@ class ContractsController extends Controller
                 } else if ($request->input('company')) {
                     $contract = $contract;
                 } else if ($request->input('search')) {
-                    $search = $search;
+                    $contract = Contract::select('contracts.*', 'companies.name as company_name')
+                        ->SearchSortCompany($order, $request->input('search'));
                 } else {
                     $contract = Contract::select('contracts.*', 'companies.name as company_name')->SortCompany($order);
                 }
@@ -111,7 +102,8 @@ class ContractsController extends Controller
                 } else if ($request->input('company')) {
                     $contract = Contract::select('contracts.*', 'stores.name as stores', 'stores.id as stores_id')->SortStoreCompany($order, $request->input('company'));
                 } else if ($request->input('search')) {
-                    $contract = $contract;
+                    $contract = Contract::select('contracts.*', 'stores.name as stores', 'stores.id as stores_id')
+                        ->SearchSortStore($order, $request->input('search'));
                 } else {
                     $contract = Contract::select('contracts.*', 'stores.name as stores', 'stores.id as stores_id')->SortStore($order);
                 }
@@ -125,7 +117,7 @@ class ContractsController extends Controller
                 } else if ($request->input('company')) {
                     $contract = Contract::select('contracts.*', 'departments.name as departments', 'departments.id as departments_id')->SortCompanyDepartment($order, $request->input('company'));
                 } else if ($request->input('search')) {
-                    $contract = $contract;
+                    $contract = Contract::select('contracts.*', 'departments.name as departments', 'departments.id as departments_id')->SearchSortDepartment($order, $request->input('search'));
                 } else {
                     $contract = Contract::select('contracts.*', 'departments.name as departments', 'departments.id as departments_id')->SortDepartment($order);
                 }
@@ -138,6 +130,8 @@ class ContractsController extends Controller
                     $contract = Contract::select('contracts.*', \DB::raw('locations.name AS location_name'))->OrderLocationStore($order, $request->input('store'));
                 } else if ($request->input('company')) {
                     $contract = Contract::select('contracts.*', \DB::raw('locations.name AS location_name'))->OrderLocationCompany($order, $request->input('company'));
+                } else if ($request->input('search')) {
+                    $contract = Contract::select('contracts.*', \DB::raw('locations.name AS location_name'))->SearchSortLocation($order, $request->input('search'));
                 } else {
                     $contract = $contract->OrderLocation($order);
                 }
@@ -145,11 +139,11 @@ class ContractsController extends Controller
 
             case 'contact_id_1':
                 if (($request->input('department'))) {
-                    $contract = Contract::select('contracts.*', \DB::raw('users.last_name AS last_name'))->OrderContactDepartment('contact_id_1', $order, $request->input('department'));
+                    $contract = Contract::select('contracts.*', \DB::raw('users.first_name AS first_name'))->OrderContactDepartment('contact_id_1', $order, $request->input('department'));
                 } else if ($request->input('store')) {
-                    $contract = Contract::select('contracts.*', \DB::raw('users.last_name AS last_name'))->OrderContactStore('contact_id_1', $order, $request->input('store'));
+                    $contract = Contract::select('contracts.*', \DB::raw('users.first_name AS first_name'))->OrderContactStore('contact_id_1', $order, $request->input('store'));
                 } else if ($request->input('company')) {
-                    $contract = Contract::select('contracts.*', \DB::raw('users.last_name AS last_name'))->OrderContactCompany('contact_id_1', $order, $request->input('company'));
+                    $contract = Contract::select('contracts.*', \DB::raw('users.first_name AS first_name'))->OrderContactCompany('contact_id_1', $order, $request->input('company'));
                 } else {
                     $contract = $contract->OrderContactOne($order);
                 }
@@ -157,11 +151,11 @@ class ContractsController extends Controller
 
             case 'contact_id_2':
                 if (($request->input('department'))) {
-                    $contract = Contract::select('contracts.*', \DB::raw('users.last_name AS last_name'))->OrderContactDepartment('contact_id_2', $order, $request->input('department'));
+                    $contract = Contract::select('contracts.*', \DB::raw('users.first_name AS first_name'))->OrderContactDepartment('contact_id_2', $order, $request->input('department'));
                 } else if ($request->input('store')) {
-                    $contract = Contract::select('contracts.*', \DB::raw('users.last_name AS last_name'))->OrderContactStore('contact_id_2', $order, $request->input('store'));
+                    $contract = Contract::select('contracts.*', \DB::raw('users.first_name AS first_name'))->OrderContactStore('contact_id_2', $order, $request->input('store'));
                 } else if ($request->input('company')) {
-                    $contract = Contract::select('contracts.*', \DB::raw('users.last_name AS last_name'))->OrderContactCompany('contact_id_2', $order, $request->input('company'));
+                    $contract = Contract::select('contracts.*', \DB::raw('users.first_name AS first_name'))->OrderContactCompany('contact_id_2', $order, $request->input('company'));
                 } else {
                     $contract = $contract->OrderContactTwo($order);
                 }
