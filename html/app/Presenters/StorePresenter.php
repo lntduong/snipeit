@@ -48,28 +48,28 @@ class StorePresenter extends Presenter
                 "title" => trans('general.image'),
                 "visible" => false,
                 "formatter" => 'imageFormatter',
-            ], [
-                "field" => "location",
-                "searchable" => true,
-                "sortable" => true,
-                "title" => trans('general.location'),
-                "formatter" => "locationsLinkObjFormatter"
-            ],
-            [
-                "field" => "contract_count",
-                "searchable" => true,
-                "sortable" => true,
-                "title" => trans('general.contracts'),
-                
             ],
             [
                 "field" => "department_count",
                 "searchable" => true,
                 "sortable" => true,
                 "title" => trans('general.departments'),
-                
-            ],
 
+            ],
+            [
+                "field" => "contract_count",
+                "searchable" => true,
+                "sortable" => true,
+                "title" => trans('general.contracts'),
+
+            ],
+            [
+                "field" => "location",
+                "searchable" => true,
+                "sortable" => true,
+                "title" => trans('general.location'),
+                "formatter" => "locationsLinkObjFormatter"
+            ],
         ];
         $layout[] = [
             "field" => "actions",
@@ -83,5 +83,4 @@ class StorePresenter extends Presenter
 
         return json_encode($layout);
     }
-
 }

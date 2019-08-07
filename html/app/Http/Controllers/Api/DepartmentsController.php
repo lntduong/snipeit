@@ -37,7 +37,7 @@ class DepartmentsController extends Controller
         ])->with('users')->with('location')->with('manager')->with('store')->withCount('users')->withCount('contract');
         
         if ($request->has('store_id')) {
-            $departments=$departments->where('store_id',$request->input('store_id'));
+            $departments = $departments->where('store_id',$request->input('store_id'));
         }
         if ($request->has('search')) {
             $departments = $departments->TextSearch($request->input('search'));
@@ -85,6 +85,7 @@ class DepartmentsController extends Controller
         if ($department->save()) {
             return response()->json(Helper::formatStandardApiResponse('success', $department, trans('admin/departments/message.create.success')));
         }
+
         return response()->json(Helper::formatStandardApiResponse('error', null, $department->getErrors()));
 
     }
@@ -101,6 +102,7 @@ class DepartmentsController extends Controller
     {
         $this->authorize('view', Department::class);
         $department = Department::findOrFail($id);
+        
         return (new DepartmentsTransformer)->transformDepartment($department);
     }
 
@@ -149,12 +151,17 @@ class DepartmentsController extends Controller
         if ($request->has('search')) {
             $departments = $departments->where('name', 'LIKE', '%'.$request->get('search').'%');
         }
-        if ($request->input('store_id')) {
-            $departments = $departments->where('store_id', '=',$request->get('store_id'));
-        }
-
+       
         if ($request->get('store_id')) {
             $departments = $departments->where('store_id', '=', $request->get('store_id'));
+        } else {
+            if ($request->get('company_id')) {
+                $departments = $departments
+                ->whereIn('departments.store_id',
+                    Store::select('stores.id')
+                    ->where('stores.company_id', '=', $request->get('company_id'))
+                );
+            }
         }
 
         $departments = $departments->orderBy('name', 'ASC')->paginate(50);

@@ -42,6 +42,16 @@ class InventoryPresenter extends Presenter
                 "formatter" => 'storesLinkObjFormatter',
             ],
             [
+                "field" => "department",
+                "searchable" => true,
+                "sortable" => true,
+                "switchable" => true,
+                "title" => trans('general.department'),
+                "visible" => true,
+                "formatter" => 'departmentsLinkObjFormatter',
+
+            ],
+            [
                 "field" => "contract",
                 "searchable" => true,
                 "sortable" => true,
@@ -51,14 +61,20 @@ class InventoryPresenter extends Presenter
                 "formatter" => 'contractsLinkObjFormatter',
             ],
             [
-                "field" => "department",
+                "field" => "notes",
                 "searchable" => true,
                 "sortable" => true,
-                "switchable" => true,
-                "title" => trans('general.department'),
+                "visible" => false,
+                "title" => trans('general.notes'),
+
+            ],
+            [
+                "field" => "name",
+                "searchable" => true,
+                "sortable" => true,
+                "title" => trans('admin/inventories/table.inventory'),
                 "visible" => true,
-                "formatter" => 'departmentsLinkObjFormatter',
-             
+
             ],
             [
                 "field" => "date",
@@ -67,22 +83,6 @@ class InventoryPresenter extends Presenter
                 "title" => trans('general.date'),
                 "visible" => true,
                 "formatter" => "dateDisplayFormatter"
-              
-            ],
-            [
-                "field" => "name",
-                "searchable" => true,
-                "sortable" => true,
-                "title" => trans('admin/inventories/table.inventory'),
-                "visible" => true,
-               
-            ],
-            [
-                "field" => "notes",
-                "searchable" => true,
-                "sortable" => true,
-                "visible" => false,
-                "title" => trans('general.notes'),
 
             ],
         ];

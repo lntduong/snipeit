@@ -315,7 +315,8 @@
          data: function (params) {
              var data = {
                  search: params.term,
-                 store_id:$("#store_select").val(),
+                 company_id: $("#company_select").val(),
+                 store_id: $("#store_select").val(),
                  page: params.page || 1,
              };
              return data;

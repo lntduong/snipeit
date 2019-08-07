@@ -94,10 +94,10 @@ Route::group(['middleware' => 'auth'], function () {
         'middleware' => ['auth'],
         'parameters' => ['inventoryresult' => 'inventoryresult_id']
     ]);
-    Route::get('inventoryresults_sp', [
-        'as' => 'inventoryresults_sp',
-        'uses' => 'InventoryResultsController@create'
-    ]);   
+    Route::get('inventoryresults_sp_online', [
+        'as' => 'inventoryresults_sp_online',
+        'uses' => 'InventoryResultsController@scanOnline'
+    ]);
 });
 
 

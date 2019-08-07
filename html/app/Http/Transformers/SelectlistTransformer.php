@@ -83,12 +83,22 @@ class SelectlistTransformer
 
         // Loop through the paginated collection to set the array values
         foreach ($select_items as $select_item) {
-            $items_array[]= [
-                'id' => $select_item['id'],
-                'text' => $select_item['name'],
-                'image' => (isset($select_item['image'])) ? $select_item['image']   : null,
-
-            ];
+            if(isset($select_item['inventory_date'])) {
+                $items_array[]= [
+                    'id' => $select_item['id'],
+                    'text' => date('Y/m/d',strtotime($select_item['inventory_date'])). ' - ' .$select_item['name'],
+                    'image' => (isset($select_item['image'])) ? $select_item['image']   : null,
+     
+                ];
+            } else {
+                $items_array[]= [
+                    'id' => $select_item['id'],
+                    'text' => $select_item['name'],
+                    'image' => (isset($select_item['image'])) ? $select_item['image']   : null,
+    
+                ];
+            }
+         
 
         }
         $results = [

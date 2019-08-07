@@ -1,0 +1,43 @@
+<?php
+
+return array(
+    'switch_to_offline'             => 'Offline Mode',
+    'switch_to_online'              => 'Online Mode',
+    'title_online_mode'             => 'Scan Online',
+    'title_offline_mode'            => 'Scan Offline',
+    'title_search_block'            => 'Select Inventory',
+    'help_title'                    => 'Help Title',
+    'help_text'                     => 'Help Text',
+    'start'                         => 'Start',
+    'change'                        => 'Change',
+    'scan'                          => 'Scan',
+    'cancel'                        => 'Cancel',
+    'default_results_title'         => 'Inventory Results',
+    'scan_title'                    => 'Scan Barcode',
+    'close_scanner'                 => 'Stop Camera',
+    'save_asset'                    => 'Save Asset',
+    'rescan'                        => 'ReScan',
+    'invalid_asset_tag'             => 'Invalid Asset Tag',
+    'close'                         => 'Close',
+    'familiar'                      => 'Familiar',
+    'unknown'                       => 'Unknown',
+    'save'                          => 'Save',
+    'clear'                         => 'Clear',
+    'add_status'                    => 'Update Status',
+    'success'                       => 'Success: ',
+    'error'                         => 'Error: ',
+    'error_msg'                     => 'Info save failed',
+    'asset_not_found'               => 'Asset not found',
+    'add_status'                    => 'Update Status',
+    'camera_load_failed'            => 'Cannot load camera! Please contact Administrator for more information.',
+    'delete'                        => array(
+        'confirm'   	=> 'Are you sure you wish to delete this result?',
+        'error'         => 'There was an issue deleting the result. Please try again.',
+        'success'       => 'The result was deleted successfully.'),
+    'create'                        => array(
+        'error'         => 'Result was not created, please try again.',
+        'success'       => 'Result created successfully.'),
+    'update'                        => array(
+        'error'         => 'Result was not created, please try again.',
+        'success'       => 'Info saved successfully.'),
+);

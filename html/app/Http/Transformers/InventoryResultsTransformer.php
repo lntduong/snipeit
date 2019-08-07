@@ -44,6 +44,51 @@ class InventoryResultsTransformer
 
         return $array;
     }
+
+    /**
+     * Scan Results Transformer
+     * @version 1.0 - 2019/07/30
+     * @author ThongLT
+     */
+    public function transformScanInventoryResults($inventoryresults)
+    {
+        $array = array();
+        foreach ($inventoryresults as $inventoryresult) {
+            $array[] = self::transformScanInventoryResult($inventoryresult);
+        }
+
+        return (new DatatablesTransformer)->transformDatatables($array, sizeof($array));
+    }
+
+    /**
+     * Scan Result Transformer
+     * @version 1.0 - 2019/07/30
+     * @return Array
+     * @author ThongLT
+     */
+    public function transformScanInventoryResult($inventoryresult)
+    {
+        $array = [
+            'id'              => !is_null($inventoryresult->id) ? (int) $inventoryresult->id : null,
+            'asset_id'        => (int) e($inventoryresult->asset_id),
+            'image'           => self::getImageUrl($inventoryresult->image, $inventoryresult->image_model),
+            'asset_tag'       => e($inventoryresult->asset_tag),
+            'name'            => e($inventoryresult->name),
+            'checked'         => Helper::getFormattedDateObject($inventoryresult->checked_time, 'datetime'),
+            'familiar'        => !is_null($inventoryresult->familiar) ? (int) $inventoryresult->familiar : null,
+            'status_label'    => [
+                'id'          => (!empty($inventoryresult->status_id)) ? (int) $inventoryresult->status_id : null,
+                'name'        => (!empty($inventoryresult->status_name)) ? e($inventoryresult->status_name) : null]
+        ];
+        $permissions_array['available_actions'] = [
+            'update' => false,
+            'delete' => (bool) Gate::allows('delete', InventoryResult::class),
+        ];
+        $array += $permissions_array;
+
+        return $array;
+    }
+
     public function getImageUrl($image,$image_model)
     {
         if ($image && !empty($image)) {
@@ -81,6 +126,6 @@ class InventoryResultsTransformer
         return $this->presenterInterface;
 
     }
-    
+
 
 }

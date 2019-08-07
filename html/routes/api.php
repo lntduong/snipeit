@@ -122,7 +122,6 @@ Route::group(['prefix' => 'v1','namespace' => 'Api', 'middleware' => 'api'], fun
                 'as' => 'api.inventories.savelist',
                 'uses' => 'InventoriesController@savelist'
             ]
-
         );
 
     Route::get('selectlist',
@@ -130,7 +129,12 @@ Route::group(['prefix' => 'v1','namespace' => 'Api', 'middleware' => 'api'], fun
                 'as' => 'api.inventories.selectlist',
                 'uses' => 'InventoriesController@selectlist'
             ]
-
+        );
+    Route::get('getall',
+            [
+                'as' => 'api.inventories.getall',
+                'uses'=> 'InventoriesController@getAll'
+            ]
         );
 
     });
@@ -875,10 +879,9 @@ Route::group(['prefix' => 'v1','namespace' => 'Api', 'middleware' => 'api'], fun
             'show' => 'api.inventoryresults.show',
             'store' => 'api.inventoryresults.store',
             'update' => 'api.inventoryresults.update',
-            'destroy' => 'api.inventoryresults.destroy',
-            'scan' => 'api.inventoryresults.scan'
+            'destroy' => 'api.inventoryresults.destroy'
         ],
-    'except' => ['create', 'edit'],
+    'except' => ['create', 'edit', 'show'],
     'parameters' => ['inventoryresult' => 'inventoryresult_id']
     ]
     ); // InventoryResult resource
@@ -905,12 +908,23 @@ Route::group(['prefix' => 'v1','namespace' => 'Api', 'middleware' => 'api'], fun
             'uses'=>'InventoryResultsController@checkasset'
         ]);
 
-        Route::post('scan',
+        Route::get('showbyscan',
         [
-            'as'=>'api.inventoryresults.scan',
-            'uses'=>'InventoryResultsController@scan'
+            'as'=>'api.inventoryresults.showbyscan',
+            'uses'=>'InventoryResultsController@showByScan'
         ]);
 
+        Route::post('storebyscan',
+        [
+            'as'=>'api.inventoryresults.storebyscan',
+            'uses'=>'InventoryResultsController@storeByScan'
+        ]);
+
+        Route::post('destroy',
+        [
+            'as'=>'api.inventoryresults.destroy',
+            'uses'=>'InventoryResultsController@destroy'
+        ]);
     }); // Suppliers group
 
 });

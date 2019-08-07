@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Transformers;
 
 use App\Models\Department;
@@ -9,7 +10,7 @@ use App\Helpers\Helper;
 class DepartmentsTransformer
 {
 
-    public function transformDepartments (Collection $departments, $total)
+    public function transformDepartments(Collection $departments, $total)
     {
         $array = array();
         foreach ($departments as $department) {
@@ -18,23 +19,27 @@ class DepartmentsTransformer
         return (new DatatablesTransformer)->transformDatatables($array, $total);
     }
 
-    public function transformDepartment (Department $department = null)
+    public function transformDepartment(Department $department = null)
     {
         if ($department) {
 
             $array = [
                 'id' => (int) $department->id,
                 'name' => e($department->name),
-                'image' =>   ($department->image) ? app('departments_upload_url').e($department->image) : null,
+                'image' => ($department->image) ? app('departments_upload_url') . e($department->image) : null,
                 'store' => ($department->store) ? [
                     'id' => (int) $department->store->id,
-                    'name'=> e($department->store->name)
+                    'name' => e($department->store->name)
+                ] : null,
+                'company' => ($department->store->company) ? [
+                    'id' => (int) $department->store->company->id,
+                    'name' => e($department->store->company->name)
                 ] : null,
                 'manager' => ($department->manager) ? [
                     'id' => (int) $department->manager->id,
                     'name' => e($department->manager->getFullNameAttribute()),
-                    'first_name'=> e($department->manager->first_name),
-                    'last_name'=> e($department->manager->last_name)
+                    'first_name' => e($department->manager->first_name),
+                    'last_name' => e($department->manager->last_name)
                 ] : null,
                 'location' => ($department->location) ? [
                     'id' => (int) $department->location->id,
@@ -48,17 +53,12 @@ class DepartmentsTransformer
 
             $permissions_array['available_actions'] = [
                 'update' => Gate::allows('update', Department::class) ? true : false,
-                'delete' => (Gate::allows('delete', Department::class) && ($department->contract->count() !=0 ? false : true) && ($department->users_count==0) && ($department->deleted_at=='')) ? true : false,
+                'delete' => (Gate::allows('delete', Department::class) && ($department->contract->count() != 0 ? false : true) && ($department->users_count == 0) && ($department->deleted_at == '')) ? true : false,
             ];
 
             $array += $permissions_array;
 
             return $array;
         }
-
-
     }
-
-
-
 }

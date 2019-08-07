@@ -20,7 +20,7 @@
                <span class="hidden-lg hidden-md">
                <i class="fa fa-barcode"></i>
                </span>
-               <span class="hidden-xs hidden-sm">{{ trans('general.user') }}</span>
+               <span class="hidden-xs hidden-sm">{{ trans('general.users') }}</span>
                </a>
             </li>
             <li>
@@ -28,7 +28,7 @@
                <span class="hidden-lg hidden-md">
                <i class="fa fa-floppy-o"></i>
                </span>
-               <span class="hidden-xs hidden-sm">{{ trans('general.contract') }}</span>
+               <span class="hidden-xs hidden-sm">{{ trans('general.contracts') }}</span>
                </a>
             </li>
          </ul>

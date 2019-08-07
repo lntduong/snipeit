@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Models;
 
 use App\Models\Traits\Searchable;
@@ -33,7 +34,7 @@ class InventoryResult extends SnipeModel
         'name',
         'notes',
         'inventory_date'
-       ];
+    ];
     protected $injectUniqueIdentifier = true;
     use ValidatingTrait;
 
@@ -62,12 +63,10 @@ class InventoryResult extends SnipeModel
 
     public function inventories()
     {
-    	return $this->belongsTo('\App\Models\Inventory','inventory_id');
+        return $this->belongsTo('\App\Models\Inventory', 'inventory_id');
     }
     public function asset()
     {
-    	return $this->belongsTo('\App\Models\Asset','asset_id');
+        return $this->belongsTo('\App\Models\Asset', 'asset_id');
     }
-
-
 }

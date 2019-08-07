@@ -27,14 +27,15 @@ class InventoryResultsController extends Controller
     }
 
     /**
-    * create a inventory result.
-    *
+    * Scan Results Online
+    * @author [Thong.LT]
+    * @version v1.0 - 2019/07/30
     * @return \Illuminate\InventoryResult\View\View
     */
-    public function create()
+    public function scanOnline()
     {
         $setting = Setting::first();
-        return view('inventories/edit')
+        return view('inventories/scan-online')
             ->with('item', new InventoryResult)
             ->with('statuslabel_list', Helper::statusLabelList())
             ->with('asset_tag', $setting->auto_increment_prefix);
@@ -52,7 +53,7 @@ class InventoryResultsController extends Controller
             return redirect()->route('inventories.index')->with('error', trans('admin/inventories/message.does_not_exist'));
         }
         $this->authorize('create', $inventory);
-  
+
         if($inventory->object_type == 'App\Models\Company')
         {
             $inventory=Inventory::select('inventories.id as inventory_id','companies.id as company_id')
@@ -113,7 +114,7 @@ class InventoryResultsController extends Controller
                     break;
                 }
             }
-            
+
         }
         return view('inventories/result')
             ->with('item', $inventory);

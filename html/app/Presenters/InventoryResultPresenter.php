@@ -18,7 +18,7 @@ class InventoryResultPresenter extends Presenter
     public static function dataTableLayout()
     {
         $layout = [
-            
+
             [
                 "field" => "deviece",
                 "searchable" => true,
@@ -70,7 +70,7 @@ class InventoryResultPresenter extends Presenter
                 "visible" => true,
                 "formatter" => 'statuslabelsLinkObjFormatter',
             ],
-            
+
         ];
         $layout[] = [
             "field" => "actions",
@@ -84,4 +84,64 @@ class InventoryResultPresenter extends Presenter
 
         return json_encode($layout);
     }
+
+    /**
+     * Json Column Layout for bootstrap table - Scan Result Layout
+     * @version 1.0
+     * @author ThongLT
+     * @return JSON
+     */
+    public static function scanTableLayout()
+    {
+        $layout = [
+            [
+                "field" => "asset_id",
+                "searchable" => true,
+                "sortable" => true,
+                "switchable" => true,
+                "title" => trans('admin/hardware/form.name'),
+                "visible" => true,
+                "formatter" => 'scanHardwareLinkFormatter',
+            ], [
+                "field" => "asset_tag",
+                "searchable" => true,
+                "sortable" => true,
+                "title" => trans('admin/hardware/table.asset_tag'),
+                "visible" => true,
+                "formatter" => "scanTagLinkFormatter"
+            ], [
+                "field" => "checked",
+                "searchable" => true,
+                "sortable" => true,
+                "switchable" => true,
+                "title" => trans('admin/inventories/table.checked'),
+                "visible" => true,
+                "formatter" => 'scanDateDisplayFormatter',
+            ], [
+                "field" => "familiar",
+                "searchable" => true,
+                "sortable" => true,
+                "title" => trans('admin/inventories/table.recognized'),
+                "visible" => true,
+                "formatter" => 'resultRecognizedFormatter',
+            ], [
+                "field" => "status_label",
+                "searchable" => true,
+                "sortable" => true,
+                "title" => trans('admin/hardware/table.status'),
+                "visible" => true,
+                "formatter" => 'scanStatusFormatetter',
+            ], [
+                "field" => "actions",
+                "searchable" => false,
+                "sortable" => false,
+                "switchable" => false,
+                "title" => trans('table.actions'),
+                "formatter" => "scanActionsFormatter",
+            ]
+        ];
+
+        return json_encode($layout);
+    }
+
 }

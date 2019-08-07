@@ -193,6 +193,82 @@
         }
     }
 
+    // Result Recognized Formatter
+    function resultRecognizedFormatter(value) {
+        switch (value) {
+            case 1:
+                return '<span style="color:black">{{ trans('admin/inventories/result.familiar') }}</span>';
+                break;
+            case 0:
+                return '<span style="color:red">{{ trans('admin/inventories/result.unknown') }}</span>'
+                break;
+            default:
+                return;
+        }
+    }
+
+    // Scan Result Layout Hardwaree Link
+    function scanHardwareLinkFormatter() {
+        return function (value,row) {
+            if (row.name) {
+                return '<a href="{{ url('/hardware') }}/' + row.asset_id.toString() + '"> ' + row.name + '</a>';
+            }
+
+            return '';
+        };
+    }
+
+    // Scan Result Layout Tag Link
+    function scanTagLinkFormatter() {
+        return function (value,row) {
+            if (value) {
+                return '<a href="{{ url('/hardware') }}/' + row.asset_id + '"> ' + value + '</a>';
+            }
+
+            return '';
+        };
+    }
+
+    // Scan Result Layout DateTime
+    function scanDateDisplayFormatter(value) {
+        if (value) {
+            return  value.datetime;
+        }
+    }
+
+    // Scan Status Formatter
+    function scanStatusFormatetter() {
+        return function (value,row) {
+            if (row.id || row.checked) {
+                let statusText = (value.id) ? value.name : "{{ trans('admin/inventories/result.add_status') }}";
+                return '<nobr><a href="#" data-toggle="modal" data-target="#modal-result" class="status" data-tag="' + row.asset_tag + '"> ' + statusText + '</a></span>';
+            }
+
+            return '';
+        };
+    }
+
+    // Scan Action Formatter
+    function scanActionsFormatter() {
+        return function (value,row) {
+            var actions = '';
+            if (row.id || row.checked || row.status_label.id) {
+                var actions = '<nobr>';
+                if ((row.available_actions) && (row.available_actions.update === true)) {
+                    actions += '<a href="#" data-tag="' + row.asset_tag + '" class="asset-update">{{ trans('admin/inventories/result.save') }}</a>&nbsp;';
+                    actions += ' | ';
+                    actions += '<a href="#" data-tag="' + row.asset_tag + '" class="asset-cancel">{{ trans('admin/inventories/result.cancel') }}</a>&nbsp;';
+                }
+                if ((row.available_actions) && (row.available_actions.delete === true)) {
+                    actions += '<a href="#" data-id="' + row.id + '" class="asset-clear">{{ trans('admin/inventories/result.clear') }}</a>';
+                }
+                actions +='</nobr>';
+            }
+
+            return actions;
+        };
+    }
+
     // Make the edit/delete buttons
     function genericActionsFormatter(destination) {
         return function (value,row) {
@@ -213,7 +289,7 @@
             if ((row.available_actions) && (row.available_actions.clone === true)) {
                 actions += '<a href="{{ url('/') }}/' + dest + '/' + row.id + '/clone" class="btn btn-sm btn-info" data-tooltip="true" title="Clone"><i class="fa fa-copy"></i></a>&nbsp;';
             }
-            
+
             if ((row.available_actions) && (row.available_actions.update === true)) {
                 if(destination == 'inventoryresults')
                 {
@@ -237,7 +313,7 @@
                     + ' data-title="{{  trans('general.delete') }}" onClick="return false;">'
                     + '<i class="fa fa-trash"></i></a>&nbsp;';
                     }
-                   
+
                 }
                 else{
                     actions += '<a href="{{ url('/') }}/' + dest + '/' + row.id + '" '
@@ -302,14 +378,14 @@
             } else if (value.type == 'inventoryResult') {
                 item_destination = 'inventoryresults'
                 item_icon = 'fa-barcode';
-                
+
                 return '<nobr><a href="{{ url('/') }}/' + item_destination +'/' + value.id + '" data-tooltip="true" title="' + value.type + '"><i class="fa ' + item_icon + ' text-blue"></i> ' + value.name + '</a></nobr>';
             }
             else if (value.type == 'contract') {
                 item_destination = 'contracts'
                 item_icon = 'fa-map-marker';
             }
-            
+
             return '<nobr><a href="{{ url('/') }}/' + item_destination +'/' + value.id + '" data-tooltip="true" title="' + value.type + '"><i class="fa ' + item_icon + ' text-blue"></i> ' + value.name + '</a></nobr>';
 
         } else {
@@ -410,6 +486,14 @@
         window[formatters[i] + 'InOutFormatter'] = genericCheckinCheckoutFormatter(formatters[i]);
     }
 
+    // Scan Hardware Formatter
+    window['scanHardwareLinkFormatter'] = scanHardwareLinkFormatter();
+    // Scan Hardware Formatter
+    window['scanTagLinkFormatter'] = scanTagLinkFormatter();
+    // Scan Status Formatter
+    window['scanStatusFormatetter'] = scanStatusFormatetter();
+    // Scan Action Formatter
+    window['scanActionsFormatter'] = scanActionsFormatter();
 
     // This is  gross, but necessary so that we can package the API response
     // for custom fields in a more useful way.

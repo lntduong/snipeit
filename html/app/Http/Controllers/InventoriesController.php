@@ -54,7 +54,7 @@ class InventoriesController extends Controller
      */
     public function store(InventoryRequest $request)
     {
-  
+
             $this->authorize('create', Inventory::class);
             $inventory = new Inventory();
             if($request->input('contract_id')) {
@@ -82,11 +82,8 @@ class InventoriesController extends Controller
             if ($inventory->save()) {
                 return redirect()->route('inventories.index')->with('success', trans('admin/inventories/message.create.success'));
             }
-     
+
             return redirect()->back()->withInput()->withErrors($inventory->getErrors());
-     
-            
-        
     }
 
     /**
@@ -131,7 +128,7 @@ class InventoriesController extends Controller
                 }
                 case "App\Models\Contract";
                 {
-                    
+
                     switch($item->contract->object_type){
                         case "App\Models\Company";
                         {

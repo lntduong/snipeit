@@ -62,20 +62,15 @@ function initCanvas(w,h)
 function captureToCanvas() {
     if (stype!=1)
         return;
-    if (isInventoryNull()) {
-        return;
-    }
     if (gUM) {
         try {
             gCtx.drawImage(v,0,0);
             try {
                 qrcode.decode();
             } catch(e) {
-                console.log(e);
                 setTimeout(captureToCanvas, 500);
             };
         } catch(e) {
-            console.log(e);
             setTimeout(captureToCanvas, 500);
         };
     }
@@ -107,22 +102,20 @@ function error2(error)
     return;
 }
 
-function load()
+function loadCamera()
 {
 	if (isCanvasSupported() && window.File && window.FileReader) {
 		initCanvas(800, 600);
 		qrcode.callback = scanCallback;
-        document.getElementById("outdiv").style.display="block";
-        $(window).scrollTop($('#outdiv').offset().top);
+        document.getElementById("scanner-stream").style.display="block";
         setwebcam();
 	} else {
-		showErrorMsg($('#alert-page'), 'ERROR! Cannot load camera! Please use another web browser like Firefox and try again or contact Administrator for more information.');
+		loadAlert('camera_error');
 	}
 }
 
 function setwebcam()
 {
-    $('.alert-message').hide();
 	var options = true;
 	if(navigator.mediaDevices && navigator.mediaDevices.enumerateDevices)
 	{
@@ -138,7 +131,7 @@ function setwebcam()
 			  setwebcam2(options);
 			});
 		} catch(e) {
-            showErrorMsg($('#alert-page'), 'ERROR! Cannot load camera! Please use another web browser like Firefox and try again or contact Administrator for more information.');
+            loadAlert('camera_error');
 		}
 	} else {
 		console.log("no navigator.mediaDevices.enumerateDevices" );
@@ -154,7 +147,7 @@ function setwebcam2(options)
         return;
     }
     var n=navigator;
-    document.getElementById("outdiv").innerHTML = vidhtml;
+    document.getElementById("scanner-stream").innerHTML = vidhtml;
     v=document.getElementById("v");
 
     try {
@@ -163,8 +156,9 @@ function setwebcam2(options)
             n.mediaDevices.getUserMedia({video: options, audio: false}).
                 then(function(stream){
                     success(stream);
+                    $('#scanner').modal('show');
                 }).catch(function(error){
-                    showErrorMsg($('#alert-page'), 'ERROR! Cannot load camera! Please use another web browser like Firefox and try again or contact Administrator for more information.');
+                    loadAlert('camera_error');
                     error2(error);
                 });
         } else if (n.getUserMedia) {
@@ -175,7 +169,7 @@ function setwebcam2(options)
             n.webkitGetUserMedia({video:options, audio: false}, success, error);
         }
     } catch (e) {
-        showErrorMsg($('#alert-page'), 'ERROR! Cannot load camera! Please use another web browser like Firefox and try again or contact Administrator for more information.');
+        loadAlert('camera_error');
     }
 
     stype=1;
@@ -184,8 +178,13 @@ function setwebcam2(options)
 
 function stopCamera()
 {
-    v.pause();
-    v.srcObject.getTracks()[0].stop();
+    $("#scanner-stream").hide();
+    if (v) {
+        v.pause();
+        if (v.srcObject) {
+            v.srcObject.getTracks()[0].stop();
+        }
+    }
     gCtx = null;
     gCanvas = null;
     c = 0;

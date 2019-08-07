@@ -19,15 +19,23 @@
                   <div class="col-md-6">
                      {{-- Company-Name --}}
                      @include ('partials.forms.edit.company-select', ['translated_name' => trans('general.company'), 'fieldname' => 'company_id'])
+                     <div style="margin-top:40px">
                      {{-- Store-Name --}}
                      @include ('partials.forms.edit.store-select', ['translated_name' => trans('admin/contracts/table.store'), 'fieldname' => 'store_id'])
+                     </div>
+                     <div style="margin-top:80px">
                      {{-- Department-Name --}}
                      @include ('partials.forms.edit.department-select', ['translated_name' => trans('general.department'), 'fieldname' => 'department_id','class' => 'department_select'])
+                     </div>
+                     <div style="margin-top:120px">
                      {{-- Contract-Name --}}
                      @include ('partials.forms.edit.contract', ['translated_name' => trans('general.contract'), 'fieldname' => 'assigned_contract'])
+                     </div>
+                     <div style="margin-top:160px">
                      {{-- Inventory-Name --}}
                      @include ('partials.forms.edit.inventory', ['translated_name' => trans('admin/inventories/table.inventory'), 'fieldname' => 'inventory_id'])
-                  </div>
+                     </div>
+                </div>
                   <!-- /.col -->
                   <table
                      data-columns="{{ \App\Presenters\InventoryResultPresenter::dataTableLayout() }}"
@@ -47,16 +55,15 @@
                      class="table table-striped snipe-table"
                      data-url="{{ route('api.inventoryresults.index',['inventory_id' => $item->inventory_id]) }}"
                      data-export-options='{
-                        "fileName": "export-components-{{ date('Y-m-d') }}",
+                        "fileName": "export-inventory-result-{{ date('Y-m-d') }}",
                         "ignoreColumn": ["actions","image"]
                         }'>
                      
                   </table>
                   <div class="box-footer text-right">
-                     <button href='{{ route('modal.inventory-result') }}' data-toggle="modal"  data-target="#createModal" data-select='assigned_user_select' type="button" class="btn btn-success" id="addasset"><i class=""></i> Add Unknow Asset</button>
+                     <button href='{{ route('modal.inventory-result') }}' data-toggle="modal"  data-target="#createModal" data-select='assigned_user_select' type="button" class="btn btn-success" id="addasset" {{isset($item->inventory_id) ? "" : "disabled" }} ><i class=""></i> Add Unknow Asset</button>
                   </div>
                </div>
-        
                <!-- /.row -->
             </div>
             <!-- /.row -->
@@ -75,6 +82,7 @@
      var inventory_id=$('#inventory_select').val();
      if(inventory_id == null || inventory_id == "")
      {
+        $("#addasset").attr("disabled", true);
        var temp = {
        url: '{{ route('api.inventoryresults.index',['inventory_id' => '']) }}'
         };
@@ -82,6 +90,7 @@
      }
      else
      {
+        $("#addasset").removeAttr("disabled");
        var temp = {
        url: '{{ route('api.inventoryresults.index',['inventory_id' => '']) }}' + inventory_id
         };
@@ -157,7 +166,8 @@
            data: function (params) {
                var data = {
                    search: params.term,
-                   store_id:$("#store_select").val(),
+                   company_id: $("#company_select").val(),
+                   store_id: $("#store_select").val(),
                    page: params.page || 1,
                };
                return data;

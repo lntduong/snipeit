@@ -21,15 +21,20 @@
        
                <div class="col-md-12">
                     <div class="col-md-5">
-                         
+
                                   @include ('partials.forms.edit.company-select', ['translated_name' => trans('general.company'), 'fieldname' => 'assigned_company'])
+                                  <div style="margin-top:40px">
                                   {{-- Store-Name --}}
                                   @include ('partials.forms.edit.store-select', ['translated_name' => trans('admin/contracts/table.store'), 'fieldname' => 'assigned_store'])
+                                  </div>
+                                  <div style="margin-top:80px">
                                   {{-- Department-Name --}}
                                   @include ('partials.forms.edit.department-select', ['translated_name' => trans('general.department'), 'fieldname' => 'assigned_department','class' => 'department_select'])
+                                  </div>
+                                  <div style="margin-top:120px">
                                   {{-- Contract-Name --}}
                                   @include ('partials.forms.edit.contract', ['translated_name' => trans('general.contract'), 'fieldname' => 'assigned_contract'])
-                  
+                                  </div>
                              
                               <button style="position:absolute;bottom:0;" type="submit" id="filterCompany" class="btn btn-primary" onclick="filterCompany()">Go</button>
                         </div>
@@ -51,7 +56,7 @@
                   class="table table-striped snipe-table"
                   data-url="{{ route('api.inventories.index') }}"
                   data-export-options='{
-                  "fileName": "export-components-{{ date('Y-m-d') }}",
+                  "fileName": "export-inventories-{{ date('Y-m-d') }}",
                   "ignoreColumn": ["actions","image"]
                   }'>
                   </table>
@@ -88,10 +93,10 @@
                 } else {
                     var url= '{{ route('api.inventories.index',['company_id' => 'company_value','contract_id' => 'contract_value']) }}'; 
                     url=url.replace('company_value',company_id);
-                    
+                
                 }
             }
-           
+        
            
         }
         url=url.replace('&amp;','&');
@@ -217,7 +222,8 @@
        data: function (params) {
            var data = {
                search: params.term,
-               store_id:$("#store_select").val(),
+               company_id: $("#company_select").val(),
+               store_id: $("#store_select").val(),
                page: params.page || 1,
            };
            return data;

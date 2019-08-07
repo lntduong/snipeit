@@ -10,7 +10,7 @@
                      <span class="hidden-lg hidden-md">
                      <i class="fa fa-floppy-o"></i>
                      </span>
-                     <span class="hidden-xs hidden-sm">{{ trans('general.contract') }}</span>
+                     <span class="hidden-xs hidden-sm">{{ trans('general.contracts') }}</span>
                      </a>
             </li>
             <li >
@@ -47,6 +47,7 @@
                         <thead>
                               <tr>
                                  <th data-sortable="true" data-field="id" data-visible="false" data-searchable="false">{{ trans('general.id') }}</th>
+                                 <th data-sortable="true" data-field="department" data-visible="true" data-searchable="true" data-formatter="departmentsLinkObjFormatter">{{ trans('general.department') }}</th>
                                  <th data-sortable="true" data-field="name" data-visible="true" data-searchable="true">{{ trans('admin/contracts/table.contract_name') }}</th>
                                  <th data-sortable="true" data-field="location_id" data-visible="true" data-searchable="false" data-formatter="locationsLinkObjFormatter">{{ trans('admin/contracts/table.location') }}</th>
                                  <th data-sortable="true" data-field="contact_id_1" data-visible="true" data-searchable="false" data-formatter="usersLinkObjFormatter">{{ trans('admin/contracts/table.contact_person1') }}</th>

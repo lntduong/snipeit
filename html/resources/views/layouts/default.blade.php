@@ -256,13 +256,13 @@
                          <li {!! (Request::is('inventory/create') ? 'class="active"' : '') !!}>
                              <a href="{{ route('inventories.create') }}">
                                  <i class="fa fa-qrcode">  </i>
-                                 {{ trans('general.create_inventory') }}
+                                 {{ trans('general.inventory') }}
                              </a>
                          </li>
                      @endcan
                      @can('create', \App\Models\User::class)
-                         <li {!! (Request::is('inventoryresults_sp') ? 'class="active"' : '') !!}>
-                             <a href="{{ route('inventoryresults_sp') }}">
+                         <li {!! (Request::is('inventoryresults_sp_online') ? 'class="active"' : '') !!}>
+                             <a href="{{ route('inventoryresults_sp_online') }}">
                                  <i class="fa fa-qrcode">  </i>
                                  {{ trans('general.inventory_mobile') }}
                              </a>
@@ -571,16 +571,22 @@
                     <li{!! (Request::is('contracts*') ? ' class="active"' : '') !!}>
                         <a href="{{ route('contracts.index') }}">
                                 <i class=" 	fa fa-file-text-o"></i>
-                            <span> {{ trans('general.contract') }}</span>
+                            <span> {{ trans('general.contracts') }}</span>
                         </a>
                     </li>
 
                     <li>
-                            <a href="{{ route('inventories.index') }}">
-                                <i class="fa fa-qrcode">  </i>
-                                <span> {{ trans('general.create_inventory') }}</span>
-                            </a>
-                        </li>
+                        <a href="{{ route('inventories.index') }}">
+                            <i class="fa fa-qrcode">  </i>
+                            <span> {{ trans('general.inventories') }}</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ route('inventoryresults.index') }}">
+                            <i class="fa fa-list-ul">  </i>
+                            <span> {{ trans('general.inventoryresult_list') }}</span>
+                        </a>
+                    </li>
 
                 </ul>
             </li>
@@ -621,7 +627,7 @@
                         @can('view', \App\Models\Store::class)
                         <li>
                             <a href="{{ route('stores.index') }}">
-                                {{ trans('general.store') }}
+                                {{ trans('general.stores') }}
                             </a>
                         </li>
                         @endcan

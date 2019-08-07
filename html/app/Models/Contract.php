@@ -557,117 +557,108 @@ final class Contract extends SnipeModel
             ->whereNull('contracts.deleted_at');
     }
 
-
-    public function scopeSearchSortCompany($query, $order, $input)
-    {
-        $store = Contract::select('contracts.*', 'companies.name as company_name')
-            ->join('stores', 'stores.id', '=', $this->conditionStore)
-            ->join('companies', 'stores.company_id', '=', 'companies.id')
-            ->whereNull('contracts.deleted_at')
-            ->where('companies.name', 'LIKE', '%' . $input . '%');
-
-        $department = Contract::select('contracts.*', 'companies.name as company_name')
-            ->whereNull('contracts.deleted_at')
-            ->join('departments', 'departments.id', '=',  $this->conditionDepartment)
-            ->join('stores', 'stores.id', '=', 'departments.store_id')
-            ->join('companies', 'companies.id', '=', 'stores.company_id')
-            ->where('companies.name', 'LIKE', '%' . $input . '%')
-            ->orWhere('departments.name', 'LIKE', '%' . $input . '%')
-            ->orWhere('stores.name', 'LIKE', '%' . $input . '%');
-
-        return $query
-            ->join('companies', 'companies.id', '=', $this->conditionCompany)
-            ->whereNull('contracts.deleted_at')
-            ->where('companies.name', 'LIKE', '%' . $input . '%')
-            ->union($store)
-            ->union($department)
-            ->whereNull('contracts.deleted_at')
-            ->orderBy('company_name', $order);
-    }
-
-    public function scopeSearchSortStore($query, $order, $input)
-    {
-        $company = Contract::select('contracts.*', \DB::raw('null as stores'),  \DB::raw('null as stores_id'))
-            ->join('companies', 'companies.id', '=', $this->conditionCompany)
-            ->whereNull('contracts.deleted_at')
-            ->where('companies.name', 'LIKE', '%' . $input . '%');
-
-        $department = Contract::select('contracts.*', 'stores.name as stores', 'stores.id as stores_id')
-            ->join('departments', 'departments.id', '=', $this->conditionDepartment)
-            ->join('stores', 'stores.id', '=', 'departments.store_id')
-            ->whereNull('contracts.deleted_at')
-            ->where('stores.name', 'LIKE', '%' . $input . '%')
-            ->orWhere('departments.name', 'LIKE', '%' . $input . '%');
-
-        return $query
-            ->join('stores', 'stores.id', '=', $this->conditionStore)
-            ->leftJoin('companies', 'companies.id', '=', 'stores.company_id')
-            ->whereNull('contracts.deleted_at')
-            ->where('stores.name', 'LIKE', '%' . $input . '%')
-            ->orWhere('companies.name', 'LIKE', '%' . $input . '%')
-            ->union($company)
-            ->union($department)
-            ->whereNull('contracts.deleted_at')
-            ->orderBy('stores', $order);
-    }
-
-    public function scopeSearchSortDepartment($query, $order, $input)
+    public function scopeSearchSort($query, $field, $order, $input)
     {
 
-        $company = Contract::select('contracts.*', \DB::raw('null as departments'),  \DB::raw('null as departments_id'))
-            ->join('companies', 'companies.id', '=', $this->conditionCompany)
-            ->whereNull('contracts.deleted_at')
-            ->where('companies.name', 'LIKE', '%' . $input . '%')
-            ->whereNull('contracts.deleted_at');
+        $selectStores = Contract::select(
+            'contracts.*',
+            'companies.name as companies',
+            'stores.name as stores',
+            \DB::raw('null as departments'),
+            'locations.name as locations',
+            'contact_1.first_name as users_1',
+            'contact_2.first_name as users_2'
+        );
 
-        $store = Contract::select('contracts.*', \DB::raw('null as departments'),  \DB::raw('null as departments_id'))
-            ->join('stores', 'stores.id', '=', $this->conditionStore)
-            ->whereNull('contracts.deleted_at')
-            ->join('companies', 'companies.id', '=', 'stores.company_id')
-            ->where('stores.name', 'LIKE', '%' . $input . '%')
-            ->orWhere('companies.name', 'LIKE', '%' . $input . '%')
-            ->whereNull('contracts.deleted_at');
+        $selectDepartments = Contract::select(
+            'contracts.*',
+            'companies.name as companies',
+            'stores.name as stores',
+            'departments.name as departments',
+            'locations.name as locations',
+            'contact_1.first_name as users_1',
+            'contact_2.first_name as users_2'
+        );
 
-        return $query
-            ->join('departments', 'departments.id', '=', $this->conditionDepartment)
-            ->join('stores', 'stores.id', '=', 'departments.store_id')
-            ->where('stores.name', 'LIKE', '%' . $input . '%')
-            ->orWhere('departments.name', 'LIKE', '%' . $input . '%')
-            ->union($company)
-            ->union($store)
-            ->whereNull('contracts.deleted_at')
-            ->orderBy('departments', $order);
-    }
-
-    public function scopeSearchSortLocation($query, $order, $input)
-    {
-
-        $company = Contract::select('contracts.*', \DB::raw('locations.name AS location_name'))
-            ->join('companies', 'companies.id', '=', $this->conditionCompany)
-            ->leftJoin('locations', 'contracts.location_id', '=', 'locations.id')
-            ->where('companies.name', 'LIKE', '%' . $input . '%')
-            ->whereNull('contracts.deleted_at');
-
-        $store = Contract::select('contracts.*', \DB::raw('locations.name AS location_name'))
+        $stores = $selectStores
             ->join('stores', 'stores.id', '=', $this->conditionStore)
             ->join('companies', 'companies.id', '=', 'stores.company_id')
-            ->leftJoin('locations', 'contracts.location_id', '=', 'locations.id')
+            ->leftJoin('locations', 'locations.id', '=', 'contracts.location_id')
+            ->leftJoin('users as contact_1', 'contact_1.id', '=', 'contracts.contact_id_1')
+            ->leftJoin('users as contact_2', 'contact_2.id', '=', 'contracts.contact_id_2')
             ->whereNull('contracts.deleted_at')
             ->where('companies.name', 'LIKE', '%' . $input . '%')
+            ->orWhere('contracts.name', 'LIKE', '%' . $input . '%')
+            ->whereNull('contracts.deleted_at')
             ->orWhere('stores.name', 'LIKE', '%' . $input . '%')
-            ->whereNull('contracts.deleted_at');
+            ->whereNull('contracts.deleted_at')
+            ->orWhere('locations.name', 'LIKE', '%' . $input . '%')
+            ->orWhere('contact_1.first_name', 'LIKE', '%' . $input . '%')
+            ->orWhere('contact_1.last_name', 'LIKE', '%' . $input . '%')
+            ->orWhere('contact_1.username', 'LIKE', '%' . $input . '%')
+            ->orWhereRaw('CONCAT(' . DB::getTablePrefix() . 'contact_1.first_name," ",' . DB::getTablePrefix() . 'contact_1.last_name) LIKE ?', ["%$input%", "%$input%"])
+            ->orWhere('contact_2.first_name', 'LIKE', '%' . $input . '%')
+            ->orWhere('contact_2.last_name', 'LIKE', '%' . $input . '%')
+            ->orWhere('contact_2.username', 'LIKE', '%' . $input . '%')
+            ->orWhereRaw('CONCAT(' . DB::getTablePrefix() . 'contact_2.first_name," ",' . DB::getTablePrefix() . 'contact_2.last_name) LIKE ?', ["%$input%", "%$input%"])
+            ->orWhere('contracts.start_date', 'LIKE', '%' . $input . '%')
+            ->orWhere('contracts.end_date', 'LIKE', '%' . $input . '%')
+            ->orWhere('contracts.billing_date', 'LIKE', '%' . $input . '%')
+            ->orWhere('contracts.payment_date', 'LIKE', '%' . $input . '%');
 
-        return $query
+        $departments = $selectDepartments
             ->join('departments', 'departments.id', '=', $this->conditionDepartment)
             ->join('stores', 'stores.id', '=', 'departments.store_id')
             ->join('companies', 'companies.id', '=', 'stores.company_id')
-            ->leftJoin('locations', 'contracts.location_id', '=', 'locations.id')
-            ->where('companies.name', 'LIKE', '%' . $input . '%')
-            ->orWhere('stores.name', 'LIKE', '%' . $input . '%')
-            ->orWhere('departments.name', 'LIKE', '%' . $input . '%')
-            ->union($company)
-            ->union($store)
+            ->leftJoin('locations', 'locations.id', '=', 'contracts.location_id')
+            ->leftJoin('users as contact_1', 'contact_1.id', '=', 'contracts.contact_id_1')
+            ->leftJoin('users as contact_2', 'contact_2.id', '=', 'contracts.contact_id_2')
             ->whereNull('contracts.deleted_at')
-            ->orderBy('location_name', $order);
+            ->where('companies.name', 'LIKE', '%' . $input . '%')
+            ->orWhere('contracts.name', 'LIKE', '%' . $input . '%')
+            ->whereNull('contracts.deleted_at')
+            ->orWhere('stores.name', 'LIKE', '%' . $input . '%')
+            ->whereNull('contracts.deleted_at')
+            ->orWhere('departments.name', 'LIKE', '%' . $input . '%')
+            ->whereNull('contracts.deleted_at')
+            ->orWhere('locations.name', 'LIKE', '%' . $input . '%')
+            ->orWhere('contact_1.first_name', 'LIKE', '%' . $input . '%')
+            ->orWhere('contact_1.last_name', 'LIKE', '%' . $input . '%')
+            ->orWhere('contact_1.username', 'LIKE', '%' . $input . '%')
+            ->orWhereRaw('CONCAT(' . DB::getTablePrefix() . 'contact_1.first_name," ",' . DB::getTablePrefix() . 'contact_1.last_name) LIKE ?', ["%$input%", "%$input%"])
+            ->orWhere('contact_2.first_name', 'LIKE', '%' . $input . '%')
+            ->orWhere('contact_2.last_name', 'LIKE', '%' . $input . '%')
+            ->orWhere('contact_2.username', 'LIKE', '%' . $input . '%')
+            ->orWhereRaw('CONCAT(' . DB::getTablePrefix() . 'contact_2.first_name," ",' . DB::getTablePrefix() . 'contact_2.last_name) LIKE ?', ["%$input%", "%$input%"])
+            ->orWhere('contracts.start_date', 'LIKE', '%' . $input . '%')
+            ->orWhere('contracts.end_date', 'LIKE', '%' . $input . '%')
+            ->orWhere('contracts.billing_date', 'LIKE', '%' . $input . '%')
+            ->orWhere('contracts.payment_date', 'LIKE', '%' . $input . '%');
+
+        return $query
+            ->join('companies', 'companies.id', '=', $this->conditionCompany)
+            ->leftJoin('locations', 'locations.id', '=', 'contracts.location_id')
+            ->leftJoin('users as contact_1', 'contact_1.id', '=', 'contracts.contact_id_1')
+            ->leftJoin('users as contact_2', 'contact_2.id', '=', 'contracts.contact_id_2')
+            ->whereNull('contracts.deleted_at')
+            ->where('companies.name', 'LIKE', '%' . $input . '%')
+            ->whereNull('contracts.deleted_at')
+            ->orWhere('contracts.name', 'LIKE', '%' . $input . '%')
+            ->orWhere('locations.name', 'LIKE', '%' . $input . '%')
+            ->orWhere('contact_1.first_name', 'LIKE', '%' . $input . '%')
+            ->orWhere('contact_1.last_name', 'LIKE', '%' . $input . '%')
+            ->orWhere('contact_1.username', 'LIKE', '%' . $input . '%')
+            ->orWhereRaw('CONCAT(' . DB::getTablePrefix() . 'contact_1.first_name," ",' . DB::getTablePrefix() . 'contact_1.last_name) LIKE ?', ["%$input%", "%$input%"])
+            ->orWhere('contact_2.first_name', 'LIKE', '%' . $input . '%')
+            ->orWhere('contact_2.last_name', 'LIKE', '%' . $input . '%')
+            ->orWhere('contact_2.username', 'LIKE', '%' . $input . '%')
+            ->orWhereRaw('CONCAT(' . DB::getTablePrefix() . 'contact_2.first_name," ",' . DB::getTablePrefix() . 'contact_2.last_name) LIKE ?', ["%$input%", "%$input%"])
+            ->orWhere('contracts.start_date', 'LIKE', '%' . $input . '%')
+            ->orWhere('contracts.end_date', 'LIKE', '%' . $input . '%')
+            ->orWhere('contracts.billing_date', 'LIKE', '%' . $input . '%')
+            ->orWhere('contracts.payment_date', 'LIKE', '%' . $input . '%')
+            ->union($stores)
+            ->union($departments)
+            ->orderBy($field, $order);
     }
 }
