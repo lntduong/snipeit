@@ -21,7 +21,7 @@
                      @include ('partials.forms.edit.company-select', ['translated_name' => trans('general.company'), 'fieldname' => 'company_id'])
                      <div style="margin-top:40px">
                      {{-- Store-Name --}}
-                     @include ('partials.forms.edit.store-select', ['translated_name' => trans('admin/contracts/table.store'), 'fieldname' => 'store_id'])
+                     @include ('partials.forms.edit.store-select', ['translated_name' => trans('general.store'), 'fieldname' => 'store_id'])
                      </div>
                      <div style="margin-top:80px">
                      {{-- Department-Name --}}

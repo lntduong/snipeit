@@ -23,7 +23,7 @@
 @include ('partials.forms.edit.name', ['translated_name' => trans('admin/contracts/table.contract_name')])
 
 <!-- Location-->
-@include ('partials.forms.edit.location-select-contract', ['translated_name' => trans('admin/contracts/table.location'), 'fieldname' => 'location_id', 'new' => 'no'])
+@include ('partials.forms.edit.location-select-contract', ['translated_name' => trans('general.location'), 'fieldname' => 'location_id', 'new' => 'no'])
 
 <!-- Contact Person 1-->
 @include ('partials.forms.edit.user2-select', ['translated_name' => trans('admin/contracts/table.contact_person_1'), 'fieldname' => 'contact_id_1', 'classname' => 'user_select_id'])

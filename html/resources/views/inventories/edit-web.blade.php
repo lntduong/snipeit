@@ -10,7 +10,7 @@
     {{-- Company-Name --}}
     @include ('partials.forms.edit.company-select', ['translated_name' => trans('general.company'), 'fieldname' => 'company_id', 'required'=>'true'])
     {{-- Store-Name --}}
-    @include ('partials.forms.edit.store-select', ['translated_name' => trans('admin/contracts/table.store'), 'fieldname' => 'store_id', 'required' => 'true' ])
+    @include ('partials.forms.edit.store-select', ['translated_name' => trans('general.store'), 'fieldname' => 'store_id', 'required' => 'true' ])
     {{-- Department-Name --}}
     @include ('partials.forms.edit.department-select', ['translated_name' => trans('general.department'), 'fieldname' => 'department_id', 'required' => 'true','class' => 'department_select'])
     {{-- Contract-Name --}}

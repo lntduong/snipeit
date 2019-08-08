@@ -10,7 +10,7 @@
 
 @section('header_right')
   <a href="{{ route('contracts.create') }}" class="btn btn-primary pull-right"></i> {{ trans('general.create') }}</a>
-  <a href="{{ route('contracts.billing')  }}" class="btn btn-info pull-right" style="margin-right: 10px;"></i> {{ trans('general.billing_list') }}</a>
+  <a href="{{ route('contracts.billing')  }}" class="btn btn-info pull-right" style="margin-right: 10px;"></i> {{ trans('admin/contracts/table.list_billing') }}</a>
 @stop
 
 {{-- Page content --}}
@@ -28,7 +28,7 @@
                             @include ('partials.forms.edit.store-select-report', ['translated_name' =>  trans('general.store') , 'fieldname' => 'store_id'])
                             {{-- Department-Name --}}
                             @include ('partials.forms.edit.department-select-contract', ['translated_name' => trans('general.department'), 'fieldname' => 'department_id'])
-                            <button type="submit" id="filterCompany" class="btn btn-primary" onclick="filterCompany()">Go</button>
+                            <button type="submit" id="filterCompany" class="btn btn-primary" onclick="filterCompany()">{{ trans('admin/contracts/table.go') }}</button>
                         </div>
                         <table
                           data-click-to-select="true"

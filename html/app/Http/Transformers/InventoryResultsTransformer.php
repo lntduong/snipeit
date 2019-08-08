@@ -56,8 +56,8 @@ class InventoryResultsTransformer
         foreach ($inventoryresults as $inventoryresult) {
             $array[] = self::transformScanInventoryResult($inventoryresult);
         }
-
-        return (new DatatablesTransformer)->transformDatatables($array, sizeof($array));
+        
+        return $array;
     }
 
     /**

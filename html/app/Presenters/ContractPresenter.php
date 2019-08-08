@@ -57,7 +57,7 @@ class ContractPresenter extends Presenter
                 "searchable" => true,
                 "sortable" => true,
                 "switchable" => true,
-                "title" => trans('admin/contracts/table.location'),
+                "title" => trans('general.location'),
                 "visible" => true,
                 "formatter" => "locationsLinkObjFormatter"
             ],

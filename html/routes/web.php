@@ -98,6 +98,10 @@ Route::group(['middleware' => 'auth'], function () {
         'as' => 'inventoryresults_sp_online',
         'uses' => 'InventoryResultsController@scanOnline'
     ]);
+    Route::get('inventoryresults_sp_offline', [
+        'as' => 'inventoryresults_sp_offline',
+        'uses' => 'InventoryResultsController@scanOffline'
+    ]);
 });
 
 

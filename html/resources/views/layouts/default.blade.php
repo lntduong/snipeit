@@ -881,7 +881,11 @@
 
 
     <script src="{{ url(mix('js/dist/all.js')) }}" nonce="{{ csrf_token() }}"></script>
-    {{-- <script src="{{ url(mix('js/dist/instascan.min.js')) }}"  ></script> --}}
+
+    @if (Route::current()->getName() == 'inventoryresults_sp_offline' || Route::current()->getName() == 'inventoryresults_sp_online')
+        <script src="{{ url(asset('js/extensions/webqr/llqrcode.js')) }}"></script>
+        <script src="{{ url(asset('js/extensions/webqr/webqr.js')) }}"></script>
+    @endif
 
     @section('moar_scripts')
     @show

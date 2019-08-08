@@ -920,6 +920,12 @@ Route::group(['prefix' => 'v1','namespace' => 'Api', 'middleware' => 'api'], fun
             'uses'=>'InventoryResultsController@storeByScan'
         ]);
 
+        Route::post('storebyofflinescan',
+        [
+            'as'=>'api.inventoryresults.storebyofflinescan',
+            'uses'=>'InventoryResultsController@storeByOfflineScan'
+        ]);
+
         Route::post('destroy',
         [
             'as'=>'api.inventoryresults.destroy',

@@ -376,7 +376,7 @@ class InventoryResultsController extends Controller
     }
 
     /**
-     * Store scanned result in storage.
+     * Store scanned result in storage [Online Mode].
      *
      * @author [Thong.LT]
      * @since [v1.0]
@@ -420,8 +420,6 @@ class InventoryResultsController extends Controller
         $inventoryresult->familiar = $checkRecongnized['Recongnized'];
         $inventoryresult->user_id = Auth::id();
 
-        $familiarJSON = $this->checkasset($request);
-
         if($inventoryresult->save()) {
             $inventoryresult->asset = $asset;
             if ($inventoryresult->status_id) {
@@ -431,6 +429,106 @@ class InventoryResultsController extends Controller
             return response()->json(Helper::formatStandardApiResponse('success', $inventoryresult, trans('admin/inventories/result.update.success')));
         }
         return response()->json(Helper::formatStandardApiResponse('error', null, $inventoryresult->getErrors()));
+    }
+
+    /**
+     * Store scanned result in storage. [Offline Mode]
+     *
+     * @author [Thong.LT]
+     * @since [v1.0]
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function storeByOfflineScan(Request $request)
+    {
+        // $this->authorize('update', InventoryResult::class);
+        $res = ['rows' => array(), 'total' => 0];
+
+        // Delete
+        if ($request->has('deleted')) {
+            foreach ($request->deleted as $delete) {
+                $action['type'] = 'delete';
+                $result = InventoryResult::select(['inventory_results.*'])
+                            ->where("inventory_results.id", '=', $delete['id'])
+                            ->first();
+                if ($result) {
+                    if ($result->delete()) {
+                        $action['status'] = 'success';
+                        $action['message'] = '';
+                    } else {
+                        $action['status'] = 'error';
+                        $action['message'] = $result->getErrors();
+                    }
+                } else {
+                    $action['status'] = 'error';
+                    $action['message'] = trans('admin/inventories/result.asset_not_found');
+                }
+                $delete['action'] = $action;
+                $res['rows'][] = $delete;
+                $res['total'] += 1;
+            }
+        }
+
+        // Update
+        if ($request->has('stored')) {
+            $tmp = $request->stored;
+            foreach ($tmp as $key=>$storedResult) {
+                if ($storedResult['checked'] && $storedResult['checked']['datetime']) {
+                    $action['type'] = '';
+                    $date = new DateTime();
+                    $checkedTime = $storedResult['checked']['datetime'];
+                    $inventoryId = $request->inventory_id;
+                    $asset = Asset::select(['assets.*'])
+                                ->where("assets.asset_tag", '=', $storedResult['asset_tag'])
+                                ->first();
+                    if ($asset) {
+                        $assetId = $asset->id;
+                        $result = InventoryResult::select(['inventory_results.*'])
+                                    ->where("inventory_results.asset_id", '=', $assetId)
+                                    ->where("inventory_results.inventory_id", '=', $request->inventory_id)
+                                    ->first();
+                        if ($result) {
+                            // Update inventory_result
+                            $action['type'] = 'update';
+                            $inventoryresult = $result;
+                        } else {
+                            // Create inventory_result
+                            $action['type'] = 'create';
+                            $inventoryresult = new InventoryResult();
+                            $inventoryresult->inventory_id = $inventoryId;
+                            $inventoryresult->asset_id = $assetId;
+                        }
+
+                        $checkFamiliarRequest = new Request();
+                        $checkFamiliarRequest->asset_id = $assetId;
+                        $checkFamiliarRequest->inventory_id = $inventoryId;
+                        $checkRecongnized = $this->checkasset($checkFamiliarRequest);
+
+                        $inventoryresult->checked_time = $checkedTime;
+                        $inventoryresult->status_id = $storedResult['status_label']['id'];
+                        $inventoryresult->familiar = $checkRecongnized['Recongnized'];
+                        $inventoryresult->user_id = Auth::id();
+
+                        if ($inventoryresult->save()) {
+                            $action['status'] = 'success';
+                            $action['message'] = trans('admin/inventories/result.update.success');
+                        } else {
+                            $action['status'] = 'error';
+                            $action['message'] = $inventoryresult->getErrors();
+                        }
+                    } else {
+                        $action['status'] = 'error';
+                        $action['message'] = trans('admin/inventories/result.asset_not_found');
+                    }
+
+                    $storedResult['action'] = $action;
+                    $res['rows'][] = $storedResult;
+                    $res['total'] += 1;
+                }
+            }
+        }
+
+        return response()->json(Helper::formatStandardApiResponse('success', $res, trans('admin/inventories/result.update.success')));
     }
 
     /**

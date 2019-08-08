@@ -53,7 +53,7 @@
                             @include ('partials.forms.edit.store-select-report', ['translated_name' =>  trans('general.store') , 'fieldname' => 'store_id'])
                             {{-- Contract-Name --}}
                             @include ('partials.forms.edit.contract', ['translated_name' => trans('general.contract'), 'fieldname' => 'contract_id'])
-                            <button id="searchContractReport" class="btn btn-info" onclick="searchContractReport()">Go</button>
+                            <button id="searchContractReport" class="btn btn-info" onclick="searchContractReport()">{{ trans('admin/contracts/table.go') }}</button>
                         </div>
                     </div></div>
                     </div>

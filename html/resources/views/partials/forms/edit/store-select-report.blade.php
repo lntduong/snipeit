@@ -2,7 +2,7 @@
 <div id="{{ $fieldname }}" style="margin-top:40px" class="form-group{{ $errors->has($fieldname) ? ' has-error' : '' }}">
     {{ Form::label($fieldname, $translated_name, array('class' => 'col-md-3 control-label')) }}
     <div class="col-md-7{{isset($required) ? ((\App\Helpers\Helper::checkIfRequired($item, 'contract_id')) ? ' required' : '') : '' }}">
-        <select class="store_select" data-endpoint="store" data-placeholder="Select Store" name="{{ $fieldname }}" style="width: 100%" id="store_select">
+        <select class="store_select" data-endpoint="store" data-placeholder="{{ trans('general.select_store') }}" name="{{ $fieldname }}" style="width: 100%" id="store_select">
             @if ($store_id = Input::old($fieldname, (isset($item)) ? $item->{$fieldname} : ''))
                 <option value="{{ $store_id }}" selected="selected">
                     {{ (\App\Models\Store::find($store_id)) ? \App\Models\Store::find($store_id)->name : '' }}

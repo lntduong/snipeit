@@ -110,7 +110,7 @@ function loadCamera()
         document.getElementById("scanner-stream").style.display="block";
         setwebcam();
 	} else {
-		loadAlert('camera_error');
+		loadScanAlert('camera_error');
 	}
 }
 
@@ -131,7 +131,7 @@ function setwebcam()
 			  setwebcam2(options);
 			});
 		} catch(e) {
-            loadAlert('camera_error');
+            loadScanAlert('camera_error');
 		}
 	} else {
 		console.log("no navigator.mediaDevices.enumerateDevices" );
@@ -158,7 +158,7 @@ function setwebcam2(options)
                     success(stream);
                     $('#scanner').modal('show');
                 }).catch(function(error){
-                    loadAlert('camera_error');
+                    loadScanAlert('camera_error');
                     error2(error);
                 });
         } else if (n.getUserMedia) {
@@ -169,7 +169,7 @@ function setwebcam2(options)
             n.webkitGetUserMedia({video:options, audio: false}, success, error);
         }
     } catch (e) {
-        loadAlert('camera_error');
+        loadScanAlert('camera_error');
     }
 
     stype=1;

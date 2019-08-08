@@ -37,7 +37,7 @@ class StorePresenter extends Presenter
                 "field" => "name",
                 "searchable" => true,
                 "sortable" => true,
-                "title" => trans('admin/store/table.store_name'),
+                "title" => trans('general.store'),
                 "visible" => true,
                 "formatter" => 'storesLinkFormatter',
             ], [

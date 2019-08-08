@@ -7,7 +7,7 @@
 @stop
 
 @section('header_right')
-<a href="' . route('inventoryresults.scanoffline') . '" class="btn btn-primary text-right">{{ trans('admin/inventories/result.switch_to_offline') }}</a>
+<a href="{{ route('inventoryresults_sp_offline') }}" class="btn btn-primary text-right">{{ trans('admin/inventories/result.switch_to_offline') }}</a>
 <a href="{{ URL::previous() }}" class="btn btn-default text-right">{{ trans('general.back') }}</a>
 @stop
 
@@ -34,7 +34,7 @@
                         {{-- Company-Name --}}
                         @include ('partials.forms.edit.company-select', ['translated_name' => trans('general.company'), 'fieldname' => 'select_company'])
                         {{-- Store-Name --}}
-                        @include ('partials.forms.edit.store-select', ['translated_name' => trans('admin/contracts/table.store'), 'fieldname' => 'select_store'])
+                        @include ('partials.forms.edit.store-select', ['translated_name' => trans('general.store'), 'fieldname' => 'select_store'])
                         {{-- Department-Name --}}
                         @include ('partials.forms.edit.department-select', ['translated_name' => trans('general.department'), 'fieldname' => 'select_department'])
                         {{-- Contract-Name --}}
@@ -69,14 +69,9 @@
                         data-columns="{{ \App\Presenters\InventoryResultPresenter::scanTableLayout() }}"
                         data-cookie-id-table="tbl-results"
                         data-toolbar="#toolbar"
-                        data-pagination="false"
+                        data-pagination="true"
                         data-id-table="tbl-results"
                         data-search="true"
-                        data-side-pagination="server"
-                        data-show-columns="false"
-                        data-show-export="false"
-                        data-show-footer="false"
-                        data-show-refresh="false"
                         data-sort-order="asc"
                         data-sort-name="name"
                         data-row-style="rowStyle"
@@ -90,8 +85,8 @@
                 <div class="alert alert-success fade in">
                     <button type="button" class="close" data-dismiss="alert">×</button>
                     <i class="fa fa-check faa-pulse animated"></i>
-                    <strong><span id="alert-title">success</span></strong>
-                    <span id="alert-content"> You have successfully logged in. </span>
+                    <strong><span id="alert-title"></span></strong>
+                    <span id="alert-content"></span>
                 </div>
             </div>
             <div class="box-footer text-right">
@@ -166,16 +161,12 @@
 </div>
 
 <input type="hidden" id="setting-tag" value="{!! $asset_tag !!}" />
-<input type="hidden" id="txt-current" value="" />
 <input type="hidden" id="highlight" value="" />
 
 @stop
 
-<script src="/js/extensions/webqr/llqrcode.js"></script>
-<script src="/js/extensions/webqr/webqr.js"></script>
-
 @section('moar_scripts')
-    @include ('partials.bootstrap-table', ['exportFile' => 'components-export', 'search' => true, 'showFooter' => true, 'columns' => \App\Presenters\StorePresenter::dataTableLayout()])
+    @include ('partials.bootstrap-table-no-responsive', ['exportFile' => 'components-export', 'search' => true, 'showFooter' => true, 'columns' => \App\Presenters\StorePresenter::dataTableLayout()])
     <script>
     $(".store_select").select2({
           placeholder: '',
@@ -359,6 +350,7 @@
             $('#div-results').hide();
             $('#div-search').show();
             $('#highlight').val('');
+            disableScanBtn();
         });
 
         // Scan button click
@@ -368,11 +360,13 @@
 
         // Status save button click
         $('#status-save').click(function() {
-            var target = $("tr:contains(" + $('#txt-edit-tag').val() + ")");
-            if (target.length > 0) {
-                let index = target.data("index");
-                let data = $('#tbl-results').bootstrapTable('getData');
-                localStorage.setItem(data[index].asset_tag, JSON.stringify(data[index]));
+            let data = $('#tbl-results').bootstrapTable('getData');
+            let index = data.findIndex(a => a.asset_tag === $('#txt-edit-tag').val());
+            if (index > -1) {
+                if (localStorage.getItem('tmp_' + data[index].asset_tag) === null) {
+                    if (data[index].available_actions.update == false)
+                        localStorage.setItem('tmp_' + data[index].asset_tag, JSON.stringify(data[index]));
+                }
                 if (data[index].status_label === null) data[index].status_label = {};
                 if (data[index].checked === null) data[index].checked = {date: null, formatted: null};
                 data[index].status_label.id = $('#status_select_id').val();
@@ -454,18 +448,16 @@
 
         // Scan Callback function
         function scanCallback(scannedText) {
-            $('#txt-current').val(scannedText);
             var asset_tag_scanned = scannedText.replace($('#setting-tag').val(), '');
             var dateTime = getDateTime();
             if (scannedText.includes($("#setting-tag").val())) {
                 stopCamera();
-                disableScanBtn();
                 $('#highlight').val(asset_tag_scanned);
                 $('#scanner').modal('hide');
                 let data = $('#tbl-results').bootstrapTable('getData');
                 let index = data.findIndex(a => a.asset_tag === asset_tag_scanned);
                 if (index > -1) {
-                    localStorage.setItem(data[index].asset_tag, JSON.stringify(data[index]));
+                    localStorage.setItem('tmp_' + data[index].asset_tag, JSON.stringify(data[index]));
                     data[index].checked = {datetime: dateTime, formatted: dateTime};
                     data[index].available_actions = {update: true, delete: false};
                 } else {
@@ -500,14 +492,20 @@
         function bindAction() {
             let alertStatus = '';
             let alertHtml = '';
-            $('.status').bind( "click", function() {
+
+            $('.status').unbind("click");
+
+            $('.status').bind("click", function() {
                 let data = $('#tbl-results').bootstrapTable('getData');
                 let index = data.findIndex(a => a.asset_tag === $(this).attr("data-tag"));
                 $('#txt-edit-tag').val($(this).attr("data-tag"));
                 $('#status_select_id').val(data[index].status_label.id);
                 $('#status_select_id').trigger("change");
             });
-            $('.asset-clear').bind( "click", function() {
+
+            $('.asset-clear').unbind("click");
+
+            $('.asset-clear').bind("click", function() {
                 event.preventDefault();
                 resetAlert();
                 let data = $('#tbl-results').bootstrapTable('getData');
@@ -526,13 +524,17 @@
                         success: function(res)
                         {
                             if (res.status == 'success') {
-                                data[index].id = null;
-                                data[index].checked = null;
-                                data[index].familiar = null;
-                                data[index].status_label = {id: null, name: null},
-                                data[index].available_actions = {update: false, delete: false};
-                                loadData(data);
                                 alertHtml = '<strong>[' + data[index].asset_tag + ' - ' + data[index].name + ']</strong> ' + res.messages;
+                                if (res.payload.familiar) {
+                                    data[index].id = null;
+                                    data[index].checked = null;
+                                    data[index].familiar = null;
+                                    data[index].status_label = {id: null, name: null},
+                                    data[index].available_actions = {update: false, delete: false};
+                                } else {
+                                    data.splice(index, 1);
+                                }
+                                loadData(data);
                             } else {
                                 alertHtml = '<strong>[' + data[index].asset_tag + ' - ' + data[index].name + ']</strong> ' + res.messages;
                             }
@@ -543,10 +545,13 @@
                            alertHtml = '<strong>[' + data[index].asset_tag + ' - ' + data[index].name + ']</strong> ' + '{{ trans('admin/inventories/result.error_msg') }}';
                        },
                     })
-                    .done(function (d) { loadAlert(alertStatus, alertHtml); });
+                    .done(function (d) { loadScanAlert(alertStatus, alertHtml); });
                 }
             });
-            $('.asset-update').bind( "click", function() {
+
+            $('.asset-update').unbind("click");
+
+            $('.asset-update').bind("click", function() {
                 event.preventDefault();
                 let data = $('#tbl-results').bootstrapTable('getData');
                 let index = data.findIndex(a => a.asset_tag === $(this).attr("data-tag"));
@@ -583,6 +588,7 @@
                                    available_actions: {update: false, delete: true}
                                }
                                loadData(data);
+                               localStorage.removeItem('tmp_' + $(this).attr("data-tag"));
                                alertHtml = '<strong>[' + res.payload.asset.asset_tag + ' - ' + (res.payload.asset.name ? res.payload.asset.name : '') + ']</strong> ' + res.messages;
                            } else {
                                alertHtml = '<strong>[' + data[index].asset_tag + ']</strong> ' + res.messages;
@@ -594,30 +600,37 @@
                             alertHtml = '<strong>[' + data[index].asset_tag + ']</strong> ' + '{{ trans('admin/inventories/result.error_msg') }}';
                         },
                     })
-                    .done(function (d) { loadAlert(alertStatus, alertHtml); });
+                    .done(function (d) { loadScanAlert(alertStatus, alertHtml); });
                 }
                 if ($(this).attr("data-tag") == $('#highlight').val()) {
                     $('#highlight').val('');
-                    enableScanBtn();
                 }
             });
-            $('.asset-cancel').bind( "click", function() {
+
+            $('.asset-cancel').unbind("click");
+
+            $('.asset-cancel').bind("click", function() {
                 event.preventDefault();
-                let stored = localStorage.getItem($(this).attr("data-tag"));
-                if (stored) {
-                    let data = $('#tbl-results').bootstrapTable('getData');
-                    let index = data.findIndex(a => a.asset_tag === $(this).attr("data-tag"));
-                    if (index > -1) {
+                let data = $('#tbl-results').bootstrapTable('getData');
+                let index = data.findIndex(a => a.asset_tag === $(this).attr("data-tag"));
+                if (index > -1) {
+                    let stored = localStorage.getItem('tmp_' + $(this).attr("data-tag"));
+                    if (stored) {
                         data[index] = JSON.parse(stored);
-                        loadData(data);
+                    } else {
+                        data.splice(index, 1);
+                    }
+                    if ($(this).attr("data-tag") == $('#highlight').val()) {
                         $('#highlight').val('');
                     }
+                    loadData(data);
+                    localStorage.removeItem('tmp_' + $(this).attr("data-tag"));
                 }
             });
         }
 
         // Load alert div
-        function loadAlert(status, htmlCode) {
+        function loadScanAlert(status, htmlCode) {
             resetAlert();
             switch (status) {
                 case 'success':
@@ -734,4 +747,5 @@
     .highlight {
         background-color: #C3D7EB !important;
     }
+
 </style>

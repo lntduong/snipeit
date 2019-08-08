@@ -58,29 +58,29 @@
                     <div class="alert alert-success fade in" id="plzAddContract" style="display: none;">
                         <button type="button" class="close" data-dismiss="alert">&times;</button>
                         <i class="fa fa-check faa-pulse animated"></i>
-                        Please add Assets for Contract
+                        {{ trans('admin/contracts/message.require_add_contract') }}
                     </div>
                     <div class="alert alert-success fade in" id="mgsContractAssets" style="display: none;">
                         <button type="button" class="close" data-dismiss="alert">&times;</button>
                         <i class="fa fa-check faa-pulse animated"></i>
-                        <strong>Success: </strong>
-                        Contract Assets created successfully. :)
+                        <strong>{{ trans('admin/contracts/message.success') }} </strong>
+                        {{ trans('admin/contracts/message.create_contract_assets') }}
                     </div>
                     <div class="alert alert-warning fade in" id="mgsContractAssetsFailed" style="display: none;">
                         <button type="button" class="close" data-dismiss="alert">&times;</button>
                         <i class="fa fa-check faa-pulse animated"></i>
-                        <strong>Failed: </strong>
-                        Asset required. :(
+                        <strong>{{ trans('admin/contracts/message.fail') }}</strong>
+                            {{ trans('admin/contracts/message.asset_required') }}
                     </div>
                     <div class="alert alert-success fade in" id="mgsContractAssetsDel" style="display: none;">
                         <button type="button" class="close" data-dismiss="alert">&times;</button>
                         <i class="fa fa-check faa-pulse animated"></i>
-                        <strong>Success: </strong>
-                        The asset was deleted from contract successfully.
+                        <strong>{{ trans('admin/contracts/message.success') }} </strong>
+                        {{ trans('admin/contracts/message.delete_contract_assets') }}
                     </div>
                     <!-- Contract Assets -->
                     <div id="hideForm" style="display: none;">
-                        <h4 class="box-title">Contract Assets</h4>
+                        <h4 class="box-title">{{ trans('admin/contracts/table.contract_assets') }}</h4>
                         @include ('partials.forms.edit.contract-asset-select', ['translated_name' => trans('admin/asset_maintenances/table.asset_name'), 'fieldname' => 'asset_id', 'required' => 'true'])
                         <div>
                         @include ('contractassets.index')

@@ -9,7 +9,7 @@
 @stop
 
 @section('header_right')
-  <a href="{{ route('contracts.index') }}" class="btn btn-info pull-right"></i> {{ trans('general.all_contracts') }}</a>
+  <a href="{{ route('contracts.index') }}" class="btn btn-info pull-right"></i> {{ trans('admin/contracts/table.all_contracts') }}</a>
 @stop
 
 {{-- Page content --}}
@@ -22,12 +22,12 @@
                <div class="col-md-3">
                   @if (Input::get('status')!='Deleted')
                   <div id="toolbar">
-                     <label style="float: left; margin-top: 7px;"> {{ trans('admin/contracts/table.billing_date') }} </label>
+                     <label style="float: left; margin-top: 7px;"> {{ trans('admin/contracts/table.select_billing_date') }} </label>
                      <div class="col-md-6">
                      <div id="datepicker" style="width: 170px" class="input-group date" data-provide="datepicker" data-date-format="yyyy-mm"  data-autoclose="true">
-                      <input type="text" class="form-control" placeholder="{{ trans('general.select_billing_date') }}" name="billing_date" id="billing_date" >
+                      <input type="text" class="form-control" placeholder="{{ trans('general.select_date') }}" name="billing_date" id="billing_date" >
                       <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
-                    <button type="submit" style="float: right; margin-right: -60px;" class="btn btn-primary" onclick="filterPaymentDate()" >Go</button>
+                    <button type="submit" style="float: right; margin-right: -60px;" class="btn btn-primary" onclick="filterPaymentDate()" >{{ trans('admin/contracts/table.go') }}</button>
                     </div>
                     </div> 
                   </div>

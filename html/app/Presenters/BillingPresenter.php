@@ -57,7 +57,7 @@ class BillingPresenter extends Presenter
                 "searchable" => false,
                 "sortable" => true,
                 "switchable" => true,
-                "title" => trans('admin/contracts/table.location'),
+                "title" => trans('general.location'),
                 "visible" => true,
                 "formatter" => "locationsLinkObjFormatter"
             ],

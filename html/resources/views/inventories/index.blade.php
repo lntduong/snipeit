@@ -25,7 +25,7 @@
                                   @include ('partials.forms.edit.company-select', ['translated_name' => trans('general.company'), 'fieldname' => 'assigned_company'])
                                   <div style="margin-top:40px">
                                   {{-- Store-Name --}}
-                                  @include ('partials.forms.edit.store-select', ['translated_name' => trans('admin/contracts/table.store'), 'fieldname' => 'assigned_store'])
+                                  @include ('partials.forms.edit.store-select', ['translated_name' => trans('general.store'), 'fieldname' => 'assigned_store'])
                                   </div>
                                   <div style="margin-top:80px">
                                   {{-- Department-Name --}}
@@ -36,7 +36,7 @@
                                   @include ('partials.forms.edit.contract', ['translated_name' => trans('general.contract'), 'fieldname' => 'assigned_contract'])
                                   </div>
                              
-                              <button style="position:absolute;bottom:0;" type="submit" id="filterCompany" class="btn btn-primary" onclick="filterCompany()">Go</button>
+                              <button style="position:absolute;bottom:0;" type="submit" id="filterCompany" class="btn btn-primary" onclick="filterCompany()">{{ trans('general.go') }}</button>
                         </div>
                   <table
                   data-columns="{{ \App\Presenters\InventoryPresenter::dataTableLayout() }}"

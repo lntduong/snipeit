@@ -42,6 +42,21 @@ class InventoryResultsController extends Controller
     }
 
     /**
+    * Scan Results Offline
+    * @author [Thong.LT]
+    * @version v1.0 - 2019/07/30
+    * @return \Illuminate\InventoryResult\View\View
+    */
+    public function scanOffline()
+    {
+        $setting = Setting::first();
+        return view('inventories/scan-offline')
+            ->with('item', new InventoryResult)
+            ->with('statuslabel_list', Helper::statusLabelList())
+            ->with('asset_tag', $setting->auto_increment_prefix);
+    }
+
+    /**
     * show a inventory.
     *
     * @param int $inventoryId
