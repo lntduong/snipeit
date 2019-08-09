@@ -163,6 +163,24 @@ class InventoryResultsController extends Controller
 
                 );
             }
+            if ($inventory->object_type == 'App\Models\Location') {
+                $inventory_result->union(
+                    Contract::select('contracts.deleted_at', 'asset_id', 'contracts.deleted_at', 'contracts.deleted_at', 'assets.name', 'assets.image', 'models.image as image_model', 'contracts.deleted_at', 'contracts.deleted_at', 'contracts.deleted_at', 'contracts.deleted_at', 'contracts.deleted_at', 'assets.asset_tag as asset_tag', 'assets.assigned_to as assigned_to')
+                        ->where('contracts.location_id', '=', $inventory->object_id)
+                        ->where('contracts.start_date', '<=', $inventory->inventory_date)
+                        ->where('contracts.end_date', '>=', $inventory->inventory_date)
+                        ->join('contract_assets', 'contract_assets.contract_id', '=', 'contracts.id')
+                        ->join('assets', 'assets.id', '=', 'contract_assets.asset_id')
+                        ->join('models', 'models.id', '=', 'assets.model_id')
+                        ->Where(function ($query) use ($search) {
+                            if ($search) {
+                                $query = self::search($query, $search);
+                            }
+                        })
+
+                );
+            }
+
             if ($request->has('search')) {
                 $inventory_result = $inventory_result->Where(function ($query) use ($search) {
                     $query = $query
@@ -246,9 +264,9 @@ class InventoryResultsController extends Controller
     public function store(Request $request)
     {
         $dt = new DateTime();
-        $inventory_id=$request->inventory_id;
-        $asset_id=$request->asset_id;
-        $inventoryresultflag=InventoryResult::select('*')->where('inventory_id',$inventory_id)->where('asset_id',$asset_id)->first();
+        $inventory_id = $request->inventory_id;
+        $asset_id = $request->asset_id;
+        $inventoryresultflag = InventoryResult::select('*')->where('inventory_id', $inventory_id)->where('asset_id', $asset_id)->first();
         if ($inventoryresultflag) {
             //update inventory_result
             $inventoryresult = InventoryResult::find($inventoryresultflag->id);
@@ -285,14 +303,14 @@ class InventoryResultsController extends Controller
         $status_lable = Statuslabel::find($device->status_id)->first();
         $inventory = Inventory::find($request->inventory_id);
         if ($inventory) {
-            if($inventory->object_type == 'App\Models\Company')
-            {
-                
-                $contract=Contract::select('contract_assets.*')
-                    ->join('contract_assets','contract_assets.contract_id','=','contracts.id')
-                    ->join('assets','assets.id','=','contract_assets.asset_id')
-                    ->where('contracts.object_type', '=', \DB::raw('"App\\\Models\\\Department"') )
-                    ->whereIn('contracts.object_id', 
+            if ($inventory->object_type == 'App\Models\Company') {
+
+                $contract = Contract::select('contract_assets.*')
+                    ->join('contract_assets', 'contract_assets.contract_id', '=', 'contracts.id')
+                    ->join('assets', 'assets.id', '=', 'contract_assets.asset_id')
+                    ->where('contracts.object_type', '=', \DB::raw('"App\\\Models\\\Department"'))
+                    ->whereIn(
+                        'contracts.object_id',
                         Department::select('departments.id')
                             ->join('stores', 'stores.id', '=', 'departments.store_id')
                             ->join('companies', 'companies.id', '=', 'stores.company_id')
@@ -323,13 +341,14 @@ class InventoryResultsController extends Controller
                             ->where('contract_assets.asset_id', '=', $request->asset_id)
                     );
             }
-            if ($inventory->object_type == 'App\Models\Store'){
-    
+            if ($inventory->object_type == 'App\Models\Store') {
+
                 $contract = Contract::select('contract_assets.*')
-                    ->join('contract_assets','contract_assets.contract_id','=','contracts.id')
-                    ->join('assets','assets.id','=','contract_assets.asset_id')
-                    ->where('contracts.object_type', '=', \DB::raw('"App\\\Models\\\Department"') )
-                    ->whereIn('contracts.object_id', 
+                    ->join('contract_assets', 'contract_assets.contract_id', '=', 'contracts.id')
+                    ->join('assets', 'assets.id', '=', 'contract_assets.asset_id')
+                    ->where('contracts.object_type', '=', \DB::raw('"App\\\Models\\\Department"'))
+                    ->whereIn(
+                        'contracts.object_id',
                         Department::select('departments.id')
                             ->join('stores', 'stores.id', '=', 'departments.store_id')
                             ->where('stores.id', '=', $inventory->object_id)
@@ -346,20 +365,20 @@ class InventoryResultsController extends Controller
 
                     );
             }
-            if ($inventory->object_type == 'App\Models\Department'){
-                
+            if ($inventory->object_type == 'App\Models\Department') {
+
                 $contract = Contract::select('contract_assets.*')
-                    ->join('contract_assets','contract_assets.contract_id','=','contracts.id')
-                    ->join('assets','assets.id','=','contract_assets.asset_id')
-                    ->where('contracts.object_type', '=', \DB::raw('"App\\\Models\\\Department"') )
+                    ->join('contract_assets', 'contract_assets.contract_id', '=', 'contracts.id')
+                    ->join('assets', 'assets.id', '=', 'contract_assets.asset_id')
+                    ->where('contracts.object_type', '=', \DB::raw('"App\\\Models\\\Department"'))
                     ->where('contracts.object_id', '=', $inventory->object_id)
                     ->where('contract_assets.asset_id', '=', $request->asset_id);
             }
-            if ($inventory->object_type == 'App\Models\Contract'){
-                
-                $contract=Contract::select('contract_assets.*')
-                    ->join('contract_assets','contract_assets.contract_id','=','contracts.id')
-                    ->join('assets','assets.id','=','contract_assets.asset_id')
+            if ($inventory->object_type == 'App\Models\Contract') {
+
+                $contract = Contract::select('contract_assets.*')
+                    ->join('contract_assets', 'contract_assets.contract_id', '=', 'contracts.id')
+                    ->join('assets', 'assets.id', '=', 'contract_assets.asset_id')
                     ->where('contracts.id', '=', $inventory->object_id)
                     ->where('contract_assets.asset_id', '=', $request->asset_id);
             }
@@ -390,19 +409,19 @@ class InventoryResultsController extends Controller
         $checkedTime = $request->checked_time;
         $inventoryId = $request->inventory_id;
         $asset = Asset::select(['assets.*'])
-                    ->where("assets.asset_tag", '=', $request->asset_tag)
-                    ->first();
+            ->where("assets.asset_tag", '=', $request->asset_tag)
+            ->first();
         if ($asset) {
             $assetId = $asset->id;
-            $request->asset_id= $asset->id;
+            $request->asset_id = $asset->id;
         } else {
             return response()->json(Helper::formatStandardApiResponse('error', null, trans('admin/inventories/result.asset_not_found')));
         }
 
         $result = InventoryResult::select(['inventory_results.*'])
-                    ->where("inventory_results.asset_id", '=', $assetId)
-                    ->where("inventory_results.inventory_id", '=', $request->inventory_id)
-                    ->first();
+            ->where("inventory_results.asset_id", '=', $assetId)
+            ->where("inventory_results.inventory_id", '=', $request->inventory_id)
+            ->first();
         if ($result) {
             // Update inventory_result
             $inventoryresult = InventoryResult::findOrFail($request->id);
@@ -420,7 +439,7 @@ class InventoryResultsController extends Controller
         $inventoryresult->familiar = $checkRecongnized['Recongnized'];
         $inventoryresult->user_id = Auth::id();
 
-        if($inventoryresult->save()) {
+        if ($inventoryresult->save()) {
             $inventoryresult->asset = $asset;
             if ($inventoryresult->status_id) {
                 $status = StatusLabel::findOrFail($inventoryresult->status_id);
@@ -449,8 +468,8 @@ class InventoryResultsController extends Controller
             foreach ($request->deleted as $delete) {
                 $action['type'] = 'delete';
                 $result = InventoryResult::select(['inventory_results.*'])
-                            ->where("inventory_results.id", '=', $delete['id'])
-                            ->first();
+                    ->where("inventory_results.id", '=', $delete['id'])
+                    ->first();
                 if ($result) {
                     if ($result->delete()) {
                         $action['status'] = 'success';
@@ -472,21 +491,21 @@ class InventoryResultsController extends Controller
         // Update
         if ($request->has('stored')) {
             $tmp = $request->stored;
-            foreach ($tmp as $key=>$storedResult) {
+            foreach ($tmp as $key => $storedResult) {
                 if ($storedResult['checked'] && $storedResult['checked']['datetime']) {
                     $action['type'] = '';
                     $date = new DateTime();
                     $checkedTime = $storedResult['checked']['datetime'];
                     $inventoryId = $request->inventory_id;
                     $asset = Asset::select(['assets.*'])
-                                ->where("assets.asset_tag", '=', $storedResult['asset_tag'])
-                                ->first();
+                        ->where("assets.asset_tag", '=', $storedResult['asset_tag'])
+                        ->first();
                     if ($asset) {
                         $assetId = $asset->id;
                         $result = InventoryResult::select(['inventory_results.*'])
-                                    ->where("inventory_results.asset_id", '=', $assetId)
-                                    ->where("inventory_results.inventory_id", '=', $request->inventory_id)
-                                    ->first();
+                            ->where("inventory_results.asset_id", '=', $assetId)
+                            ->where("inventory_results.inventory_id", '=', $request->inventory_id)
+                            ->first();
                         if ($result) {
                             // Update inventory_result
                             $action['type'] = 'update';
@@ -541,114 +560,117 @@ class InventoryResultsController extends Controller
      */
     public function showByScan(Request $request)
     {
-       $this->authorize('view', InventoryResult::class);
-       $inventory=Inventory::find($request->input('inventory_id'));
-       $inventory_result=InventoryResult::Select('inventory_results.id','asset_id','checked_time','familiar','assets.name','assets.image','models.image as image_model','status_labels.id as status_id','status_labels.name as status_name','status_labels.deployable as status_dep','status_labels.pending as pen','status_labels.archived as arc','assets.asset_tag as asset_tag','assets.assigned_to as assigned_to')
-                       ->join('assets', 'assets.id', '=', 'inventory_results.asset_id')
-                       ->join('models', 'models.id', '=', 'assets.model_id')
-                       ->leftjoin('status_labels', 'status_labels.id', '=', 'inventory_results.status_id')
-                       ->where('inventory_results.inventory_id',$inventory->id);
-                       if($inventory->object_type == 'App\Models\Company')
-                       {
-                           $inventory_result ->union(
-                               Contract::select('contracts.deleted_at','asset_id','contracts.deleted_at','contracts.deleted_at','assets.name','assets.image','models.image as image_model','contracts.deleted_at','contracts.deleted_at','contracts.deleted_at','contracts.deleted_at','contracts.deleted_at','assets.asset_tag as asset_tag','assets.assigned_to as assigned_to')
-                               ->join('contract_assets','contract_assets.contract_id','=','contracts.id')
-                               ->join('assets','assets.id','=','contract_assets.asset_id')
-                               ->join('models','models.id','=','assets.model_id')
-                               ->where('contracts.object_type', '=', \DB::raw('"App\\\Models\\\Department"') )
-                               ->whereIn('contracts.object_id',
-                                   Department::select('departments.id')
-                                   ->join('stores','stores.id', '=', 'departments.store_id')
-                                   ->join('companies','companies.id', '=', 'stores.company_id')
-                                   ->where('companies.id','=',$inventory->object_id)
-                               )
-                           )
-                           ->union(
-                               Contract::select('contracts.deleted_at','asset_id','contracts.deleted_at','contracts.deleted_at','assets.name','assets.image','models.image as image_model','contracts.deleted_at','contracts.deleted_at','contracts.deleted_at','contracts.deleted_at','contracts.deleted_at','assets.asset_tag as asset_tag','assets.assigned_to as assigned_to')
-                               ->join('contract_assets','contract_assets.contract_id','=','contracts.id')
-                               ->join('assets','assets.id','=','contract_assets.asset_id')
-                               ->join('models','models.id','=','assets.model_id')
-                               ->where('contracts.object_type', '=', \DB::raw('"App\\\Models\\\Store"'))
-                               ->whereIn('contracts.object_id',
-                                   Store::select('stores.id')
-                                   ->join('companies','companies.id', '=', 'stores.company_id')
-                                   ->where('companies.id','=',$inventory->object_id)
-                               )
+        $this->authorize('view', InventoryResult::class);
+        $inventory = Inventory::find($request->input('inventory_id'));
+        $inventory_result = InventoryResult::Select('inventory_results.id', 'asset_id', 'checked_time', 'familiar', 'assets.name', 'assets.image', 'models.image as image_model', 'status_labels.id as status_id', 'status_labels.name as status_name', 'status_labels.deployable as status_dep', 'status_labels.pending as pen', 'status_labels.archived as arc', 'assets.asset_tag as asset_tag', 'assets.assigned_to as assigned_to')
+            ->join('assets', 'assets.id', '=', 'inventory_results.asset_id')
+            ->join('models', 'models.id', '=', 'assets.model_id')
+            ->leftjoin('status_labels', 'status_labels.id', '=', 'inventory_results.status_id')
+            ->where('inventory_results.inventory_id', $inventory->id);
+        if ($inventory->object_type == 'App\Models\Company') {
+            $inventory_result->union(
+                Contract::select('contracts.deleted_at', 'asset_id', 'contracts.deleted_at', 'contracts.deleted_at', 'assets.name', 'assets.image', 'models.image as image_model', 'contracts.deleted_at', 'contracts.deleted_at', 'contracts.deleted_at', 'contracts.deleted_at', 'contracts.deleted_at', 'assets.asset_tag as asset_tag', 'assets.assigned_to as assigned_to')
+                    ->join('contract_assets', 'contract_assets.contract_id', '=', 'contracts.id')
+                    ->join('assets', 'assets.id', '=', 'contract_assets.asset_id')
+                    ->join('models', 'models.id', '=', 'assets.model_id')
+                    ->where('contracts.object_type', '=', \DB::raw('"App\\\Models\\\Department"'))
+                    ->whereIn(
+                        'contracts.object_id',
+                        Department::select('departments.id')
+                            ->join('stores', 'stores.id', '=', 'departments.store_id')
+                            ->join('companies', 'companies.id', '=', 'stores.company_id')
+                            ->where('companies.id', '=', $inventory->object_id)
+                    )
+            )
+                ->union(
+                    Contract::select('contracts.deleted_at', 'asset_id', 'contracts.deleted_at', 'contracts.deleted_at', 'assets.name', 'assets.image', 'models.image as image_model', 'contracts.deleted_at', 'contracts.deleted_at', 'contracts.deleted_at', 'contracts.deleted_at', 'contracts.deleted_at', 'assets.asset_tag as asset_tag', 'assets.assigned_to as assigned_to')
+                        ->join('contract_assets', 'contract_assets.contract_id', '=', 'contracts.id')
+                        ->join('assets', 'assets.id', '=', 'contract_assets.asset_id')
+                        ->join('models', 'models.id', '=', 'assets.model_id')
+                        ->where('contracts.object_type', '=', \DB::raw('"App\\\Models\\\Store"'))
+                        ->whereIn(
+                            'contracts.object_id',
+                            Store::select('stores.id')
+                                ->join('companies', 'companies.id', '=', 'stores.company_id')
+                                ->where('companies.id', '=', $inventory->object_id)
+                        )
 
-                           )
-                           ->union(
-                               Contract::select('contracts.deleted_at','asset_id','contracts.deleted_at','contracts.deleted_at','assets.name','assets.image','models.image as image_model','contracts.deleted_at','contracts.deleted_at','contracts.deleted_at','contracts.deleted_at','contracts.deleted_at','assets.asset_tag as asset_tag','assets.assigned_to as assigned_to')
-                               ->join('contract_assets','contract_assets.contract_id','=','contracts.id')
-                               ->join('assets','assets.id','=','contract_assets.asset_id')
-                               ->join('models','models.id','=','assets.model_id')
-                               ->where('contracts.object_type', '=', \DB::raw('"App\\\Models\\\Company"'))
-                               ->where('contracts.object_id', '=', $inventory->object_id)
-                           );
-                       }
-                       if($inventory->object_type == 'App\Models\Store'){
-                           $inventory_result ->union(
-                               Contract::select('contracts.deleted_at','asset_id','contracts.deleted_at','contracts.deleted_at','assets.name','assets.image','models.image as image_model','contracts.deleted_at','contracts.deleted_at','contracts.deleted_at','contracts.deleted_at','contracts.deleted_at','assets.asset_tag as asset_tag','assets.assigned_to as assigned_to')
-                               ->join('contract_assets','contract_assets.contract_id','=','contracts.id')
-                               ->join('assets','assets.id','=','contract_assets.asset_id')
-                               ->join('models','models.id','=','assets.model_id')
-                               ->where('contracts.object_type', '=', \DB::raw('"App\\\Models\\\Department"') )
-                               ->whereIn('contracts.object_id',
-                                   Department::select('departments.id')
-                                   ->join('stores','stores.id', '=', 'departments.store_id')
-                                   ->where('stores.id','=',$inventory->object_id)
-                               )
-                           )
-                           ->union(
-                               Contract::select('contracts.deleted_at','asset_id','contracts.deleted_at','contracts.deleted_at','assets.name','assets.image','models.image as image_model','contracts.deleted_at','contracts.deleted_at','contracts.deleted_at','contracts.deleted_at','contracts.deleted_at','assets.asset_tag as asset_tag','assets.assigned_to as assigned_to')
-                               ->join('contract_assets','contract_assets.contract_id','=','contracts.id')
-                               ->join('assets','assets.id','=','contract_assets.asset_id')
-                               ->join('models','models.id','=','assets.model_id')
-                               ->where('contracts.object_type', '=', \DB::raw('"App\\\Models\\\Store"'))
-                               ->where('contracts.object_id', '=', $inventory->object_id)
+                )
+                ->union(
+                    Contract::select('contracts.deleted_at', 'asset_id', 'contracts.deleted_at', 'contracts.deleted_at', 'assets.name', 'assets.image', 'models.image as image_model', 'contracts.deleted_at', 'contracts.deleted_at', 'contracts.deleted_at', 'contracts.deleted_at', 'contracts.deleted_at', 'assets.asset_tag as asset_tag', 'assets.assigned_to as assigned_to')
+                        ->join('contract_assets', 'contract_assets.contract_id', '=', 'contracts.id')
+                        ->join('assets', 'assets.id', '=', 'contract_assets.asset_id')
+                        ->join('models', 'models.id', '=', 'assets.model_id')
+                        ->where('contracts.object_type', '=', \DB::raw('"App\\\Models\\\Company"'))
+                        ->where('contracts.object_id', '=', $inventory->object_id)
+                );
+        }
+        if ($inventory->object_type == 'App\Models\Store') {
+            $inventory_result->union(
+                Contract::select('contracts.deleted_at', 'asset_id', 'contracts.deleted_at', 'contracts.deleted_at', 'assets.name', 'assets.image', 'models.image as image_model', 'contracts.deleted_at', 'contracts.deleted_at', 'contracts.deleted_at', 'contracts.deleted_at', 'contracts.deleted_at', 'assets.asset_tag as asset_tag', 'assets.assigned_to as assigned_to')
+                    ->join('contract_assets', 'contract_assets.contract_id', '=', 'contracts.id')
+                    ->join('assets', 'assets.id', '=', 'contract_assets.asset_id')
+                    ->join('models', 'models.id', '=', 'assets.model_id')
+                    ->where('contracts.object_type', '=', \DB::raw('"App\\\Models\\\Department"'))
+                    ->whereIn(
+                        'contracts.object_id',
+                        Department::select('departments.id')
+                            ->join('stores', 'stores.id', '=', 'departments.store_id')
+                            ->where('stores.id', '=', $inventory->object_id)
+                    )
+            )
+                ->union(
+                    Contract::select('contracts.deleted_at', 'asset_id', 'contracts.deleted_at', 'contracts.deleted_at', 'assets.name', 'assets.image', 'models.image as image_model', 'contracts.deleted_at', 'contracts.deleted_at', 'contracts.deleted_at', 'contracts.deleted_at', 'contracts.deleted_at', 'assets.asset_tag as asset_tag', 'assets.assigned_to as assigned_to')
+                        ->join('contract_assets', 'contract_assets.contract_id', '=', 'contracts.id')
+                        ->join('assets', 'assets.id', '=', 'contract_assets.asset_id')
+                        ->join('models', 'models.id', '=', 'assets.model_id')
+                        ->where('contracts.object_type', '=', \DB::raw('"App\\\Models\\\Store"'))
+                        ->where('contracts.object_id', '=', $inventory->object_id)
 
-                           );
-                       }
-                       if($inventory->object_type == 'App\Models\Department'){
-                           $inventory_result ->union(
-                               Contract::select('contracts.deleted_at','asset_id','contracts.deleted_at','contracts.deleted_at','assets.name','assets.image','models.image as image_model','contracts.deleted_at','contracts.deleted_at','contracts.deleted_at','contracts.deleted_at','contracts.deleted_at','assets.asset_tag as asset_tag','assets.assigned_to as assigned_to')
-                               ->join('contract_assets','contract_assets.contract_id','=','contracts.id')
-                               ->join('assets','assets.id','=','contract_assets.asset_id')
-                               ->join('models','models.id','=','assets.model_id')
-                               ->where('contracts.object_type', '=', \DB::raw('"App\\\Models\\\Department"') )
-                               ->where('contracts.object_id', '=', $inventory->object_id)
-                           );
-                       }
-                       if($inventory->object_type == 'App\Models\Contract'){
-                           $inventory_result ->union(
-                               Contract::select('contracts.deleted_at','asset_id','contracts.deleted_at','contracts.deleted_at','assets.name','assets.image','models.image as image_model','contracts.deleted_at','contracts.deleted_at','contracts.deleted_at','contracts.deleted_at','contracts.deleted_at','assets.asset_tag as asset_tag','assets.assigned_to as assigned_to')
-                               ->join('contract_assets','contract_assets.contract_id','=','contracts.id')
-                               ->join('assets','assets.id','=','contract_assets.asset_id')
-                               ->join('models','models.id','=','assets.model_id')
-                               ->where('contracts.id', '=', $inventory->object_id)
-                           );
-                       }
+                );
+        }
+        if ($inventory->object_type == 'App\Models\Department') {
+            $inventory_result->union(
+                Contract::select('contracts.deleted_at', 'asset_id', 'contracts.deleted_at', 'contracts.deleted_at', 'assets.name', 'assets.image', 'models.image as image_model', 'contracts.deleted_at', 'contracts.deleted_at', 'contracts.deleted_at', 'contracts.deleted_at', 'contracts.deleted_at', 'assets.asset_tag as asset_tag', 'assets.assigned_to as assigned_to')
+                    ->join('contract_assets', 'contract_assets.contract_id', '=', 'contracts.id')
+                    ->join('assets', 'assets.id', '=', 'contract_assets.asset_id')
+                    ->join('models', 'models.id', '=', 'assets.model_id')
+                    ->where('contracts.object_type', '=', \DB::raw('"App\\\Models\\\Department"'))
+                    ->where('contracts.object_id', '=', $inventory->object_id)
+            );
+        }
+        if ($inventory->object_type == 'App\Models\Contract') {
+            $inventory_result->union(
+                Contract::select('contracts.deleted_at', 'asset_id', 'contracts.deleted_at', 'contracts.deleted_at', 'assets.name', 'assets.image', 'models.image as image_model', 'contracts.deleted_at', 'contracts.deleted_at', 'contracts.deleted_at', 'contracts.deleted_at', 'contracts.deleted_at', 'assets.asset_tag as asset_tag', 'assets.assigned_to as assigned_to')
+                    ->join('contract_assets', 'contract_assets.contract_id', '=', 'contracts.id')
+                    ->join('assets', 'assets.id', '=', 'contract_assets.asset_id')
+                    ->join('models', 'models.id', '=', 'assets.model_id')
+                    ->where('contracts.id', '=', $inventory->object_id)
+            );
+        }
 
-       $result = DB::table( DB::raw("({$inventory_result->toSql()}) as sub") )
-       ->mergeBindings($inventory_result->getQuery())
-       ->groupBy('sub.asset_id')
-       ->select(
-           'sub.id as id',
-           'sub.asset_id',
-           'sub.checked_time as checked_time',
-           'sub.name as name',
-           'sub.familiar as familiar',
-           'sub.image as image',
-           'sub.image_model as image_model',
-           'sub.status_id as status_id',
-           'sub.status_name as status_name',
-           'sub.status_dep as status_dep',
-           'sub.pen as status_pen',
-           'sub.arc as status_arc',
-           'sub.asset_tag as asset_tag',
-           'sub.assigned_to as assigned_to')
-       ->get();
+        $result = DB::table(DB::raw("({$inventory_result->toSql()}) as sub"))
+            ->mergeBindings($inventory_result->getQuery())
+            ->groupBy('sub.asset_id')
+            ->select(
+                'sub.id as id',
+                'sub.asset_id',
+                'sub.checked_time as checked_time',
+                'sub.name as name',
+                'sub.familiar as familiar',
+                'sub.image as image',
+                'sub.image_model as image_model',
+                'sub.status_id as status_id',
+                'sub.status_name as status_name',
+                'sub.status_dep as status_dep',
+                'sub.pen as status_pen',
+                'sub.arc as status_arc',
+                'sub.asset_tag as asset_tag',
+                'sub.assigned_to as assigned_to'
+            )
+            ->get();
 
-       return (new InventoryResultsTransformer)->transformScanInventoryResults($result);
+        return (new InventoryResultsTransformer)->transformScanInventoryResults($result);
     }
 
     /**
@@ -666,6 +688,5 @@ class InventoryResultsController extends Controller
         $results->delete();
 
         return response()->json(Helper::formatStandardApiResponse('success', $results, trans('admin/inventories/result.delete.success')));
-
     }
 }

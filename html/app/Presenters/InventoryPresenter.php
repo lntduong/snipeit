@@ -61,6 +61,15 @@ class InventoryPresenter extends Presenter
                 "formatter" => 'contractsLinkObjFormatter',
             ],
             [
+                "field" => "location",
+                "searchable" => true,
+                "sortable" => true,
+                "switchable" => true,
+                "title" => trans('general.location'),
+                "visible" => true,
+                "formatter" => "locationsLinkObjFormatter"
+            ],
+            [
                 "field" => "notes",
                 "searchable" => true,
                 "sortable" => true,

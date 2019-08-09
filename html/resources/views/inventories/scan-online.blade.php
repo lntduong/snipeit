@@ -34,7 +34,7 @@
                         {{-- Company-Name --}}
                         @include ('partials.forms.edit.company-select', ['translated_name' => trans('general.company'), 'fieldname' => 'select_company'])
                         {{-- Store-Name --}}
-                        @include ('partials.forms.edit.store-select', ['translated_name' => trans('general.store'), 'fieldname' => 'select_store'])
+                        @include ('partials.forms.edit.store-select', ['translated_name' => trans('admin/contracts/table.store'), 'fieldname' => 'select_store'])
                         {{-- Department-Name --}}
                         @include ('partials.forms.edit.department-select', ['translated_name' => trans('general.department'), 'fieldname' => 'select_department'])
                         {{-- Contract-Name --}}
@@ -111,6 +111,7 @@
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" id="btn-stop-camera" data-dismiss="modal">{{ trans('admin/inventories/result.close_scanner') }}</button>
+            <button type="button" class="btn btn-success" id="btn-switch-camera" onclick="switchCamera()">{{ trans('admin/inventories/result.switch_camera') }}</button>
           </div>
         </div>
       </div>
@@ -182,7 +183,7 @@
               data: function (params) {
                   var data = {
                       search: params.term,
-                      company_id: $("#company_select").val(),
+                      company_id: ($("#company_select").val()) ? $("#company_select").val() : "-1",
                       page: params.page || 1,
                   };
                   return data;
@@ -318,11 +319,7 @@
         });
 
         $('#status_select_id').select2();
-
-        // // Start camera stream
-        // $("#scanner").on('show.bs.modal', function(){
-        //     loadCamera();
-        // });
+        checkCamera();
 
         // Stop camera stream
         $("#scanner").on('hide.bs.modal', function(){
@@ -696,6 +693,38 @@
             $('#alert-content').text('');
         }
 
+        // Check Device camera
+        function checkCamera() {
+            if(navigator.mediaDevices && navigator.mediaDevices.enumerateDevices) {
+        		try {
+        			navigator.mediaDevices.enumerateDevices()
+        			.then(function(devices) {
+                        devices.forEach(function(device) {
+                            if (device.kind === 'videoinput') {
+                                if(device.label.toLowerCase().search("back") >-1)
+                                    $('#btn-switch-camera').show();
+                            }
+                        });
+                    });
+        		} catch(e) {
+                    loadScanAlert('camera_error');
+        		}
+        	}
+        }
+
+        var loc = window.location.href;
+        // Trigger back button close camera
+        if (window.history && window.history.pushState) {
+            $('#scanner').on('show.bs.modal', function (e) {
+                window.history.pushState('forward', null, loc);
+            });
+
+            $(window).on('popstate', function () {
+                $('#scanner').modal('hide');
+                window.history.pushState('forward', null, loc);
+            });
+        }
+
     </script>
 @stop
 
@@ -729,7 +758,7 @@
     }
 
     #v {
-        width: 100%;
+        height: 50vh;
     }
 
     #btn-save-asset {
@@ -746,6 +775,32 @@
 
     .highlight {
         background-color: #C3D7EB !important;
+    }
+
+    #scanner .modal-body {
+        background-color: black;
+    }
+
+    #btn-switch-camera {
+        display: none;
+    }
+
+    #tbl-results {
+        font-size: 10px;
+    }
+
+    .row {
+        margin-left: -25px !important;
+        margin-right: -25px !important;
+    }
+
+    .col-md-12 {
+        padding-left: 5px !important;
+        padding-right: 5px !important;
+    }
+
+    #div-results .box-body {
+        padding: 0px !important;
     }
 
 </style>

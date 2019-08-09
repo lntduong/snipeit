@@ -23,18 +23,28 @@ class InventoryRequest extends Request
      */
     public function rules()
     {
-        if (request('company_id') === null && request('store_id') === null && request('department_id') === null && request('contract_id') === null) {
-            return [
-                "company_id"                => 'required',
-                "store_id"                  => 'required',
-                "department_id"             => 'required',
-                'contract_id'               => 'required',
-                'inventory_date'            => 'required',
-            ];      
+        if (request('checkout_inventory_to_type') == 'object') {
+            if (request('company_id') === null && request('store_id') === null && request('department_id') === null && request('contract_id') === null) {
+                return [
+                    "company_id"                => 'required',
+                    "store_id"                  => 'required',
+                    "department_id"             => 'required',
+                    'contract_id'               => 'required',
+                    'inventory_date'            => 'required',
+                    'name'                      => 'required',
+                ];
+            } else {
+                return [
+                    'inventory_date'            => 'required',
+                    'name'                      => 'required',
+                ];
+            }
         } else {
             return [
                 'inventory_date'            => 'required',
-            ];  
+                'location_id'               => 'required',
+                'name'                      => 'required',
+            ];
         }
     }
 }

@@ -6,7 +6,7 @@
     {{-- Page content --}}
     @section('inputFields')
     
-    
+    @include ('partials.forms.scope_inventory_selector', ['object_select' => 'true','location_select' => 'true'])
     {{-- Company-Name --}}
     @include ('partials.forms.edit.company-select', ['translated_name' => trans('general.company'), 'fieldname' => 'company_id', 'required'=>'true'])
     {{-- Store-Name --}}
@@ -15,16 +15,39 @@
     @include ('partials.forms.edit.department-select', ['translated_name' => trans('general.department'), 'fieldname' => 'department_id', 'required' => 'true','class' => 'department_select'])
     {{-- Contract-Name --}}
     @include ('partials.forms.edit.contract', ['translated_name' => trans('general.contract'), 'fieldname' => 'contract_id','required' => 'true'])
+    {{-- Location-Name --}}
+    @include ('partials.forms.edit.location-store', ['translated_name' => trans('general.location'),'fieldname' => 'location_id', 'required'=>'true'])
     {{-- Inventory-Name --}}
     @include ('partials.forms.edit.name', ['translated_name' => trans('general.name')])
     {{-- Inventory_date --}}
     @include ('partials.forms.edit.inventories_date')
- 
     {{-- Inventory-Notes --}}
     @include ('partials.forms.edit.notes')
     @stop
     @section('moar_scripts')
     <script>
+     
+        $('input[name=checkout_inventory_to_type]').on("change",function () {
+            var assignto_type = $('input[name=checkout_inventory_to_type]:checked').val();
+
+            if (assignto_type == 'object') {
+                $('#company_id').show();
+                $('#store_id').show();
+                $('#assigned_user').show();
+                $('#contract_id').show();
+                $('#location_id').hide();
+              
+
+            } else if (assignto_type == 'location') {
+                $('#company_id').hide();
+                $('#store_id').hide();
+                $('#assigned_user').hide();
+                $('#contract_id').hide();
+                $('#location_id').show();
+            
+        
+            }
+        });
        $(".store_select").select2({
        
            /**

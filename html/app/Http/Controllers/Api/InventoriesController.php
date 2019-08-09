@@ -41,34 +41,41 @@ class InventoriesController extends Controller
             ->with('department')
             ->with('contract');
 
-        $company = $request->input('company_id');
-        $store = $request->input('store_id');
-        $department = $request->input('department_id');
-        $contract = $request->input('contract_id');
-        $inventory = self::filter($company, $store, $department, $contract, $inventory);
-        if ($request->input('search')) {
-            $inventory = $inventory->TextSearch($request->input('search'));
+        $search = $request->input('search');
+        $company_search = $request->input('company_id');
+        $store_search = $request->input('store_id');
+        $department_search = $request->input('department_id');
+        $contract_search = $request->input('contract_id');
+
+        if ($search) {
+            $inventory = self::search($search, $company_search, $store_search, $department_search, $contract_search);
         }
+
+        $inventory = self::filter($company_search, $store_search, $department_search, $contract_search, $inventory, $search);
+
         $limit = request('limit', 50);
         $order = $request->input('order') === 'asc' ? 'asc' : 'desc';
         $allowed_columns = [
-            'name', 'date', 'note', 'company', 'store', 'department', 'contract'
+            'id', 'name', 'date', 'notes', 'company', 'store', 'department', 'contract', 'location',
         ];
 
         $sort = in_array($request->input('sort'), $allowed_columns) ? $request->input('sort') : 'created_at';
         switch ($sort) {
 
             case 'company':
-                $inventory = $inventory->select('inventories.*', \DB::raw('null AS name_sort'))->SortCompany($order, $company, $store, $department, $contract, $inventory = new Inventory);
+                $inventory = $inventory->SortCompany($order, $company_search, $store_search, $department_search, $contract_search, $inventory = new Inventory, $search);
                 break;
             case 'store':
-                $inventory = $inventory->SortStore($order, $company, $store, $department, $contract, $inventory = new Inventory);
+                $inventory = $inventory->SortStore($order, $company_search, $store_search, $department_search, $contract_search, $inventory = new Inventory, $search);
                 break;
             case 'department':
-                $inventory = $inventory->SortDepartment($order, $company, $store, $department, $contract, $inventory = new Inventory);
+                $inventory = $inventory->SortDepartment($order, $company_search, $store_search, $department_search, $contract_search, $inventory = new Inventory, $search);
                 break;
             case 'contract':
-                $inventory = $inventory->SortContract($order, $company, $store, $department, $contract, $inventory = new Inventory);
+                $inventory = $inventory->SortContract($order, $company_search, $store_search, $department_search, $contract_search, $inventory = new Inventory, $search);
+                break;
+            case 'location':
+                $inventory = $inventory->SortLocation($order, $company_search, $store_search, $department_search, $contract_search, $inventory = new Inventory, $search);
                 break;
             case 'name':
                 $inventory = $inventory->orderBy('name', $order);
@@ -76,8 +83,11 @@ class InventoriesController extends Controller
             case 'date':
                 $inventory = $inventory->orderBy('inventory_date', $order);
                 break;
-            case 'note':
+            case 'notes':
                 $inventory = $inventory->orderBy('notes', $order);
+                break;
+            case 'id':
+                $inventory = $inventory->orderBy('id', $order);
                 break;
         }
         $total = $inventory->get()->count();
@@ -86,6 +96,7 @@ class InventoriesController extends Controller
 
         return (new InventoriesTransformer)->transformInventories($inventory, $total);
     }
+
 
     /**
      * Display all assets attached to a component
@@ -105,7 +116,7 @@ class InventoriesController extends Controller
         $contract = $request->input('contract');
         $inventories = self::filter($company, $store, $department, $contract, $inventories);
         if ($request->input('search')) {
-            $inventories = $inventories->where('inventories.name', 'LIKE', '%' . $request->get('search') . '%');
+            $inventories = self::search($request->input('search'), $company, $store, $department, $contract);
         }
         $inventories = $inventories->get();
         $slice = array_slice($inventories->toArray(), $paginate * ($page - 1), $paginate);
@@ -114,16 +125,214 @@ class InventoriesController extends Controller
         return (new SelectlistTransformer)->transformSelectlistContract($result);
     }
     /**
-     * fillter inventory
+     * Search inventory
+     * @param search,company_search,store_search,department_search,contract_search
+     * @return Inventory
+     */
+    public function search($search = "", $company_search = "", $store_search = "", $department_search = "", $contract_search = "")
+    {
+        $department =
+            Inventory::select('inventories.*', 'departments.name as department_name', 'stores.name as store_name', 'companies.name as company_name', \DB::raw('null AS contract_name'), \DB::raw('null AS name_sort'), \DB::raw('null AS location_name'))
+            ->join('departments', 'departments.id', '=', 'inventories.object_id')
+            ->join('stores', 'stores.id', '=', 'departments.store_id')
+            ->join('companies', 'companies.id', '=', 'stores.company_id')
+            ->where('inventories.object_type', \DB::raw('"App\\\Models\\\Department"'))
+            ->Where(function ($query) use ($search) {
+                $query = $query
+                    ->Where('inventories.name', 'LIKE', '%' . $search . '%')
+                    ->orWhere('inventories.notes', 'LIKE', '%' . $search . '%')
+                    ->orWhere('inventories.inventory_date', 'LIKE', '%' . $search . '%')
+                    ->orWhere('companies.name', 'LIKE', '%' . $search . '%')
+                    ->orWhere('stores.name', 'LIKE', '%' . $search . '%')
+                    ->orWhere('departments.name', 'LIKE', '%' . $search . '%');
+            })
+            ->Where(function ($query) use ($company_search, $store_search, $department_search, $contract_search) {
+                if ($company_search) {
+                    $query->Where('companies.id', $company_search);
+                }
+                if ($store_search) {
+                    $query->Where('stores.id', $store_search);
+                }
+                if ($department_search) {
+                    $query->Where('departments.id', $department_search);
+                }
+                if ($contract_search) {
+                    $query->whereRaw(0);
+                }
+            });
+
+        $store =
+            Inventory::select('inventories.*', \DB::raw('null AS department_name'), 'stores.name as store_name', 'companies.name as company_name', \DB::raw('null AS contract_name'), \DB::raw('null AS name_sort'), \DB::raw('null AS location_name'))
+            ->join('stores', 'stores.id', '=', 'inventories.object_id')
+            ->join('companies', 'companies.id', '=', 'stores.company_id')
+            ->where('inventories.object_type', \DB::raw('"App\\\Models\\\Store"'))
+            ->Where(function ($query) use ($search) {
+                $query = $query->Where('inventories.name', 'LIKE', '%' . $search . '%')
+                    ->orWhere('inventories.notes', 'LIKE', '%' . $search . '%')
+                    ->orWhere('inventories.inventory_date', 'LIKE', '%' . $search . '%')
+                    ->orWhere('companies.name', 'LIKE', '%' . $search . '%')
+                    ->orWhere('stores.name', 'LIKE', '%' . $search . '%');
+            })
+            ->Where(function ($query) use ($company_search, $store_search, $department_search, $contract_search) {
+                if ($company_search) {
+                    $query->Where('companies.id', $company_search);
+                }
+                if ($store_search) {
+                    $query->Where('stores.id', $store_search);
+                }
+                if ($contract_search || $department_search) {
+                    $query->whereRaw(0);
+                }
+            });
+
+
+        $company =
+            Inventory::select('inventories.*', \DB::raw('null AS department_name'), \DB::raw('null AS store_name'), 'companies.name as company_name', \DB::raw('null AS contract_name'), \DB::raw('null AS name_sort'), \DB::raw('null AS location_name'))
+            ->join('companies', 'companies.id', '=', 'inventories.object_id')
+            ->where('inventories.object_type', \DB::raw('"App\\\Models\\\Company"'))
+            ->Where(function ($query) use ($search) {
+                $query = $query->Where('inventories.name', 'LIKE', '%' . $search . '%')
+                    ->orWhere('inventories.notes', 'LIKE', '%' . $search . '%')
+                    ->orWhere('inventories.inventory_date', 'LIKE', '%' . $search . '%')
+                    ->orWhere('companies.name', 'LIKE', '%' . $search . '%');
+            })
+            ->Where(function ($query) use ($company_search, $store_search, $department_search, $contract_search) {
+                if ($company_search) {
+                    $query->Where('companies.id', $company_search);
+                }
+                if ($contract_search || $department_search || $store_search) {
+                    $query->whereRaw(0);
+                }
+            });
+        $location =
+            Inventory::select('inventories.*', \DB::raw('null AS department_name'), \DB::raw('null AS store_name'), \DB::raw('null AS company_name'), \DB::raw('null AS contract_name'), \DB::raw('null AS name_sort'), 'locations.name AS location_name')
+            ->join('locations', 'locations.id', '=', 'inventories.object_id')
+            ->where('inventories.object_type', \DB::raw('"App\\\Models\\\Location"'))
+            ->Where(function ($query) use ($search) {
+                $query = $query
+                    ->Where('inventories.name', 'LIKE', '%' . $search . '%')
+                    ->orWhere('inventories.notes', 'LIKE', '%' . $search . '%')
+                    ->orWhere('inventories.inventory_date', 'LIKE', '%' . $search . '%')
+                    ->orWhere('locations.name', 'LIKE', '%' . $search . '%');
+            })
+            ->Where(function ($query) use ($company_search, $store_search, $department_search, $contract_search) {
+                if ($contract_search || $department_search || $store_search || $company_search) {
+                    $query->whereRaw(0);
+                }
+            });
+
+        $contract_department =
+            Inventory::select('inventories.*', 'departments.name as department_name', 'stores.name as store_name', 'companies.name as company_name', 'contracts.name as contract_name', \DB::raw('null AS name_sort'), 'locations.name as location_name')
+            ->join('contracts', 'contracts.id', '=', 'inventories.object_id')
+            ->leftjoin('locations', 'locations.id', '=', 'contracts.location_id')
+            ->join('departments', 'departments.id', '=', 'contracts.object_id')
+            ->join('stores', 'stores.id', '=', 'departments.store_id')
+            ->join('companies', 'companies.id', '=', 'stores.company_id')
+            ->where('inventories.object_type', \DB::raw('"App\\\Models\\\Contract"'))
+            ->where('contracts.object_type', \DB::raw('"App\\\Models\\\Department"'))
+            ->Where(function ($query) use ($search) {
+                $query = $query->Where('inventories.name', 'LIKE', '%' . $search . '%')
+                    ->orWhere('inventories.notes', 'LIKE', '%' . $search . '%')
+                    ->orWhere('inventories.inventory_date', 'LIKE', '%' . $search . '%')
+                    ->orWhere('companies.name', 'LIKE', '%' . $search . '%')
+                    ->orWhere('stores.name', 'LIKE', '%' . $search . '%')
+                    ->orWhere('departments.name', 'LIKE', '%' . $search . '%')
+                    ->orWhere('contracts.name', 'LIKE', '%' . $search . '%')
+                    ->orWhere('locations.name', 'LIKE', '%' . $search . '%');
+            })
+            ->Where(function ($query) use ($company_search, $store_search, $department_search, $contract_search) {
+                if ($company_search) {
+                    $query->Where('companies.id', $company_search);
+                }
+                if ($store_search) {
+                    $query->Where('stores.id', $store_search);
+                }
+                if ($department_search) {
+                    $query->Where('departments.id', $department_search);
+                }
+                if ($contract_search) {
+                    $query->Where('contracts.id', $contract_search);
+                }
+            });
+
+        $contract_store =
+            Inventory::select('inventories.*', \DB::raw('null AS department_name'), 'stores.name as store_name', 'companies.name as company_name', 'contracts.name as contract_name', \DB::raw('null AS name_sort'), 'locations.name as location_name')
+            ->join('contracts', 'contracts.id', '=', 'inventories.object_id')
+            ->leftjoin('locations', 'locations.id', '=', 'contracts.location_id')
+            ->join('stores', 'stores.id', '=', 'contracts.object_id')
+            ->join('companies', 'companies.id', '=', 'stores.company_id')
+            ->where('inventories.object_type', \DB::raw('"App\\\Models\\\Contract"'))
+            ->where('contracts.object_type', \DB::raw('"App\\\Models\\\Store"'))
+            ->Where(function ($query) use ($search) {
+                $query = $query->Where('inventories.name', 'LIKE', '%' . $search . '%')
+                    ->orWhere('inventories.notes', 'LIKE', '%' . $search . '%')
+                    ->orWhere('inventories.inventory_date', 'LIKE', '%' . $search . '%')
+                    ->orWhere('companies.name', 'LIKE', '%' . $search . '%')
+                    ->orWhere('stores.name', 'LIKE', '%' . $search . '%')
+                    ->orWhere('contracts.name', 'LIKE', '%' . $search . '%')
+                    ->orWhere('locations.name', 'LIKE', '%' . $search . '%');
+            })
+            ->Where(function ($query) use ($company_search, $store_search, $department_search, $contract_search) {
+                if ($company_search) {
+                    $query->Where('companies.id', $company_search);
+                }
+                if ($store_search) {
+                    $query->Where('stores.id', $store_search);
+                }
+                if ($department_search) {
+                    $query->whereRaw(0);
+                }
+                if ($contract_search) {
+                    $query->Where('contracts.id', $contract_search);
+                }
+            });
+
+        $contract_company =
+            Inventory::select('inventories.*', \DB::raw('null AS department_name'), \DB::raw('null AS store_name'), 'companies.name as company_name', 'contracts.name as contract_name', \DB::raw('null AS name_sort'), 'locations.name as location_name')
+            ->join('contracts', 'contracts.id', '=', 'inventories.object_id')
+            ->leftjoin('locations', 'locations.id', '=', 'contracts.location_id')
+            ->join('companies', 'companies.id', '=', 'contracts.object_id')
+            ->where('inventories.object_type', \DB::raw('"App\\\Models\\\Contract"'))
+            ->where('contracts.object_type', \DB::raw('"App\\\Models\\\Company"'))
+            ->Where(function ($query) use ($search) {
+                $query = $query->Where('inventories.name', 'LIKE', '%' . $search . '%')
+                    ->orWhere('inventories.notes', 'LIKE', '%' . $search . '%')
+                    ->orWhere('inventories.inventory_date', 'LIKE', '%' . $search . '%')
+                    ->orWhere('companies.name', 'LIKE', '%' . $search . '%')
+                    ->orWhere('contracts.name', 'LIKE', '%' . $search . '%')
+                    ->orWhere('locations.name', 'LIKE', '%' . $search . '%');
+            })
+            ->Where(function ($query) use ($company_search, $store_search, $department_search, $contract_search) {
+                if ($company_search) {
+                    $query->Where('companies.id', $company_search);
+                }
+                if ($department_search || $store_search) {
+                    $query->whereRaw(0);
+                }
+                if ($contract_search) {
+                    $query->Where('contracts.id', $contract_search);
+                }
+            });
+
+        return $department
+            ->union($store)
+            ->union($company)
+            ->union($location)
+            ->union($contract_department)
+            ->union($contract_store)
+            ->union($contract_company);
+    }
+    /**
+     * Fillter inventory
      * @param company,store,department,contract,inventory
      * @return Inventory
      */
-    public function filter($company = "", $store = "", $department = "", $contract = "", $inventory)
+    public function filter($company = "", $store = "", $department = "", $contract = "", $inventory, $search = "")
     {
         if ($department) {
             if ($contract) {
                 $inventory = $inventory
-                    ->select('inventories.*', \DB::raw('null AS name_sort'))
+                    ->select('inventories.*', \DB::raw('null AS department_name'), \DB::raw('null AS store_name'), \DB::raw('null AS company_name'), 'contracts.name AS contract_name', \DB::raw('null AS name_sort'), \DB::raw('null AS location_name'))
                     ->where('inventories.object_type', '=', \DB::raw('"App\\\Models\\\Contract"'))
                     ->whereIn(
                         'inventories.object_id',
@@ -136,19 +345,19 @@ class InventoriesController extends Controller
                             )
                     );
             } else {
-                $inventory = $inventory
-                    ->select('inventories.*', \DB::raw('null AS name_sort'))
-                    ->where('inventories.object_type', '=', \DB::raw('"App\\\Models\\\Department"'))
-                    ->whereIn(
-                        'inventories.object_id',
-                        Department::select('departments.id')
-                            ->join('stores', 'stores.id', '=', 'departments.store_id')
-                            ->join('companies', 'companies.id', '=', 'stores.company_id')
-                            ->where('departments.id', '=', $department)
-                    )
-                    ->union(
-                        Inventory::select('inventories.*')
-                            ->select('inventories.*', \DB::raw('null AS name_sort'))
+                if ($search) {
+                    $inventory = $inventory
+                        ->select('inventories.*', 'departments.name AS department_name', 'stores.name AS store_name', 'companies.name AS company_name', \DB::raw('null AS contract_name'), \DB::raw('null AS name_sort'), \DB::raw('null AS location_name'))
+                        ->where('inventories.object_type', '=', \DB::raw('"App\\\Models\\\Department"'))
+                        ->where('inventories.object_id', $department);
+                }
+                if (!$search) {
+                    $inventory = $inventory
+                        ->select('inventories.*', \DB::raw('null AS department_name'), \DB::raw('null AS store_name'), \DB::raw('null AS company_name'), \DB::raw('null AS contract_name'), \DB::raw('null AS name_sort'), \DB::raw('null AS location_name'))
+                        ->where('inventories.object_type', '=', \DB::raw('"App\\\Models\\\Department"'))
+                        ->where('inventories.object_id', $department);
+                    $inventory->union(
+                        Inventory::select('inventories.*', \DB::raw('null AS department_name'), \DB::raw('null AS store_name'), \DB::raw('null AS company_name'), \DB::raw('null AS contract_name'), \DB::raw('null AS name_sort'), \DB::raw('null AS location_name'))
                             ->where('inventories.object_type', '=', \DB::raw('"App\\\Models\\\Contract"'))
                             ->whereIn(
                                 'inventories.object_id',
@@ -161,12 +370,13 @@ class InventoriesController extends Controller
                                     )
                             )
                     );
+                }
             }
         } else {
             if ($store) {
                 if ($contract) {
                     $inventory = $inventory
-                        ->select('inventories.*', \DB::raw('null AS name_sort'))
+                        ->select('inventories.*', \DB::raw('null AS department_name'), \DB::raw('null AS store_name'), \DB::raw('null AS company_name'), 'contracts.name AS contract_name', \DB::raw('null AS name_sort'), \DB::raw('null AS location_name'))
                         ->where('inventories.object_type', '=', \DB::raw('"App\\\Models\\\Contract"'))
                         ->whereIn(
                             'inventories.object_id',
@@ -186,46 +396,59 @@ class InventoriesController extends Controller
                                 ->get()
                         );
                 } else {
-                    $inventory = $inventory
-                        ->select('inventories.*', \DB::raw('null AS name_sort'))
-                        ->where('inventories.object_type', '=', \DB::raw('"App\\\Models\\\Department"'))
-                        ->whereIn(
-                            'inventories.object_id',
-                            Department::select('departments.id')
-                                ->join('stores', 'stores.id', '=', 'departments.store_id')
-                                ->where('stores.id', $store)
-                        )
-                        ->union(
-                            Inventory::select('inventories.*', \DB::raw('null AS name_sort'))
+                    if ($search) {
+                        $inventory = $inventory
+                            ->select('inventories.*', 'departments.name AS department_name', 'stores.name AS store_name', 'companies.name AS company_name', \DB::raw('null AS contract_name'), \DB::raw('null AS name_sort'), \DB::raw('null AS location_name'))
+                            ->where('inventories.object_type', '=', \DB::raw('"App\\\Models\\\Department"'))
+                            ->whereIn(
+                                'inventories.object_id',
+                                Department::select('departments.id')
+                                    ->join('stores', 'stores.id', '=', 'departments.store_id')
+                                    ->where('stores.id', $store)
+                            );
+                    }
+                    if (!$search) {
+                        $inventory = $inventory
+                            ->select('inventories.*', \DB::raw('null AS department_name'), \DB::raw('null AS store_name'), \DB::raw('null AS company_name'), \DB::raw('null AS contract_name'), \DB::raw('null AS name_sort'), \DB::raw('null AS location_name'))
+                            ->where('inventories.object_type', '=', \DB::raw('"App\\\Models\\\Department"'))
+                            ->whereIn(
+                                'inventories.object_id',
+                                Department::select('departments.id')
+                                    ->join('stores', 'stores.id', '=', 'departments.store_id')
+                                    ->where('stores.id', $store)
+                            );
+                        $inventory->union(
+                            Inventory::select('inventories.*', \DB::raw('null AS department_name'), \DB::raw('null AS store_name'), \DB::raw('null AS company_name'), \DB::raw('null AS contract_name'), \DB::raw('null AS name_sort'), \DB::raw('null AS location_name'))
                                 ->where('inventories.object_type', '=', \DB::raw('"App\\\Models\\\Store"'))
                                 ->where('inventories.object_id', $store)
                         )
-                        ->union(
-                            Inventory::select('inventories.*', \DB::raw('null AS name_sort'))
-                                ->where('inventories.object_type', '=', \DB::raw('"App\\\Models\\\Contract"'))
-                                ->whereIn(
-                                    'inventories.object_id',
-                                    Contract::select('contracts.id')
-                                        ->where('contracts.object_type', '=', \DB::raw('"App\\\Models\\\Department"'))
-                                        ->whereIn(
-                                            'contracts.object_id',
-                                            Department::select('departments.id as id')
-                                                ->join('stores', 'stores.id', '=', 'departments.store_id')
-                                                ->where('stores.id', '=', $store)
-                                        )
-                                        ->union(
-                                            Contract::select('contracts.id as id')
-                                                ->where('contracts.object_type', '=', \DB::raw('"App\\\Models\\\Store"'))
-                                                ->where('contracts.object_id', '=', $store)
-                                        )
-                                        ->get()
-                                )
-                        );
+                            ->union(
+                                Inventory::select('inventories.*', \DB::raw('null AS department_name'), \DB::raw('null AS store_name'), \DB::raw('null AS company_name'), \DB::raw('null AS contract_name'), \DB::raw('null AS name_sort'), \DB::raw('null AS location_name'))
+                                    ->where('inventories.object_type', '=', \DB::raw('"App\\\Models\\\Contract"'))
+                                    ->whereIn(
+                                        'inventories.object_id',
+                                        Contract::select('contracts.id')
+                                            ->where('contracts.object_type', '=', \DB::raw('"App\\\Models\\\Department"'))
+                                            ->whereIn(
+                                                'contracts.object_id',
+                                                Department::select('departments.id as id')
+                                                    ->join('stores', 'stores.id', '=', 'departments.store_id')
+                                                    ->where('stores.id', '=', $store)
+                                            )
+                                            ->union(
+                                                Contract::select('contracts.id as id')
+                                                    ->where('contracts.object_type', '=', \DB::raw('"App\\\Models\\\Store"'))
+                                                    ->where('contracts.object_id', '=', $store)
+                                            )
+                                            ->get()
+                                    )
+                            );
+                    }
                 }
             } elseif ($company) {
                 if ($contract) {
                     $inventory = $inventory
-                        ->select('inventories.*', \DB::raw('null AS name_sort'))
+                        ->select('inventories.*', \DB::raw('null AS department_name'), \DB::raw('null AS store_name'), \DB::raw('null AS company_name'), 'contracts.name AS contract_name', \DB::raw('null AS name_sort'), \DB::raw('null AS location_name'))
                         ->where('inventories.object_type', '=', \DB::raw('"App\\\Models\\\Contract"'))
                         ->whereIn(
                             'inventories.object_id',
@@ -258,18 +481,31 @@ class InventoriesController extends Controller
 
                         );
                 } else {
-                    $inventory = $inventory
-                        ->select('inventories.*', \DB::raw('null AS name_sort'))
-                        ->where('inventories.object_type', '=', \DB::raw('"App\\\Models\\\Department"'))
-                        ->whereIn(
-                            'inventories.object_id',
-                            Department::select('departments.id')
-                                ->join('stores', 'stores.id', '=', 'departments.store_id')
-                                ->join('companies', 'companies.id', '=', 'stores.company_id')
-                                ->where('companies.id', '=', $company)
-                        )
-                        ->union(
-                            Inventory::select('inventories.*', \DB::raw('null AS name_sort'))
+                    if ($search) {
+                        $inventory = $inventory
+                            ->select('inventories.*', \DB::raw('departments.name AS department_name'), \DB::raw('null AS store_name'), \DB::raw('null AS company_name'), \DB::raw('null AS contract_name'), \DB::raw('null AS name_sort'), \DB::raw('null AS location_name'))
+                            ->where('inventories.object_type', '=', \DB::raw('"App\\\Models\\\Department"'))
+                            ->whereIn(
+                                'inventories.object_id',
+                                Department::select('departments.id')
+                                    ->join('stores', 'stores.id', '=', 'departments.store_id')
+                                    ->join('companies', 'companies.id', '=', 'stores.company_id')
+                                    ->where('companies.id', '=', $company)
+                            );
+                    }
+                    if (!$search) {
+                        $inventory = $inventory
+                            ->select('inventories.*', \DB::raw('null AS department_name'), \DB::raw('null AS store_name'), \DB::raw('null AS company_name'), \DB::raw('null AS contract_name'), \DB::raw('null AS name_sort'), \DB::raw('null AS location_name'))
+                            ->where('inventories.object_type', '=', \DB::raw('"App\\\Models\\\Department"'))
+                            ->whereIn(
+                                'inventories.object_id',
+                                Department::select('departments.id')
+                                    ->join('stores', 'stores.id', '=', 'departments.store_id')
+                                    ->join('companies', 'companies.id', '=', 'stores.company_id')
+                                    ->where('companies.id', '=', $company)
+                            );
+                        $inventory->union(
+                            Inventory::select('inventories.*', \DB::raw('null AS department_name'), \DB::raw('null AS store_name'), \DB::raw('null AS company_name'), \DB::raw('null AS contract_name'), \DB::raw('null AS name_sort'), \DB::raw('null AS location_name'))
                                 ->where('inventories.object_type', '=', \DB::raw('"App\\\Models\\\Store"'))
                                 ->whereIn(
                                     'inventories.object_id',
@@ -278,50 +514,51 @@ class InventoriesController extends Controller
                                         ->where('companies.id', '=', $company)
                                 )
                         )
-                        ->union(
-                            Inventory::select('inventories.*', \DB::raw('null AS name_sort'))
-                                ->where('inventories.object_type', '=', \DB::raw('"App\\\Models\\\Company"'))
-                                ->where('inventories.object_id', '=', $company)
-                        )
-                        ->union(
-                            Inventory::select('inventories.*', \DB::raw('null AS name_sort'))
-                                ->where('inventories.object_type', '=', \DB::raw('"App\\\Models\\\Contract"'))
-                                ->whereIn(
-                                    'inventories.object_id',
-                                    Contract::select('contracts.id')
-                                        ->where('contracts.object_type', '=', \DB::raw('"App\\\Models\\\Department"'))
-                                        ->whereIn(
-                                            'contracts.object_id',
-                                            Department::select('departments.id as id')
-                                                ->join('stores', 'stores.id', '=', 'departments.store_id')
-                                                ->join('companies', 'companies.id', '=', 'stores.company_id')
-                                                ->where('companies.id', '=', $company)
-                                        )
-                                        ->union(
-                                            Contract::select('contracts.id as id')
-                                                ->where('contracts.object_type', '=', \DB::raw('"App\\\Models\\\Company"'))
-                                                ->where('contracts.object_id', '=', $company)
-                                        )
+                            ->union(
+                                Inventory::select('inventories.*', \DB::raw('null AS department_name'), \DB::raw('null AS store_name'), \DB::raw('null AS company_name'), \DB::raw('null AS contract_name'), \DB::raw('null AS name_sort'), \DB::raw('null AS location_name'))
+                                    ->where('inventories.object_type', '=', \DB::raw('"App\\\Models\\\Company"'))
+                                    ->where('inventories.object_id', '=', $company)
+                            )
+                            ->union(
+                                Inventory::select('inventories.*', \DB::raw('null AS department_name'), \DB::raw('null AS store_name'), \DB::raw('null AS company_name'), \DB::raw('null AS contract_name'), \DB::raw('null AS name_sort'), \DB::raw('null AS location_name'))
+                                    ->where('inventories.object_type', '=', \DB::raw('"App\\\Models\\\Contract"'))
+                                    ->whereIn(
+                                        'inventories.object_id',
+                                        Contract::select('contracts.id')
+                                            ->where('contracts.object_type', '=', \DB::raw('"App\\\Models\\\Department"'))
+                                            ->whereIn(
+                                                'contracts.object_id',
+                                                Department::select('departments.id as id')
+                                                    ->join('stores', 'stores.id', '=', 'departments.store_id')
+                                                    ->join('companies', 'companies.id', '=', 'stores.company_id')
+                                                    ->where('companies.id', '=', $company)
+                                            )
+                                            ->union(
+                                                Contract::select('contracts.id as id')
+                                                    ->where('contracts.object_type', '=', \DB::raw('"App\\\Models\\\Company"'))
+                                                    ->where('contracts.object_id', '=', $company)
+                                            )
 
-                                        ->union(
-                                            Contract::select('contracts.id as id')
-                                                ->where('contracts.object_type', '=', \DB::raw('"App\\\Models\\\Store"'))
-                                                ->whereIn(
-                                                    'contracts.object_id',
-                                                    Store::select('stores.id')
-                                                        ->join('companies', 'companies.id', '=', 'stores.company_id')
-                                                        ->where('companies.id', '=', $company)
-                                                )
-                                        )
-                                        ->get()
-                                )
-                        );
+                                            ->union(
+                                                Contract::select('contracts.id as id')
+                                                    ->where('contracts.object_type', '=', \DB::raw('"App\\\Models\\\Store"'))
+                                                    ->whereIn(
+                                                        'contracts.object_id',
+                                                        Store::select('stores.id')
+                                                            ->join('companies', 'companies.id', '=', 'stores.company_id')
+                                                            ->where('companies.id', '=', $company)
+                                                    )
+                                            )
+                                            ->get()
+                                    )
+                            );
+                    }
                 }
             }
         }
         if ($contract) {
             $inventory = $inventory
-                ->select('inventories.*', \DB::raw('null AS name_sort'))
+                ->select('inventories.*', \DB::raw('null AS department_name'), \DB::raw('null AS store_name'), \DB::raw('null AS company_name'), \DB::raw('null AS contract_name'), \DB::raw('null AS name_sort'), \DB::raw('null AS location_name'))
                 ->where('inventories.object_type', '=', \DB::raw('"App\\\Models\\\Contract"'))
                 ->where('inventories.object_id', $contract);
         }

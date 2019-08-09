@@ -6,6 +6,7 @@ var gUM = false;
 var webkit = false;
 var moz = false;
 var v = null;
+var facing = true;
 
 var vidhtml = '<video id="v" autoplay></video>';
 
@@ -125,7 +126,7 @@ function setwebcam()
 			  devices.forEach(function(device) {
 				if (device.kind === 'videoinput') {
 				  if(device.label.toLowerCase().search("back") >-1)
-					options = {'deviceId': {'exact':device.deviceId}, 'facingMode':'environment'} ;
+					options = {'facingMode': facing ? 'environment' : 'user'} ;
 				}
 			  });
 			  setwebcam2(options);
@@ -193,4 +194,21 @@ function stopCamera()
     webkit = false;
     moz = false;
     v = null;
+}
+
+function switchCamera() {
+    if (v == null) return;
+    v.srcObject.getTracks().forEach(t => {
+        t.stop();
+    });
+    gCtx = null;
+    gCanvas = null;
+    c = 0;
+    stype = 0;
+    gUM = false;
+    webkit = false;
+    moz = false;
+    v = null;
+    facing = !facing;
+    loadCamera();
 }

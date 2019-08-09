@@ -30,7 +30,7 @@
                                 {{-- Company-Name --}}
                                 @include ('partials.forms.edit.company-select', ['translated_name' => trans('general.company'), 'fieldname' => 'select_company'])
                                 {{-- Store-Name --}}
-                                @include ('partials.forms.edit.store-select', ['translated_name' => trans('general.store'), 'fieldname' => 'select_store'])
+                                @include ('partials.forms.edit.store-select', ['translated_name' => trans('admin/contracts/table.store'), 'fieldname' => 'select_store'])
                                 {{-- Department-Name --}}
                                 @include ('partials.forms.edit.department-select', ['translated_name' => trans('general.department'), 'fieldname' => 'select_department','class' => 'department_select'])
                                 {{-- Contract-Name --}}
@@ -73,7 +73,7 @@
                             <div id="local_select_inventory" class="form-group">
                                 {{ Form::label('local_inventory_select', trans('admin/inventories/result.local_inventory'), array('class' => 'col-md-3 control-label')) }}
                                 <div class="col-md-7">
-                                    <select class="local_inventory_select" data-endpoint="" data-placeholder="{{ trans('general.select_inventory') }}" name="local_inventory_select" style="width: 100%" id="local_inventory_select">
+                                    <select class="local_inventory_select" data-endpoint="" data-placeholder="Select Inventory" name="local_inventory_select" style="width: 100%" id="local_inventory_select">
                                         <option value="" selected=selected></option>
                                     </select>
                                 </div>
@@ -130,6 +130,7 @@
               </div>
               <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" id="btn-stop-camera" data-dismiss="modal">{{ trans('admin/inventories/result.close_scanner') }}</button>
+                <button type="button" class="btn btn-success" id="btn-switch-camera" onclick="switchCamera()">{{ trans('admin/inventories/result.switch_camera') }}</button>
               </div>
             </div>
           </div>
@@ -362,6 +363,7 @@
         $('#status_select_id').select2();
         $('#local_inventory_select').select2({allowClear: true});
         loadLocalInventories();
+        checkCamera();
 
         // Stop camera stream
         $("#scanner").on('hide.bs.modal', function(){
@@ -859,6 +861,36 @@
             $('#btn-batch-close').hide();
         }
 
+        // Check Device camera
+        function checkCamera() {
+            if(navigator.mediaDevices && navigator.mediaDevices.enumerateDevices) {
+        		try {
+        			navigator.mediaDevices.enumerateDevices()
+        			.then(function(devices) {
+                        devices.forEach(function(device) {
+                            if (device.kind === 'videoinput') {
+                                if(device.label.toLowerCase().search("back") >-1)
+                                    $('#btn-switch-camera').show();
+                            }
+                        });
+                    });
+        		} catch(e) {
+                    loadScanAlert('camera_error');
+        		}
+        	}
+        }
+
+        // Trigger back button close camera
+        if (window.history && window.history.pushState) {
+            $('#scanner').on('show.bs.modal', function (e) {
+                window.history.pushState('forward', null, './#scanner');
+            });
+
+            $(window).on('popstate', function () {
+                $('#scanner').modal('hide');
+            });
+        }
+
     </script>
 @stop
 
@@ -877,7 +909,7 @@
     }
 
     #v {
-        width: 100%;
+        height: 50vh;
     }
 
     .highlight {
@@ -899,6 +931,32 @@
 
     #btn-batch-submit {
         margin: 10px;
+    }
+
+    #scanner .modal-body {
+        background-color: black;
+    }
+
+    #btn-switch-camera {
+        display: none;
+    }
+
+    #tbl-results-search, #tbl-results-scan {
+        font-size: 10px;
+    }
+
+    .row {
+        margin-left: -25px !important;
+        margin-right: -25px !important;
+    }
+
+    .col-md-12 {
+        margin-left: 5px !important;
+        margin-right: 5px !important;
+    }
+
+    #search-form .box-body, #scan-form .box-body {
+        padding: 0px !important;
     }
 
 </style>

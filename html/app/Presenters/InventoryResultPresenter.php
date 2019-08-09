@@ -95,12 +95,13 @@ class InventoryResultPresenter extends Presenter
     {
         $layout = [
             [
-                "field" => "actions",
-                "searchable" => false,
-                "sortable" => false,
-                "switchable" => false,
-                "title" => trans('table.actions'),
-                "formatter" => "scanActionsFormatter",
+                "field" => "asset_id",
+                "searchable" => true,
+                "sortable" => true,
+                "switchable" => true,
+                "title" => trans('admin/hardware/form.name'),
+                "visible" => true,
+                "formatter" => 'scanHardwareLinkFormatter',
             ], [
                 "field" => "asset_tag",
                 "searchable" => true,
@@ -116,14 +117,6 @@ class InventoryResultPresenter extends Presenter
                 "visible" => true,
                 "formatter" => 'scanStatusFormatetter',
             ], [
-                "field" => "asset_id",
-                "searchable" => true,
-                "sortable" => true,
-                "switchable" => true,
-                "title" => trans('admin/hardware/form.name'),
-                "visible" => true,
-                "formatter" => 'scanHardwareLinkFormatter',
-            ], [
                 "field" => "checked",
                 "searchable" => true,
                 "sortable" => true,
@@ -138,6 +131,13 @@ class InventoryResultPresenter extends Presenter
                 "title" => trans('admin/inventories/table.recognized'),
                 "visible" => true,
                 "formatter" => 'resultRecognizedFormatter',
+            ], [
+                "field" => "actions",
+                "searchable" => false,
+                "sortable" => false,
+                "switchable" => false,
+                "title" => trans('table.actions'),
+                "formatter" => "scanActionsFormatter",
             ]
         ];
 

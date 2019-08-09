@@ -220,7 +220,7 @@ return [
     'yes'                     => 'Yes',
     'zip'                      => 'Zip',
     'noimage'                    => 'Không tìm thấy hình ảnh hoặc hình ảnh nào được tìm thấy.',
-    'token_expired'             => 'Phiên họp mẫu của bạn đã hết hạn. Vui lòng thử lại.',  
+    'token_expired'             => 'Phiên họp mẫu của bạn đã hết hạn. Vui lòng thử lại.',
     'inventories'           => 'Các Kiểm kê',
     'inventory'             => 'Kiểm kê',
     'inventoryresult_list'  => 'Danh sách kết quả kiểm kê',
@@ -234,6 +234,8 @@ return [
     'select_store'          => 'Chọn Cửa hàng',
     'store'                 => 'Cửa hàng',
     'stores'                => 'Các cửa hàng',
-    'go'                    => 'Go'
-    
+    'go'                    => 'Go',
+    'scope'                 => 'Phạm vi',
+    'object'                => 'Đối tượng',
+
 ];

@@ -16,7 +16,13 @@
          <div class="box-body">
             <div class="row">
                <div class="col-md-12">
+                    @if($item->id)
+                    <div class="box-header with-border">
+                        <h3 class="box-title">{{$item->name}}</h3>
+                    </div><!-- /.box-header -->
+                    @endif
                   <div class="col-md-6">
+                    @if(!$item->id)
                      {{-- Company-Name --}}
                      @include ('partials.forms.edit.company-select', ['translated_name' => trans('general.company'), 'fieldname' => 'company_id'])
                      <div style="margin-top:40px">
@@ -35,6 +41,7 @@
                      {{-- Inventory-Name --}}
                      @include ('partials.forms.edit.inventory', ['translated_name' => trans('admin/inventories/table.inventory'), 'fieldname' => 'inventory_id'])
                      </div>
+                     @endif
                 </div>
                   <!-- /.col -->
                   <table
@@ -53,7 +60,7 @@
                      data-sort-name="name"
                      id="inventoryresultTable"
                      class="table table-striped snipe-table"
-                     data-url="{{ route('api.inventoryresults.index',['inventory_id' => $item->inventory_id]) }}"
+                     data-url="{{ route('api.inventoryresults.index',['inventory_id' => $item->id]) }}"
                      data-export-options='{
                         "fileName": "export-inventory-result-{{ date('Y-m-d') }}",
                         "ignoreColumn": ["actions","image"]
@@ -61,7 +68,7 @@
                      
                   </table>
                   <div class="box-footer text-right">
-                     <button href='{{ route('modal.inventory-result') }}' data-toggle="modal"  data-target="#createModal" data-select='assigned_user_select' type="button" class="btn btn-success" id="addasset" {{isset($item->inventory_id) ? "" : "disabled" }} ><i class=""></i> Add Unknow Asset</button>
+                     <button href='{{ route('modal.inventory-result') }}' data-toggle="modal"  data-target="#createModal" data-select='assigned_user_select' type="button" class="btn btn-success" id="addasset" {{isset($item->id) ? "" : "disabled" }} ><i class=""></i> Add Unknow Asset</button>
                   </div>
                </div>
                <!-- /.row -->

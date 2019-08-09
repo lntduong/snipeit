@@ -558,6 +558,7 @@
                 <a href="#"  class="dropdown-toggle">
                     <i class="fa fa-users"></i>
                     <span>{{ trans('general.people') }}</span>
+                    <i class="fa fa-angle-left pull-right"></i>
                 </a>
 
                 <ul class="treeview-menu">

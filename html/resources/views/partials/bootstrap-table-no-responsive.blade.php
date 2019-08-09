@@ -48,7 +48,7 @@
             cookie: true,
             cookieExpire: '2y',
             cookieIdTable: '{{ Route::currentRouteName() }}',
-            mobileResponsive: false,
+            mobileResponsive: true,
             maintainSelected: true,
             trimOnSearch: false,
             paginationFirstText: "{{ trans('general.first') }}",
@@ -255,12 +255,11 @@
             if (row.id || row.checked || row.status_label.id) {
                 var actions = '<nobr>';
                 if ((row.available_actions) && (row.available_actions.update === true)) {
-                    actions += '<a href="#" data-tag="' + row.asset_tag + '" class="asset-update">{{ trans('admin/inventories/result.save') }}</a>&nbsp;';
-                    actions += ' | ';
-                    actions += '<a href="#" data-tag="' + row.asset_tag + '" class="asset-cancel">{{ trans('admin/inventories/result.cancel') }}</a>&nbsp;';
+                    actions += '<a href="#" data-tag="' + row.asset_tag + '" class="btn btn-success btn-sm asset-update"><i class="fa fa-save"></i></a>&nbsp;';
+                    actions += '<a href="#" data-tag="' + row.asset_tag + '" class="btn btn-warning btn-sm asset-cancel"><i class="fa fa-times"></i></a>&nbsp;';
                 }
                 if ((row.available_actions) && (row.available_actions.delete === true)) {
-                    actions += '<a href="#" data-tag="' + row.asset_tag + '" data-id="' + row.id + '" class="asset-clear">{{ trans('admin/inventories/result.clear') }}</a>';
+                    actions += '<a href="#" data-tag="' + row.asset_tag + '" data-id="' + row.id + '" class="btn btn-danger btn-sm asset-clear"><i class="fa fa-trash"></i></a>';
                 }
                 actions +='</nobr>';
             }

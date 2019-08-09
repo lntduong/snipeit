@@ -56,7 +56,7 @@ class InventoryResultsTransformer
         foreach ($inventoryresults as $inventoryresult) {
             $array[] = self::transformScanInventoryResult($inventoryresult);
         }
-        
+
         return $array;
     }
 
