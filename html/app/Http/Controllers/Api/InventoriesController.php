@@ -110,10 +110,10 @@ class InventoriesController extends Controller
         $inventories = Inventory::select([
             'inventories.*'
         ]);
-        $company = $request->input('company');
-        $store = $request->input('store');
-        $department = $request->input('department');
-        $contract = $request->input('contract');
+        $company = $request->input('company_id');
+        $store = $request->input('store_id');
+        $department = $request->input('department_id');
+        $contract = $request->input('contract_id');
         $inventories = self::filter($company, $store, $department, $contract, $inventories);
         if ($request->input('search')) {
             $inventories = self::search($request->input('search'), $company, $store, $department, $contract);

@@ -34,13 +34,15 @@
 
               
                 </form>
-            </div>
+            </div> 
+          
         <div class="modal-footer">
             <button type="button" class="btn btn-default" data-dismiss="modal">{{ trans('button.cancel') }}</button>
             <button type="button" class="btn btn-primary" id="modal-save">{{ trans('general.save') }}</button>
         </div>
     </div><!-- /.modal-content -->
 </div><!-- /.modal-dialog -->
+
 
 <script nonce="{{ csrf_token() }}">
     $table = $('#inventoryresultTable')
@@ -49,11 +51,16 @@
     });
     
      $('#assigned_asset_select').change(function () {
+
       var elem = $('#status_select')
       var asset_id=$('#assigned_asset_select').val();
-      var contract_id=$('#contract_select').val();
-      var inventory_id=$('#inventory_select').val();
+      
+      var js_inventory_id = '{{$inventory_id}}';
 
+      if (js_inventory_id == "") {
+        js_inventory_id = $('#inventory_select').val();
+      }
+      
       $.ajax({
       url:"{{ route('api.inventoryresults.checkasset') }}", // đường dẫn khi gửi dữ liệu đi 'search' là tên route mình đặt bạn mở route lên xem là hiểu nó là cái j.
       method:"POST", 
@@ -63,7 +70,7 @@
         },
       data:{
         asset_id:asset_id,
-        inventory_id:inventory_id,
+        inventory_id:js_inventory_id,
         },
       success:function(data){ //dữ liệu nhận về
         elem.append($('<option>', { 
@@ -85,7 +92,7 @@
             $("#Familiar").attr('class', 'col-md-6 btn btn-default');
         }
        
-        $("#inventoryid").val(inventory_id);
+        $("#inventoryid").val(js_inventory_id);
         
      }
    });

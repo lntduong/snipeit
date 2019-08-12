@@ -23,7 +23,7 @@ class DepartmentsController extends Controller
     public function index(Request $request)
     {
         $this->authorize('view', Department::class);
-        $allowed_columns = ['id','name','image','users_count','contract_count'];
+        $allowed_columns = ['id', 'name', 'image', 'users_count', 'contract_count', 'store', 'company'];
 
         $departments = Department::select([
             'departments.id',
@@ -35,9 +35,9 @@ class DepartmentsController extends Controller
             'departments.updated_at',
             'departments.image'
         ])->with('users')->with('location')->with('manager')->with('store')->withCount('users')->withCount('contract');
-        
+
         if ($request->has('store_id')) {
-            $departments = $departments->where('store_id',$request->input('store_id'));
+            $departments = $departments->where('store_id', $request->input('store_id'));
         }
         if ($request->has('search')) {
             $departments = $departments->TextSearch($request->input('search'));
@@ -55,6 +55,12 @@ class DepartmentsController extends Controller
             case 'manager':
                 $departments->OrderManager($order);
                 break;
+            case 'store':
+                $departments->OrderStore($order);
+                break;
+            case 'company':
+                $departments->OrderCompany($order);
+                break;
             default:
                 $departments->orderBy($sort, $order);
                 break;
@@ -63,7 +69,6 @@ class DepartmentsController extends Controller
         $total = $departments->count();
         $departments = $departments->skip($offset)->take($limit)->get();
         return (new DepartmentsTransformer)->transformDepartments($departments, $total);
-
     }
 
     /**
@@ -80,14 +85,13 @@ class DepartmentsController extends Controller
         $department = new Department;
         $department->fill($request->all());
         $department->user_id = Auth::user()->id;
-        $department->manager_id = ($request->has('manager_id' ) ? $request->input('manager_id') : null);
+        $department->manager_id = ($request->has('manager_id') ? $request->input('manager_id') : null);
 
         if ($department->save()) {
             return response()->json(Helper::formatStandardApiResponse('success', $department, trans('admin/departments/message.create.success')));
         }
 
         return response()->json(Helper::formatStandardApiResponse('error', null, $department->getErrors()));
-
     }
 
     /**
@@ -102,7 +106,7 @@ class DepartmentsController extends Controller
     {
         $this->authorize('view', Department::class);
         $department = Department::findOrFail($id);
-        
+
         return (new DepartmentsTransformer)->transformDepartment($department);
     }
 
@@ -128,7 +132,6 @@ class DepartmentsController extends Controller
 
         $department->delete();
         return response()->json(Helper::formatStandardApiResponse('success', null, trans('admin/departments/message.delete.success')));
-
     }
 
     /**
@@ -149,18 +152,19 @@ class DepartmentsController extends Controller
         ]);
 
         if ($request->has('search')) {
-            $departments = $departments->where('name', 'LIKE', '%'.$request->get('search').'%');
+            $departments = $departments->where('name', 'LIKE', '%' . $request->get('search') . '%');
         }
-       
+
         if ($request->get('store_id')) {
             $departments = $departments->where('store_id', '=', $request->get('store_id'));
         } else {
             if ($request->get('company_id')) {
                 $departments = $departments
-                ->whereIn('departments.store_id',
-                    Store::select('stores.id')
-                    ->where('stores.company_id', '=', $request->get('company_id'))
-                );
+                    ->whereIn(
+                        'departments.store_id',
+                        Store::select('stores.id')
+                            ->where('stores.company_id', '=', $request->get('company_id'))
+                    );
             }
         }
 
@@ -170,11 +174,9 @@ class DepartmentsController extends Controller
         // This lets us have more flexibility in special cases like assets, where
         // they may not have a ->name value but we want to display something anyway
         foreach ($departments as $department) {
-            $department->use_image = ($department->image) ? url('/').'/uploads/departments/'.$department->image : null;
+            $department->use_image = ($department->image) ? url('/') . '/uploads/departments/' . $department->image : null;
         }
 
         return (new SelectlistTransformer)->transformSelectlist($departments);
-
     }
-
 }

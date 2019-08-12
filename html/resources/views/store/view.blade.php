@@ -43,7 +43,11 @@
                         data-toolbar="#toolbar" 
                         id="contractsTable" 
                         class="table table-striped snipe-table" 
-                        data-url="{{ route('api.contracts.index',['store'=>$store->id]) }}">
+                        data-url="{{ route('api.contracts.index',['store'=>$store->id]) }}"
+                        data-export-options='{
+                           "fileName": "export-contracts-{{ date('Y-m-d') }}",
+                           "ignoreColumn": ["actions","image","change","checkbox","checkincheckout","icon"]
+                           }'>
                         <thead>
                               <tr>
                                  <th data-sortable="true" data-field="id" data-visible="false" data-searchable="false">{{ trans('general.id') }}</th>
@@ -55,7 +59,7 @@
                                  <th data-sortable="true" data-field="start_date" data-visible="true" data-searchable="false">{{ trans('admin/contracts/table.start_date') }}</th>
                                  <th data-sortable="true" data-field="end_date" data-visible="true" data-searchable="true">{{ trans('admin/contracts/table.end_date') }}</th>
                                  <th data-sortable="true" data-field="billing_date" data-visible="true" data-searchable="true" id="billing_date" class="billing_date">{{ trans('admin/contracts/table.billing_date') }}</th>
-                                 <th data-sortable="true" data-field="payment_date" data-visible="true" data-searchable="true">{{ trans('admin/contracts/table.payment_date') }}</th>
+                                 <th data-sortable="true" data-field="payment_date" data-visible="true" data-searchable="true">{{ trans('admin/contracts/table.payment') }}</th>
                                  <th data-sortable="false" data-formatter="contractsActionsFormatter" data-field="actions" data-searchable="false">{{ trans('table.actions') }}</th>
                               </tr>
                         </thead>

@@ -382,6 +382,16 @@ class InventoryResultsController extends Controller
                     ->where('contracts.id', '=', $inventory->object_id)
                     ->where('contract_assets.asset_id', '=', $request->asset_id);
             }
+            if ($inventory->object_type == 'App\Models\Location') {
+
+                $contract = Contract::select('contract_assets.*')
+                    ->join('contract_assets', 'contract_assets.contract_id', '=', 'contracts.id')
+                    ->join('assets', 'assets.id', '=', 'contract_assets.asset_id')
+                    ->where('contracts.location_id', '=', $inventory->object_id)
+                    ->where('contracts.start_date', '<=', $inventory->inventory_date)
+                    ->where('contracts.end_date', '>=', $inventory->inventory_date)
+                    ->where('contract_assets.asset_id', '=', $request->asset_id);
+            }
         } else {
             return (['Recongnized' => 0, 'status_id' => $status_lable->id, 'status_name' => $status_lable->name]);
         }

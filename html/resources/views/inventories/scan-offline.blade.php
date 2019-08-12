@@ -297,9 +297,9 @@
                 data: function (params) {
                     var data = {
                         search: params.term,
-                        company:($("#company_select").val() ? $("#company_select").val() : "" ),
-                        store:($("#store_select").val() ? $("#store_select").val() : ""),
-                        department:($("#department_select").val() ? $("#department_select").val() : ""),
+                        company_id: $("#company_select").val(),
+                        store_id: $("#store_select").val(),
+                        department_id: $("#department_select").val(),
                         page: params.page || 1,
                     };
                     return data;
@@ -335,10 +335,10 @@
                 data: function (params) {
                     var data = {
                         search: params.term,
-                        company:($("#company_select").val() ? $("#company_select").val() : "" ),
-                        store:($("#store_select").val() ? $("#store_select").val() : ""),
-                        department:($("#department_select").val() ? $("#department_select").val() : ""),
-                        contract:($("#contract_select").val() ? $("#contract_select").val() : ""),
+                        company_id: $("#company_select").val(),
+                        store_id: $("#store_select").val(),
+                        department_id: $("#department_select").val(),
+                        contract_id: $("#contract_select").val(),
                         page: params.page || 1,
                     };
                     return data;

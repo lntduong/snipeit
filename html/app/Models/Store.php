@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Models;
 
 use App\Models\Traits\Searchable;
@@ -7,6 +8,8 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Watson\Validating\ValidatingTrait;
 use App\Models\Department;
 use App\Models\Contract;
+use DB;
+
 /**
  * Model for Components.
  *
@@ -28,22 +31,22 @@ class Store extends SnipeModel
     public static $checkoutClass = null;
     public static $checkinClass = null;
 
-    
+
     /**
-    * Category validation rules
-    */
+     * Category validation rules
+     */
     public $rules = array(
         'name'        => 'required|unsame_name:stores,company_id',
         'company_id'  => 'required|integer|nullable',
     );
 
     /**
-    * Whether the model should inject it's identifier to the unique
-    * validation rules before attempting validation. If this property
-    * is not set in the model it will default to true.
-    *
-    * @var boolean
-    */
+     * Whether the model should inject it's identifier to the unique
+     * validation rules before attempting validation. If this property
+     * is not set in the model it will default to true.
+     *
+     * @var boolean
+     */
     protected $injectUniqueIdentifier = true;
     use ValidatingTrait;
 
@@ -53,7 +56,7 @@ class Store extends SnipeModel
      * @var array
      */
     protected $fillable = [
-  
+
         'company_id',
         'name',
         'location_id',
@@ -62,17 +65,17 @@ class Store extends SnipeModel
     ];
 
     use Searchable;
-    
+
     /**
      * The attributes that should be included when searching the model.
      * 
      * @var array
      */
-     protected $searchableAttributes = ['name'];
-     protected $searchableRelations = [
+    protected $searchableAttributes = ['name'];
+    protected $searchableRelations = [
         'company'      => ['name'],
         'location'     => ['name'],
-    ];   
+    ];
 
     public function location()
     {
@@ -90,36 +93,39 @@ class Store extends SnipeModel
     }
     public function department()
     {
-        return $this->belongsTo('\App\Models\Department', 'id','store_id');
+        return $this->belongsTo('\App\Models\Department', 'id', 'store_id');
     }
     public function contract()
     {
-        $contract = $this->hasMany('\App\Models\Contract', 'object_id','id')
-        ->where("contracts.object_type","=",\DB::raw('"App\\\Models\\\Store"'));
+        $contract = $this->hasMany('\App\Models\Contract', 'object_id', 'id')
+            ->where("contracts.object_type", "=", \DB::raw('"App\\\Models\\\Store"'));
         $department = Contract::Select("*")
-            ->where("contracts.object_type","=",\DB::raw('"App\\\Models\\\Department"'))
-            ->whereIn("contracts.object_id", 
+            ->where("contracts.object_type", "=", \DB::raw('"App\\\Models\\\Department"'))
+            ->whereIn(
+                "contracts.object_id",
                 Department::select('departments.id')
-                ->join('stores','stores.id', '=', 'departments.store_id')
-                ->where('stores.id',$this->id));
+                    ->join('stores', 'stores.id', '=', 'departments.store_id')
+                    ->where('stores.id', $this->id)
+            )
+            ->whereNull('contracts.deleted_at');
         return $contract->union($department);
     }
     /**
-    * Get action logs for this consumable
-    */
+     * Get action logs for this consumable
+     */
     public function assetlog()
     {
         return $this->hasMany('\App\Models\Actionlog', 'item_id')->where('item_type', Component::class)->orderBy('created_at', 'desc')->withTrashed();
     }
-   
+
     /**
-    * Query builder scope to order on company
-    *
-    * @param  Illuminate\Database\Query\Builder  $query  Query builder instance
-    * @param  text                              $order       Order
-    *
-    * @return Illuminate\Database\Query\Builder          Modified query builder
-    */
+     * Query builder scope to order on company
+     *
+     * @param  Illuminate\Database\Query\Builder  $query  Query builder instance
+     * @param  text                              $order       Order
+     *
+     * @return Illuminate\Database\Query\Builder          Modified query builder
+     */
     public function scopeOrderLocation($query, $order)
     {
         return $query->leftJoin('locations', 'stores.location_id', '=', 'locations.id')->orderBy('locations.name', $order);
@@ -127,28 +133,58 @@ class Store extends SnipeModel
 
 
     /**
-    * Query builder scope to order on company
-    *
-    * @param  Illuminate\Database\Query\Builder  $query  Query builder instance
-    * @param  text                              $order       Order
-    *
-    * @return Illuminate\Database\Query\Builder          Modified query builder
-    */
+     * Query builder scope to order on company
+     *
+     * @param  Illuminate\Database\Query\Builder  $query  Query builder instance
+     * @param  text                              $order       Order
+     *
+     * @return Illuminate\Database\Query\Builder          Modified query builder
+     */
     public function scopeOrderCompany($query, $order)
     {
         return $query->leftJoin('companies', 'stores.company_id', '=', 'companies.id')->orderBy('companies.name', $order);
     }
 
-     /**
-    * Query builder scope to order on company
-    *
-    * @param  Illuminate\Database\Query\Builder  $query  Query builder instance
-    * @param  text                              $order       Order
-    *
-    * @return Illuminate\Database\Query\Builder          Modified query builder
-    */
+    /**
+     * Query builder scope to order on company
+     *
+     * @param  Illuminate\Database\Query\Builder  $query  Query builder instance
+     * @param  text                              $order       Order
+     *
+     * @return Illuminate\Database\Query\Builder          Modified query builder
+     */
     public function scopeOrderStore($query, $order)
     {
         return $query->orderBy('stores.name', $order);
+    }
+    /**
+     * Query builder scope to order on company
+     *
+     * @param  Illuminate\Database\Query\Builder  $query  Query builder instance
+     * @param  text                              $order       Order
+     *
+     * @return Illuminate\Database\Query\Builder          Modified query builder
+     */
+    public function scopeOrderContract($query, $order)
+    {
+        return $query->select(
+            DB::raw("
+        stores.*,
+        (       
+            SELECT count(*)
+            FROM contracts
+            WHERE 
+            case 
+            when contracts.object_type = 'App\\\Models\\\Department'  
+                then contracts.object_id IN
+                                            (SELECT departments.id
+                                                FROM departments
+                                                where departments.store_id = stores.id
+                                            )
+            when contracts.object_type = 'App\\\Models\\\Store' 
+                then contracts.object_id	= stores.id
+            end 
+        ) as sum ")
+        )->orderBy('sum', $order);
     }
 }

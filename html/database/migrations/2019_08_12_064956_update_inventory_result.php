@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class EditStatusIdFromInventoryResult extends Migration
+class UpdateInventoryResult extends Migration
 {
     /**
      * Run the migrations.
@@ -14,7 +14,7 @@ class EditStatusIdFromInventoryResult extends Migration
     public function up()
     {
         Schema::table('inventory_results', function (Blueprint $table) {
-            $table->integer('status_id')->nullable();
+            $table->renameColumn('unrecognized', 'familiar');
         });
     }
 
@@ -26,7 +26,7 @@ class EditStatusIdFromInventoryResult extends Migration
     public function down()
     {
         Schema::table('inventory_results', function (Blueprint $table) {
-            $table->integer('status_id')->nullable()->change();
+            //
         });
     }
 }

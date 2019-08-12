@@ -33,9 +33,10 @@ class CompaniesController extends Controller
             'accessories_count',
             'consumables_count',
             'components_count',
+            'contracts_count'
         ];
 
-        $companies = Company::withCount('assets','licenses','accessories','consumables','components','users');
+        $companies = Company::withCount('assets', 'licenses', 'accessories', 'consumables', 'components', 'users');
 
         if ($request->has('search')) {
             $companies->TextSearch($request->input('search'));
@@ -45,12 +46,17 @@ class CompaniesController extends Controller
         $limit = $request->input('limit', 50);
         $order = $request->input('order') === 'asc' ? 'asc' : 'desc';
         $sort = in_array($request->input('sort'), $allowed_columns) ? $request->input('sort') : 'created_at';
-        $companies->orderBy($sort, $order);
-
+        switch ($sort) {
+            case 'contracts_count':
+                $companies = $companies->OrderContract($order);
+                break;
+            default:
+                $companies = $companies->orderBy($sort, $order);
+                break;
+        }
         $total = $companies->count();
         $companies = $companies->skip($offset)->take($limit)->get();
         return (new CompaniesTransformer)->transformCompanies($companies, $total);
-
     }
 
 
@@ -73,7 +79,6 @@ class CompaniesController extends Controller
         }
         return response()
             ->json(Helper::formatStandardApiResponse('error', null, $company->getErrors()));
-
     }
 
     /**
@@ -89,7 +94,6 @@ class CompaniesController extends Controller
         $this->authorize('view', Company::class);
         $company = Company::findOrFail($id);
         return (new CompaniesTransformer)->transformCompany($company);
-
     }
 
 
@@ -127,9 +131,9 @@ class CompaniesController extends Controller
      */
     public function destroy($id)
     {
-       $this->authorize('delete', Company::class);
-       $company = Company::findOrFail($id);
-            $this->authorize('delete', $company);
+        $this->authorize('delete', Company::class);
+        $company = Company::findOrFail($id);
+        $this->authorize('delete', $company);
 
         try {
             $company->delete();
@@ -143,12 +147,10 @@ class CompaniesController extends Controller
             if ($exception->getCode() == 23000) {
                 return response()
                     ->json(Helper::formatStandardApiResponse('error', null,  trans('admin/companies/message.assoc_users')));
-
             } else {
                 throw $exception;
             }
         }
-
     }
 
     /**
@@ -169,7 +171,7 @@ class CompaniesController extends Controller
         ]);
 
         if ($request->has('search')) {
-            $companies = $companies->where('companies.name', 'LIKE', '%'.$request->get('search').'%');
+            $companies = $companies->where('companies.name', 'LIKE', '%' . $request->get('search') . '%');
         }
 
         $companies = $companies->orderBy('name', 'ASC')->paginate(50);
@@ -178,7 +180,7 @@ class CompaniesController extends Controller
         // This lets us have more flexibility in special cases like assets, where
         // they may not have a ->name value but we want to display something anyway
         foreach ($companies as $company) {
-            $company->use_image = ($company->image) ? url('/').'/uploads/companies/'.$company->image : null;
+            $company->use_image = ($company->image) ? url('/') . '/uploads/companies/' . $company->image : null;
         }
 
         return (new SelectlistTransformer)->transformSelectlist($companies);

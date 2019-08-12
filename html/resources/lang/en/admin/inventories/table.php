@@ -17,5 +17,6 @@ return array(
     'unknown'               => 'Unknown',
     'familiar'              => 'Familiar',
     'device_image'          => 'Device Image',
-    'select_status'         => 'Select Status'
+    'select_status'         => 'Select Status',
+    'add_unknown_asset'     => 'Add Unknown Asset'
 );

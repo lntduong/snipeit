@@ -40,6 +40,7 @@ return array(
     'error_no_data'                 => 'Không có dữ liệu',
     'asset_not_found'               => 'Không tìm thấy tài sản',
     'add_status'                    => 'Cập nhật trạng thái',
+    'switch_camera'                 => 'Đổi Camera',
     'camera_load_failed'            => 'Không thể mở Camera! Vui lòng liên hệ với Quản trị viên để biết thêm thông tin.',
     'rm_stored'                     => 'Bạn có muốn xóa Lưu trữ Cục bộ của kết quả kiểm kê?',
     'delete'                        => array(

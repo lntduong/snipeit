@@ -588,7 +588,13 @@
                             <span> {{ trans('general.inventoryresult_list') }}</span>
                         </a>
                     </li>
-
+                    
+                    <li>
+                        <a href="{{ route('inventoryresults_sp_online') }}">
+                            <i class="fa fa-list-ul">  </i>
+                            <span> {{ trans('general.inventory_mobile') }}</span>
+                        </a>
+                    </li>
                 </ul>
             </li>
             @endcan

@@ -36,7 +36,7 @@
                         {{-- Store-Name --}}
                         @include ('partials.forms.edit.store-select', ['translated_name' => trans('admin/contracts/table.store'), 'fieldname' => 'select_store'])
                         {{-- Department-Name --}}
-                        @include ('partials.forms.edit.department-select', ['translated_name' => trans('general.department'), 'fieldname' => 'select_department'])
+                        @include ('partials.forms.edit.department-select', ['translated_name' => trans('general.department'), 'fieldname' => 'select_department', 'class' => 'department_select'])
                         {{-- Contract-Name --}}
                         @include ('partials.forms.edit.contract-select', ['translated_name' => trans('general.contract'), 'fieldname' => 'select_contract'])
                         {{-- Inventory-Name --}}
@@ -169,7 +169,7 @@
 @section('moar_scripts')
     @include ('partials.bootstrap-table-no-responsive', ['exportFile' => 'components-export', 'search' => true, 'showFooter' => true, 'columns' => \App\Presenters\StorePresenter::dataTableLayout()])
     <script>
-    $(".store_select").select2({
+    $("#store_select").select2({
           placeholder: '',
           allowClear: true,
           ajax: {
@@ -183,7 +183,7 @@
               data: function (params) {
                   var data = {
                       search: params.term,
-                      company_id: ($("#company_select").val()) ? $("#company_select").val() : "-1",
+                      company_id: $("#company_select").val(),
                       page: params.page || 1,
                   };
                   return data;
@@ -205,7 +205,7 @@
           templateSelection: formatDataSelection
       });
 
-      $(".department_select").select2({
+      $("#department_select").select2({
             placeholder: '',
             allowClear: true,
             ajax: {
@@ -219,7 +219,8 @@
                 data: function (params) {
                     var data = {
                         search: params.term,
-                        store_id:($("#store_select").val()) ? $("#store_select").val() : "-1",
+                        company_id: $("#company_select").val(),
+                        store_id: $("#store_select").val(),
                         page: params.page || 1,
                     };
                     return data;
@@ -241,7 +242,7 @@
             templateSelection: formatDataSelection
         });
 
-        $(".contract_select").select2({
+        $("#contract_select").select2({
             placeholder: '',
             allowClear: true,
             ajax: {
@@ -255,9 +256,9 @@
                 data: function (params) {
                     var data = {
                         search: params.term,
-                        company:($("#company_select").val() ? $("#company_select").val() : "" ),
-                        store:($("#store_select").val() ? $("#store_select").val() : ""),
-                        department:($("#department_select").val() ? $("#department_select").val() : ""),
+                        company_id: $("#company_select").val(),
+                        store_id: $("#store_select").val(),
+                        department_id: $("#department_select").val(),
                         page: params.page || 1,
                     };
                     return data;
@@ -279,7 +280,7 @@
             templateSelection: formatDataSelection
         });
 
-        $(".inventory_select").select2({
+        $("#inventory_select").select2({
             placeholder: '',
             allowClear: true,
             ajax: {
@@ -293,10 +294,10 @@
                 data: function (params) {
                     var data = {
                         search: params.term,
-                        company:($("#company_select").val() ? $("#company_select").val() : "" ),
-                        store:($("#store_select").val() ? $("#store_select").val() : ""),
-                        department:($("#department_select").val() ? $("#department_select").val() : ""),
-                        contract:($("#contract_select").val() ? $("#contract_select").val() : ""),
+                        company_id: $("#company_select").val(),
+                        store_id: $("#store_select").val(),
+                        department_id: $("#department_select").val(),
+                        contract_id: $("#contract_select").val(),
                         page: params.page || 1,
                     };
                     return data;

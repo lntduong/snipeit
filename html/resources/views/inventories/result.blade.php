@@ -68,7 +68,7 @@
                      
                   </table>
                   <div class="box-footer text-right">
-                     <button href='{{ route('modal.inventory-result') }}' data-toggle="modal"  data-target="#createModal" data-select='assigned_user_select' type="button" class="btn btn-success" id="addasset" {{isset($item->id) ? "" : "disabled" }} ><i class=""></i> Add Unknow Asset</button>
+                  <button href='{{ route('modal.inventory-result',['inventory_id'=>$item->id]) }}' data-toggle="modal"  data-target="#createModal" data-select='assigned_user_select' type="button" class="btn btn-success" id="addasset" {{isset($item->id) ? "" : "disabled" }} ><i class=""></i> {{trans('admin/inventories/table.add_unknown_asset')}}</button>
                   </div>
                </div>
                <!-- /.row -->
@@ -268,10 +268,10 @@
      data: function (params) {
          var data = {
              search: params.term,
-             company:($("#company_select").val() ? $("#company_select").val() : "" ),
-             store:($("#store_select").val() ? $("#store_select").val() : ""),
-             department:($("#department_select").val() ? $("#department_select").val() : ""),
-             contract:($("#contract_select").val() ? $("#contract_select").val() : ""),
+             company_id:($("#company_select").val() ? $("#company_select").val() : "" ),
+             store_id:($("#store_select").val() ? $("#store_select").val() : ""),
+             department_id:($("#department_select").val() ? $("#department_select").val() : ""),
+             contract_id:($("#contract_select").val() ? $("#contract_select").val() : ""),
              page: params.page || 1,
          };
          return data;

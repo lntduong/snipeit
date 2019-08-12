@@ -27,7 +27,7 @@
                      <div id="datepicker" style="width: 170px" class="input-group date" data-provide="datepicker" data-date-format="yyyy-mm"  data-autoclose="true">
                       <input type="text" class="form-control" placeholder="{{ trans('general.select_date') }}" name="billing_date" id="billing_date" >
                       <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
-                    <button type="submit" style="float: right; margin-right: -60px;" class="btn btn-primary" onclick="filterPaymentDate()" >{{ trans('admin/contracts/table.go') }}</button>
+                    <button type="submit" style="float: right; margin-right: -60px;" class="btn btn-primary" id="filterPaymentDate" onclick="filterPaymentDate()" >{{ trans('admin/contracts/table.go') }}</button>
                     </div>
                     </div> 
                   </div>
@@ -72,17 +72,24 @@
 @section('moar_scripts')
 <script nonce="{{ csrf_token() }}">
   var $table = $('#contractsBillingTable');
+  
+   $("#datepicker").datepicker( {
+      format: "yyyy-mm",
+      viewMode: "months", 
+      minViewMode: "months",
+      autoclose: true,
+   });
+
    function filterPaymentDate() {
       $table.bootstrapTable('refresh', {
         url: '{{url('/') }}/api/v1/contracts?billing_date='+$('#billing_date').val()
       });
-   }
-  $("#datepicker").datepicker( {
-    format: "yyyy-mm",
-    viewMode: "months", 
-    minViewMode: "months",
-    autoclose: true,
-  });
+      $("#filterPaymentDate").click(function() {
+        $('.datepicker').hide();
+      });
+   };
+
+   
 </script>
 @include ('partials.bootstrap-table', ['exportFile' => 'components-export', 'search' => true, 'showFooter' => true, 'columns' => \App\Presenters\ContractPresenter::dataTableLayout()])
 @stop

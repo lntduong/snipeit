@@ -17,5 +17,6 @@ return array(
     'unknown'               => 'Không xác định',
     'familiar'              => 'Familiar',
     'device_image'          => 'Hình ảnh thiết bị',
-    'select_status'         => 'Chọn trạng thái'
+    'select_status'         => 'Chọn trạng thái',
+    'add_unknown_asset'     => 'Thêm thiết bị lạ'
 );

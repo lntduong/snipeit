@@ -47,7 +47,7 @@ class Department extends SnipeModel
     ];
 
     use Searchable;
-    
+
     /**
      * The attributes that should be included when searching the model.
      * 
@@ -60,7 +60,7 @@ class Department extends SnipeModel
      * 
      * @var array
      */
-    protected $searchableRelations = [];    
+    protected $searchableRelations = [];
 
 
     public function store()
@@ -70,8 +70,8 @@ class Department extends SnipeModel
     public function contract()
     {
         return $this->hasMany('\App\Models\Contract', 'object_id', 'id')
-        ->select(['contracts.*'])
-        ->where("contracts.object_type","=",\DB::raw('"App\\\Models\\\Department"'));
+            ->select(['contracts.*'])
+            ->where("contracts.object_type", "=", \DB::raw('"App\\\Models\\\Department"'));
     }
 
     /**
@@ -86,9 +86,9 @@ class Department extends SnipeModel
 
 
     /**
-    * Return the manager in charge of the dept
-    * @return mixed
-    */
+     * Return the manager in charge of the dept
+     * @return mixed
+     */
     public function manager()
     {
         return $this->belongsTo('\App\Models\User', 'manager_id');
@@ -99,7 +99,7 @@ class Department extends SnipeModel
     {
         return $this->belongsTo('\App\Models\Location', 'location_id');
     }
-    
+
     /**
      * Query builder scope to order on location name
      *
@@ -121,10 +121,36 @@ class Department extends SnipeModel
      *
      * @return \Illuminate\Database\Query\Builder          Modified query builder
      */
+    public function scopeOrderCompany($query, $order)
+    {
+        return $query
+            ->leftJoin('stores', 'departments.store_id', '=', 'stores.id')
+            ->leftJoin('companies', 'companies.id', '=', 'stores.company_id')
+            ->orderBy('companies.name', $order);
+    }
+
+    /**
+     * Query builder scope to order on manager name
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query  Query builder instance
+     * @param  text                              $order       Order
+     *
+     * @return \Illuminate\Database\Query\Builder          Modified query builder
+     */
+    public function scopeOrderStore($query, $order)
+    {
+        return $query->leftJoin('stores', 'departments.store_id', '=', 'stores.id')->orderBy('stores.name', $order);
+    }
+    /**
+     * Query builder scope to order on manager name
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query  Query builder instance
+     * @param  text                              $order       Order
+     *
+     * @return \Illuminate\Database\Query\Builder          Modified query builder
+     */
     public function scopeOrderManager($query, $order)
     {
         return $query->leftJoin('users as department_user', 'departments.manager_id', '=', 'department_user.id')->orderBy('department_user.first_name', $order)->orderBy('department_user.last_name', $order);
     }
-
-
 }

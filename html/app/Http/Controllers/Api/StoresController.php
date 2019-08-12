@@ -10,9 +10,9 @@ use App\Models\Store;
 
 
 /** 
-* @author [Dang.HT]
-* @since [v1.0]
-*/
+ * @author [Dang.HT]
+ * @since [v1.0]
+ */
 
 class StoresController extends Controller
 {
@@ -24,13 +24,14 @@ class StoresController extends Controller
     public function index(Request $request)
     {
         $this->authorize('view', Store::class);
-        $allowed_columns = ['location','company','department_count'];
+        $allowed_columns = ['location', 'company', 'department_count', 'department_count', 'contract_count'];
+
         $store = Store::select('stores.*')
             ->with('company', 'location')->with('department')->withCount('department');
         if ($request->has('search')) {
             $store = $store->TextSearch($request->input('search'));
         }
-       
+
         $offset = (($store) && (request('offset') > $store->count())) ? 0 : request('offset', 0);
         $limit = request('limit', 50);
 
@@ -47,6 +48,9 @@ class StoresController extends Controller
                 break;
             case 'store':
                 $store = $store->OrderStore($order);
+                break;
+            case 'contract_count':
+                $store = $store->OrderContract($order);
                 break;
             default:
                 $store = $store->orderBy($sort, $order);
@@ -66,14 +70,14 @@ class StoresController extends Controller
             'stores.image',
         ]);
         if ($request->get('search')) {
-            $stores = $stores->where('stores.name', 'LIKE', '%'.$request->get('search').'%');
+            $stores = $stores->where('stores.name', 'LIKE', '%' . $request->get('search') . '%');
         }
         if ($request->get('company_id')) {
             $stores = $stores->where('stores.company_id', '=', $request->get('company_id'));
         }
         $stores = $stores->orderBy('name', 'ASC')->paginate(50);
         foreach ($stores as $store) {
-            $store->use_image = ($store->image) ? url('/').'/uploads/store/'.$store->image : null;
+            $store->use_image = ($store->image) ? url('/') . '/uploads/store/' . $store->image : null;
         }
 
         return (new SelectlistTransformer)->transformSelectlist($stores);

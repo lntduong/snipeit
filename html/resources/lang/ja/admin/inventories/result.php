@@ -40,6 +40,7 @@ return array(
     'error_no_data'                 => 'No data found',
     'asset_not_found'               => 'Asset not found',
     'add_status'                    => 'Update Status',
+    'switch_camera'                 => 'Switch Camera',
     'camera_load_failed'            => 'Cannot load camera! Please contact Administrator for more information.',
     'rm_stored'                     => 'Do you want to clear Local Storage of this Inventory Result?',
     'delete'                        => array(

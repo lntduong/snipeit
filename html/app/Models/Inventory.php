@@ -32,7 +32,7 @@ class Inventory extends SnipeModel
     // */
     public $rules = array(
         'inventory_date'    => 'required',
-        'name'              => 'required',
+        'name'              => 'required|unsame_name:inventories,inventory_date',
     );
 
     /**

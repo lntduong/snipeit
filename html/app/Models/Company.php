@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Models;
 
 use App\Models\SnipeModel;
@@ -30,17 +31,17 @@ final class Company extends SnipeModel
     use Presentable;
 
     /**
-    * Whether the model should inject it's identifier to the unique
-    * validation rules before attempting validation. If this property
-    * is not set in the model it will default to true.
-    *
-    * @var boolean
-    */
+     * Whether the model should inject it's identifier to the unique
+     * validation rules before attempting validation. If this property
+     * is not set in the model it will default to true.
+     *
+     * @var boolean
+     */
     protected $injectUniqueIdentifier = true;
     use ValidatingTrait;
 
     use Searchable;
-    
+
     /**
      * The attributes that should be included when searching the model.
      * 
@@ -53,7 +54,7 @@ final class Company extends SnipeModel
      * 
      * @var array
      */
-    protected $searchableRelations = [];   
+    protected $searchableRelations = [];
 
     /**
      * The attributes that are mass assignable.
@@ -74,7 +75,7 @@ final class Company extends SnipeModel
         }
     }
 
-    private static function scopeCompanyablesDirectly($query, $column = 'company_id', $table_name = null )
+    private static function scopeCompanyablesDirectly($query, $column = 'company_id', $table_name = null)
     {
         if (Auth::user()) {
             $company_id = Auth::user()->company_id;
@@ -82,8 +83,8 @@ final class Company extends SnipeModel
             $company_id = null;
         }
 
-        $table = ($table_name) ? DB::getTablePrefix().$table_name."." : '';
-        return $query->where($table.$column, '=', $company_id); 
+        $table = ($table_name) ? DB::getTablePrefix() . $table_name . "." : '';
+        return $query->where($table . $column, '=', $company_id);
     }
 
     public static function getIdFromInput($unescaped_input)
@@ -114,7 +115,6 @@ final class Company extends SnipeModel
                     return static::getIdFromInput($unescaped_input);
                 }
             }
-
         }
     }
 
@@ -139,7 +139,7 @@ final class Company extends SnipeModel
     public static function canManageUsersCompanies()
     {
         return (!static::isFullMultipleCompanySupportEnabled() || Auth::user()->isSuperUser() ||
-                Auth::user()->company_id == null);
+            Auth::user()->company_id == null);
     }
 
     public static function getIdForUser($unescaped_input)
@@ -151,7 +151,7 @@ final class Company extends SnipeModel
         }
     }
 
-    public static function scopeCompanyables($query, $column = 'company_id', $table_name = null )
+    public static function scopeCompanyables($query, $column = 'company_id', $table_name = null)
     {
         // If not logged in and hitting this, assume we are on the command line and don't scope?'
         if (!static::isFullMultipleCompanySupportEnabled() || (Auth::check() && Auth::user()->isSuperUser()) || (!Auth::check())) {
@@ -213,21 +213,65 @@ final class Company extends SnipeModel
     }
     public function contract()
     {
-        $contract = $this->hasMany('\App\Models\Contract', 'object_id','id')
-        ->where("contracts.object_type","=",\DB::raw('"App\\\Models\\\Company"'));
+        $contract = $this->hasMany('\App\Models\Contract', 'object_id', 'id')
+            ->where("contracts.object_type", "=", \DB::raw('"App\\\Models\\\Company"'));
         $department = Contract::select('*')
-            ->where('contracts.object_type', '=', \DB::raw('"App\\\Models\\\Department"') )
-            ->whereIn('contracts.object_id', 
+            ->where('contracts.object_type', '=', \DB::raw('"App\\\Models\\\Department"'))
+            ->whereIn(
+                'contracts.object_id',
                 Department::select('departments.id')
-                ->join('stores','stores.id', '=', 'departments.store_id')
-                ->join('companies','companies.id', '=', 'stores.company_id')
-                ->where('companies.id','=',$this->id));
+                    ->join('stores', 'stores.id', '=', 'departments.store_id')
+                    ->join('companies', 'companies.id', '=', 'stores.company_id')
+                    ->where('companies.id', '=', $this->id)
+            )
+            ->whereNull('contracts.deleted_at');
         $store = Contract::select('*')
             ->where('contracts.object_type', '=', \DB::raw('"App\\\Models\\\Store"'))
-            ->whereIn('contracts.object_id', 
+            ->whereIn(
+                'contracts.object_id',
                 Store::select('stores.id')
-                ->join('companies','companies.id', '=', 'stores.company_id')
-                ->where('companies.id','=',$this->id));
+                    ->join('companies', 'companies.id', '=', 'stores.company_id')
+                    ->where('companies.id', '=', $this->id)
+            )
+            ->whereNull('contracts.deleted_at');
         return $contract->union($department)->union($store);
+    }
+
+    /**
+     * Query builder scope to order on company
+     *
+     * @param  Illuminate\Database\Query\Builder  $query  Query builder instance
+     * @param  text                              $order       Order
+     *
+     * @return Illuminate\Database\Query\Builder          Modified query builder
+     */
+    public function scopeOrderContract($query, $order)
+    {
+        return $query->select(
+            DB::raw("
+        companies.*,
+        (       
+            SELECT count(*)
+            FROM contracts
+            WHERE 
+            case 
+            when contracts.object_type = 'App\\\Models\\\Department'  
+                then contracts.object_id IN
+                                            (SELECT departments.id
+                                                FROM departments
+                                                JOIN stores ON stores.id = departments.store_id
+                                                where stores.company_id = companies.id
+                                            )
+            when contracts.object_type = 'App\\\Models\\\Store' 
+                then contracts.object_id IN
+                                            (SELECT stores.id
+                                                FROM stores
+                                                where stores.company_id = companies.id
+                                            )
+            when contracts.object_type = 'App\\\Models\\\Company' 
+                then contracts.object_id	= companies.id
+            end 
+        ) as sum ")
+        )->orderBy('sum', $order);
     }
 }
