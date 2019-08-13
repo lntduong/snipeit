@@ -21,676 +21,473 @@ class ContractsController extends Controller
 {
     public function index(Request $request)
     {
-
         $this->authorize('view', Contract::class);
+        $contract = Contract::select('contracts.*')
+            ->with('company')
+            ->with('store')
+            ->with('department');
 
-        $contract = Contract::select('contracts.*')->with('company', 'store', 'location', 'user');
+        $search = $request->input('search');
+        $company_search = $request->input('company_id');
+        $store_search = $request->input('store_id');
+        $department_search = $request->input('department_id');
+
+        if ($search) {
+            $contract = self::search($search, $company_search, $store_search, $department_search);
+        }
+
+        $contract = self::filter($company_search, $store_search, $department_search, $contract, $search);
+
+        $limit = request('limit', 50);
         $order = $request->input('order') === 'asc' ? 'asc' : 'desc';
-        $allowed_columns = ['location_id', 'store', 'contact_id_1', 'contact_id_2', 'company', 'department'];
+        $allowed_columns = [
+            'id', 'name', 'company', 'store', 'department', 'location', 'start_date', 'end_date', 'billing_date', 'payment_date', 'location'
+        ];
 
-        $sort = in_array($request->input('sort'), $allowed_columns) ? e($request->input('sort')) : 'name';
+        $sort = in_array($request->input('sort'), $allowed_columns) ? $request->input('sort') : 'created_at';
+        switch ($sort) {
 
-        $limit = $request->input('limit', 50);
-
-        if ($request->has('department_id')) {
-            $contract = $contract->FilterDepartmentInDepartment($request->input('department_id'));
-        } else {
-            if ($request->has('store_id')) {
-                $contract = $contract->FilterDepartmentInStore($request->input('store_id'))
-                    ->union(Contract::select('contracts.*')->FilterStoreInStore($request->input('store_id')));
-            } else if ($request->input('company_id')) {
-                $contract = $contract->FilterDepartmentInCompany($request->input('company_id'))
-                    ->union(Contract::select('contracts.*')->FilterStoreInCompany($request->input('company_id')))
-                    ->union(Contract::select('contracts.*')->FilterCompanyInCompany($request->input('company_id')));
-            }
-        }
-
-        // Count row list contracts
-        if ($request->input('department_id')) {
-            $department = Contract::select('contracts.*')->TotalDepartment('departments.id', $request->input('department_id'))->count();
-            $countSort = $department;
-        } else if ($request->input('store_id')) {
-            $store = Contract::select('contracts.*')->TotalStore('stores.id', $request->input('store_id'))->count();
-            $department = Contract::select('contracts.*')->TotalDepartment('stores.id', $request->input('store_id'))->count();
-            $countSort = $store + $department;
-        } else if ($request->input('company_id')) {
-            $company = Contract::select('contracts.*')->TotalCompany('companies.id', $request->input('company_id'))->count();
-            $store = Contract::select('contracts.*')->TotalStore('companies.id', $request->input('company_id'))->count();
-            $department = Contract::select('contracts.*')->TotalDepartment('companies.id', $request->input('company_id'))->count();
-            $countSort = $company + $store + $department;
-        } else if ($request->input('billing_date')) {
-            $countSort = Contract::select('contracts.*')
-                ->where('contracts.billing_date', 'LIKE', $request->input('billing_date') . '-%')->whereNull('contracts.deleted_at')->count();
-        } else if ($request->input('search')) {
-            $sub = Contract::select(
-                'contracts.*',
-                'companies.name as companies',
-                \DB::raw('null as stores'),
-                \DB::raw('null as departments'),
-                'locations.name as locations',
-                'contact_1.first_name as users_1',
-                'contact_2.first_name as users_2'
-            )->SearchSort('companies', $order, $request->input('search'));
-
-            $countSort = DB::table(DB::raw("({$sub->toSql()}) as sub"))
-                ->mergeBindings($sub->getQuery())
-                ->count();
-        } else {
-            $countSort = $contract->count();
-        }
-        $offset = (($contract) && (request('offset') > $countSort)) ? 0 : request('offset', 0);
-
-        //Sort column in list contracts
-        switch ($request->input('sort')) {
             case 'company':
-                if ($request->input('department_id')) {
-                    $contract = $contract;
-                } else if ($request->input('store_id')) {
-                    $contract = $contract;
-                } else if ($request->input('search') && $request->input('company_id')) {
-                    $contract = Contract::select(
-                        'contracts.*',
-                        'companies.name as companies',
-                        \DB::raw('null as stores'),
-                        \DB::raw('null as departments'),
-                        'locations.name as locations',
-                        'contact_1.first_name as users_1',
-                        'contact_2.first_name as users_2'
-                    )->SelectSearchSort('companies', $order, $request->input('search'), 'companies.id', $request->input('company_id'))
-                        ->union(
-                            Contract::select(
-                                'contracts.*',
-                                'companies.name as companies',
-                                'stores.name as stores',
-                                \DB::raw('null as departments'),
-                                'locations.name as locations',
-                                'contact_1.first_name as users_1',
-                                'contact_2.first_name as users_2'
-                            )->SelectSearchSortStore('companies', $order, $request->input('search'), 'companies.id', $request->input('company_id'))
-                        )
-                        ->union(
-                            Contract::select(
-                                'contracts.*',
-                                'companies.name as companies',
-                                \DB::raw('null as stores'),
-                                \DB::raw('null as departments'),
-                                'locations.name as locations',
-                                'contact_1.first_name as users_1',
-                                'contact_2.first_name as users_2'
-                            )->SelectSearchSortCompany('companies', $order, $request->input('search'), 'companies.id', $request->input('company_id'))
-                        );
-                } else if ($request->input('company_id')) {
-                    $contract = $contract;
-                } else if ($request->input('search')) {
-                    $contract = Contract::select(
-                        'contracts.*',
-                        'companies.name as companies',
-                        \DB::raw('null as stores'),
-                        \DB::raw('null as departments'),
-                        'locations.name as locations',
-                        'contact_1.first_name as users_1',
-                        'contact_2.first_name as users_2'
-                    )->SearchSort('companies', $order, $request->input('search'));
-                } else {
-                    $contract = Contract::select('contracts.*', 'companies.name as company_name')->SortCompany($order);
-                }
+                $contract = $contract->SortCompany($order, $company_search, $store_search, $department_search, $search);
                 break;
-
             case 'store':
-                if ($request->input('department_id')) {
-                    $contract = $contract;
-                } else if ($request->input('search') && $request->input('company_id')) {
-                    $contract = Contract::select(
-                        'contracts.*',
-                        'companies.name as companies',
-                        \DB::raw('null as stores'),
-                        \DB::raw('null as departments'),
-                        'locations.name as locations',
-                        'contact_1.first_name as users_1',
-                        'contact_2.first_name as users_2'
-                    )->SelectSearchSort('stores', $order, $request->input('search'), 'companies.id', $request->input('company_id'))
-                        ->union(
-                            Contract::select(
-                                'contracts.*',
-                                'companies.name as companies',
-                                'stores.name as stores',
-                                \DB::raw('null as departments'),
-                                'locations.name as locations',
-                                'contact_1.first_name as users_1',
-                                'contact_2.first_name as users_2'
-                            )->SelectSearchSortStore('stores', $order, $request->input('search'), 'companies.id', $request->input('company_id'))
-                        )
-                        ->union(
-                            Contract::select(
-                                'contracts.*',
-                                'companies.name as companies',
-                                \DB::raw('null as stores'),
-                                \DB::raw('null as departments'),
-                                'locations.name as locations',
-                                'contact_1.first_name as users_1',
-                                'contact_2.first_name as users_2'
-                            )->SelectSearchSortCompany('stores', $order, $request->input('search'), 'companies.id', $request->input('company_id'))
-                        );
-                } else if ($request->input('store_id')) {
-                    $contract = $contract;
-                } else if ($request->input('company_id')) {
-                    $contract = Contract::select('contracts.*', 'stores.name as stores', 'stores.id as stores_id')->SortStoreCompany($order, $request->input('company_id'));
-                } else if ($request->input('search')) {
-                    $contract = Contract::select(
-                        'contracts.*',
-                        'companies.name as companies',
-                        \DB::raw('null as stores'),
-                        \DB::raw('null as departments'),
-                        'locations.name as locations',
-                        'contact_1.first_name as users_1',
-                        'contact_2.first_name as users_2'
-                    )->SearchSort('stores', $order, $request->input('search'));
-                } else {
-                    $contract = Contract::select('contracts.*', 'stores.name as stores', 'stores.id as stores_id')->SortStore($order);
-                }
+                $contract = $contract->SortStore($order, $company_search, $store_search, $department_search, $contract = new Contract, $search);
                 break;
-
             case 'department':
-                if (($request->input('department_id'))) {
-                    $contract = $contract;
-                } else if ($request->input('store_id')) {
-                    $contract = Contract::select('contracts.*', 'departments.name as departments', 'departments.id as departments_id')->SortStoreDepartment($order, $request->input('store_id'));
-                } else if ($request->input('search') && $request->input('company_id')) {
-                    $contract = Contract::select(
-                        'contracts.*',
-                        'companies.name as companies',
-                        \DB::raw('null as stores'),
-                        \DB::raw('null as departments'),
-                        'locations.name as locations',
-                        'contact_1.first_name as users_1',
-                        'contact_2.first_name as users_2'
-                    )->SelectSearchSort('departments', $order, $request->input('search'), 'companies.id', $request->input('company_id'))
-                        ->union(
-                            Contract::select(
-                                'contracts.*',
-                                'companies.name as companies',
-                                'stores.name as stores',
-                                \DB::raw('null as departments'),
-                                'locations.name as locations',
-                                'contact_1.first_name as users_1',
-                                'contact_2.first_name as users_2'
-                            )->SelectSearchSortStore('departments', $order, $request->input('search'), 'companies.id', $request->input('company_id'))
-                        )
-                        ->union(
-                            Contract::select(
-                                'contracts.*',
-                                'companies.name as companies',
-                                \DB::raw('null as stores'),
-                                \DB::raw('null as departments'),
-                                'locations.name as locations',
-                                'contact_1.first_name as users_1',
-                                'contact_2.first_name as users_2'
-                            )->SelectSearchSortCompany('departments', $order, $request->input('search'), 'companies.id', $request->input('company_id'))
-                        );
-                } else if ($request->input('company_id')) {
-                    $contract = Contract::select('contracts.*', 'departments.name as departments', 'departments.id as departments_id')->SortCompanyDepartment($order, $request->input('company_id'));
-                } else if ($request->input('search')) {
-                    $contract = Contract::select(
-                        'contracts.*',
-                        'companies.name as companies',
-                        \DB::raw('null as stores'),
-                        \DB::raw('null as departments'),
-                        'locations.name as locations',
-                        'contact_1.first_name as users_1',
-                        'contact_2.first_name as users_2'
-                    )->SearchSort('departments', $order, $request->input('search'));
-                } else {
-                    $contract = Contract::select('contracts.*', 'departments.name as departments', 'departments.id as departments_id')->SortDepartment($order);
-                }
+                $contract = $contract->SortDepartment($order, $company_search, $store_search, $department_search, $contract = new Contract, $search);
                 break;
-
-            case 'location_id':
-                if (($request->input('department_id'))) {
-                    $contract = Contract::select('contracts.*', \DB::raw('locations.name AS location_name'))->OrderLocationDepartment($order, $request->input('department_id'));
-                } else if ($request->input('search') && $request->input('company_id')) {
-                    $contract = Contract::select(
-                        'contracts.*',
-                        'companies.name as companies',
-                        \DB::raw('null as stores'),
-                        \DB::raw('null as departments'),
-                        'locations.name as locations',
-                        'contact_1.first_name as users_1',
-                        'contact_2.first_name as users_2'
-                    )->SelectSearchSort('locations', $order, $request->input('search'), 'companies.id', $request->input('company_id'))
-                        ->union(
-                            Contract::select(
-                                'contracts.*',
-                                'companies.name as companies',
-                                'stores.name as stores',
-                                \DB::raw('null as departments'),
-                                'locations.name as locations',
-                                'contact_1.first_name as users_1',
-                                'contact_2.first_name as users_2'
-                            )->SelectSearchSortStore('locations', $order, $request->input('search'), 'companies.id', $request->input('company_id'))
-                        )
-                        ->union(
-                            Contract::select(
-                                'contracts.*',
-                                'companies.name as companies',
-                                \DB::raw('null as stores'),
-                                \DB::raw('null as departments'),
-                                'locations.name as locations',
-                                'contact_1.first_name as users_1',
-                                'contact_2.first_name as users_2'
-                            )->SelectSearchSortCompany('locations', $order, $request->input('search'), 'companies.id', $request->input('company_id'))
-                        );
-                } else if ($request->input('store_id')) {
-                    $contract = Contract::select('contracts.*', \DB::raw('locations.name AS location_name'))->OrderLocationStore($order, $request->input('store_id'));
-                } else if ($request->input('company_id')) {
-                    $contract = Contract::select('contracts.*', \DB::raw('locations.name AS location_name'))->OrderLocationCompany($order, $request->input('company_id'));
-                } else if ($request->input('search')) {
-                    $contract = Contract::select(
-                        'contracts.*',
-                        'companies.name as companies',
-                        \DB::raw('null as stores'),
-                        \DB::raw('null as departments'),
-                        'locations.name as locations',
-                        'contact_1.first_name as users_1',
-                        'contact_2.first_name as users_2'
-                    )->SearchSort('locations', $order, $request->input('search'));
-                } else {
-                    $contract = $contract->OrderLocation($order);
-                }
+            case 'location':
+                $contract = $contract->SortLocation($order, $company_search, $store_search, $department_search, $contract = new Contract, $search);
                 break;
-
-            case 'contact_id_1':
-                if (($request->input('department_id'))) {
-                    $contract = Contract::select('contracts.*', \DB::raw('users.first_name AS first_name'))->OrderContactDepartment('contact_id_1', $order, $request->input('department_id'));
-                } else if ($request->input('search') && $request->input('company_id')) {
-                    $contract = Contract::select(
-                        'contracts.*',
-                        'companies.name as companies',
-                        \DB::raw('null as stores'),
-                        \DB::raw('null as departments'),
-                        'locations.name as locations',
-                        'contact_1.first_name as users_1',
-                        'contact_2.first_name as users_2'
-                    )->SelectSearchSort('users_1', $order, $request->input('search'), 'companies.id', $request->input('company_id'))
-                        ->union(
-                            Contract::select(
-                                'contracts.*',
-                                'companies.name as companies',
-                                'stores.name as stores',
-                                \DB::raw('null as departments'),
-                                'locations.name as locations',
-                                'contact_1.first_name as users_1',
-                                'contact_2.first_name as users_2'
-                            )->SelectSearchSortStore('users_1', $order, $request->input('search'), 'companies.id', $request->input('company_id'))
-                        )
-                        ->union(
-                            Contract::select(
-                                'contracts.*',
-                                'companies.name as companies',
-                                \DB::raw('null as stores'),
-                                \DB::raw('null as departments'),
-                                'locations.name as locations',
-                                'contact_1.first_name as users_1',
-                                'contact_2.first_name as users_2'
-                            )->SelectSearchSortCompany('users_1', $order, $request->input('search'), 'companies.id', $request->input('company_id'))
-                        );
-                } else if ($request->input('store_id')) {
-                    $contract = Contract::select('contracts.*', \DB::raw('users.first_name AS first_name'))->OrderContactStore('contact_id_1', $order, $request->input('store_id'));
-                } else if ($request->input('company_id')) {
-                    $contract = Contract::select('contracts.*', \DB::raw('users.first_name AS first_name'))->OrderContactCompany('contact_id_1', $order, $request->input('company_id'));
-                } else if ($request->input('search')) {
-                    $contract = Contract::select(
-                        'contracts.*',
-                        'companies.name as companies',
-                        \DB::raw('null as stores'),
-                        \DB::raw('null as departments'),
-                        'locations.name as locations',
-                        'contact_1.first_name as users_1',
-                        'contact_2.first_name as users_2'
-                    )->SearchSort('users_1', $order, $request->input('search'));
-                } else {
-                    $contract = $contract->OrderContactOne($order);
-                }
+            case 'name':
+                $contract = $contract->orderBy('name', $order);
                 break;
-
-            case 'contact_id_2':
-                if (($request->input('department_id'))) {
-                    $contract = Contract::select('contracts.*', \DB::raw('users.first_name AS first_name'))->OrderContactDepartment('contact_id_2', $order, $request->input('department_id'));
-                } else if ($request->input('search') && $request->input('company_id')) {
-                    $contract = Contract::select(
-                        'contracts.*',
-                        'companies.name as companies',
-                        \DB::raw('null as stores'),
-                        \DB::raw('null as departments'),
-                        'locations.name as locations',
-                        'contact_1.first_name as users_1',
-                        'contact_2.first_name as users_2'
-                    )->SelectSearchSort('users_2', $order, $request->input('search'), 'companies.id', $request->input('company_id'))
-                        ->union(
-                            Contract::select(
-                                'contracts.*',
-                                'companies.name as companies',
-                                'stores.name as stores',
-                                \DB::raw('null as departments'),
-                                'locations.name as locations',
-                                'contact_1.first_name as users_1',
-                                'contact_2.first_name as users_2'
-                            )->SelectSearchSortStore('users_2', $order, $request->input('search'), 'companies.id', $request->input('company_id'))
-                        )
-                        ->union(
-                            Contract::select(
-                                'contracts.*',
-                                'companies.name as companies',
-                                \DB::raw('null as stores'),
-                                \DB::raw('null as departments'),
-                                'locations.name as locations',
-                                'contact_1.first_name as users_1',
-                                'contact_2.first_name as users_2'
-                            )->SelectSearchSortCompany('users_2', $order, $request->input('search'), 'companies.id', $request->input('company_id'))
-                        );
-                } else if ($request->input('store_id')) {
-                    $contract = Contract::select('contracts.*', \DB::raw('users.first_name AS first_name'))->OrderContactStore('contact_id_2', $order, $request->input('store_id'));
-                } else if ($request->input('company_id')) {
-                    $contract = Contract::select('contracts.*', \DB::raw('users.first_name AS first_name'))->OrderContactCompany('contact_id_2', $order, $request->input('company_id'));
-                } else if ($request->input('search')) {
-                    $contract = Contract::select(
-                        'contracts.*',
-                        'companies.name as companies',
-                        \DB::raw('null as stores'),
-                        \DB::raw('null as departments'),
-                        'locations.name as locations',
-                        'contact_1.first_name as users_1',
-                        'contact_2.first_name as users_2'
-                    )->SearchSort('users_2', $order, $request->input('search'));
-                } else {
-                    $contract = $contract->OrderContactTwo($order);
-                }
-                break;
-
             case 'start_date':
-                if ($request->input('search') && $request->input('company_id')) {
-                    $contract = Contract::select(
-                        'contracts.*',
-                        'companies.name as companies',
-                        \DB::raw('null as stores'),
-                        \DB::raw('null as departments'),
-                        'locations.name as locations',
-                        'contact_1.first_name as users_1',
-                        'contact_2.first_name as users_2'
-                    )->SelectSearchSort('start_date', $order, $request->input('search'), 'companies.id', $request->input('company_id'))
-                        ->union(
-                            Contract::select(
-                                'contracts.*',
-                                'companies.name as companies',
-                                'stores.name as stores',
-                                \DB::raw('null as departments'),
-                                'locations.name as locations',
-                                'contact_1.first_name as users_1',
-                                'contact_2.first_name as users_2'
-                            )->SelectSearchSortStore('start_date', $order, $request->input('search'), 'companies.id', $request->input('company_id'))
-                        )
-                        ->union(
-                            Contract::select(
-                                'contracts.*',
-                                'companies.name as companies',
-                                \DB::raw('null as stores'),
-                                \DB::raw('null as departments'),
-                                'locations.name as locations',
-                                'contact_1.first_name as users_1',
-                                'contact_2.first_name as users_2'
-                            )->SelectSearchSortCompany('start_date', $order, $request->input('search'), 'companies.id', $request->input('company_id'))
-                        );
-                } else if ($request->input('search')) {
-                    $contract = Contract::select(
-                        'contracts.*',
-                        'companies.name as companies',
-                        \DB::raw('null as stores'),
-                        \DB::raw('null as departments'),
-                        'locations.name as locations',
-                        'contact_1.first_name as users_1',
-                        'contact_2.first_name as users_2'
-                    )->SearchSort('start_date', $order, $request->input('search'));
-                } else {
-                    $contract = $contract->OrderDate('start_date', $order);
-                }
-
+                $contract = $contract->orderBy('start_date', $order);
                 break;
-
             case 'end_date':
-                if ($request->input('search') && $request->input('company_id')) {
-                    $contract = Contract::select(
-                        'contracts.*',
-                        'companies.name as companies',
-                        \DB::raw('null as stores'),
-                        \DB::raw('null as departments'),
-                        'locations.name as locations',
-                        'contact_1.first_name as users_1',
-                        'contact_2.first_name as users_2'
-                    )->SelectSearchSort('end_date', $order, $request->input('search'), 'companies.id', $request->input('company_id'))
-                        ->union(
-                            Contract::select(
-                                'contracts.*',
-                                'companies.name as companies',
-                                'stores.name as stores',
-                                \DB::raw('null as departments'),
-                                'locations.name as locations',
-                                'contact_1.first_name as users_1',
-                                'contact_2.first_name as users_2'
-                            )->SelectSearchSortStore('end_date', $order, $request->input('search'), 'companies.id', $request->input('company_id'))
-                        )
-                        ->union(
-                            Contract::select(
-                                'contracts.*',
-                                'companies.name as companies',
-                                \DB::raw('null as stores'),
-                                \DB::raw('null as departments'),
-                                'locations.name as locations',
-                                'contact_1.first_name as users_1',
-                                'contact_2.first_name as users_2'
-                            )->SelectSearchSortCompany('end_date', $order, $request->input('search'), 'companies.id', $request->input('company_id'))
-                        );
-                } else if ($request->input('search')) {
-                    $contract = Contract::select(
-                        'contracts.*',
-                        'companies.name as companies',
-                        \DB::raw('null as stores'),
-                        \DB::raw('null as departments'),
-                        'locations.name as locations',
-                        'contact_1.first_name as users_1',
-                        'contact_2.first_name as users_2'
-                    )->SearchSort('end_date', $order, $request->input('search'));
-                } else {
-                    $contract = $contract->OrderDate('end_date', $order);
-                }
+                $contract = $contract->orderBy('end_date', $order);
                 break;
-
             case 'billing_date':
-                if ($request->input('search') && $request->input('company_id')) {
-                    $contract = Contract::select(
-                        'contracts.*',
-                        'companies.name as companies',
-                        \DB::raw('null as stores'),
-                        \DB::raw('null as departments'),
-                        'locations.name as locations',
-                        'contact_1.first_name as users_1',
-                        'contact_2.first_name as users_2'
-                    )->SelectSearchSort('billing_date', $order, $request->input('search'), 'companies.id', $request->input('company_id'))
-                        ->union(
-                            Contract::select(
-                                'contracts.*',
-                                'companies.name as companies',
-                                'stores.name as stores',
-                                \DB::raw('null as departments'),
-                                'locations.name as locations',
-                                'contact_1.first_name as users_1',
-                                'contact_2.first_name as users_2'
-                            )->SelectSearchSortStore('billing_date', $order, $request->input('search'), 'companies.id', $request->input('company_id'))
-                        )
-                        ->union(
-                            Contract::select(
-                                'contracts.*',
-                                'companies.name as companies',
-                                \DB::raw('null as stores'),
-                                \DB::raw('null as departments'),
-                                'locations.name as locations',
-                                'contact_1.first_name as users_1',
-                                'contact_2.first_name as users_2'
-                            )->SelectSearchSortCompany('billing_date', $order, $request->input('search'), 'companies.id', $request->input('company_id'))
-                        );
-                } else if ($request->input('search')) {
-                    $contract = Contract::select(
-                        'contracts.*',
-                        'companies.name as companies',
-                        \DB::raw('null as stores'),
-                        \DB::raw('null as departments'),
-                        'locations.name as locations',
-                        'contact_1.first_name as users_1',
-                        'contact_2.first_name as users_2'
-                    )->SearchSort('billing_date', $order, $request->input('search'));
-                } else {
-                    $contract = $contract->OrderDate('billing_date', $order);
-                }
+                $contract = $contract->orderBy('billing_date', $order);
                 break;
-
             case 'payment_date':
-                if ($request->input('search') && $request->input('company_id')) {
-                    $contract = Contract::select(
-                        'contracts.*',
-                        'companies.name as companies',
-                        \DB::raw('null as stores'),
-                        \DB::raw('null as departments'),
-                        'locations.name as locations',
-                        'contact_1.first_name as users_1',
-                        'contact_2.first_name as users_2'
-                    )->SelectSearchSort('payment_date', $order, $request->input('search'), 'companies.id', $request->input('company_id'))
-                        ->union(
-                            Contract::select(
-                                'contracts.*',
-                                'companies.name as companies',
-                                'stores.name as stores',
-                                \DB::raw('null as departments'),
-                                'locations.name as locations',
-                                'contact_1.first_name as users_1',
-                                'contact_2.first_name as users_2'
-                            )->SelectSearchSortStore('payment_date', $order, $request->input('search'), 'companies.id', $request->input('company_id'))
-                        )
-                        ->union(
-                            Contract::select(
-                                'contracts.*',
-                                'companies.name as companies',
-                                \DB::raw('null as stores'),
-                                \DB::raw('null as departments'),
-                                'locations.name as locations',
-                                'contact_1.first_name as users_1',
-                                'contact_2.first_name as users_2'
-                            )->SelectSearchSortCompany('payment_date', $order, $request->input('search'), 'companies.id', $request->input('company_id'))
-                        );
-                } else if ($request->input('search')) {
-                    $contract = Contract::select(
-                        'contracts.*',
-                        'companies.name as companies',
-                        \DB::raw('null as stores'),
-                        \DB::raw('null as departments'),
-                        'locations.name as locations',
-                        'contact_1.first_name as users_1',
-                        'contact_2.first_name as users_2'
-                    )->SearchSort('payment_date', $order, $request->input('search'));
-                } else {
-                    $contract = $contract->OrderDate('payment_date', $order);
-                }
-                break;
-
-            default:
-                if ($request->input('search') && $request->input('company_id')) {
-                    $contract = Contract::select(
-                        'contracts.*',
-                        'companies.name as companies',
-                        \DB::raw('null as stores'),
-                        \DB::raw('null as departments'),
-                        'locations.name as locations',
-                        'contact_1.first_name as users_1',
-                        'contact_2.first_name as users_2'
-                    )->SelectSearchSort('name', $order, $request->input('search'), 'companies.id', $request->input('company_id'))
-                        ->union(
-                            Contract::select(
-                                'contracts.*',
-                                'companies.name as companies',
-                                'stores.name as stores',
-                                \DB::raw('null as departments'),
-                                'locations.name as locations',
-                                'contact_1.first_name as users_1',
-                                'contact_2.first_name as users_2'
-                            )->SelectSearchSortStore('name', $order, $request->input('search'), 'companies.id', $request->input('company_id'))
-                        )
-                        ->union(
-                            Contract::select(
-                                'contracts.*',
-                                'companies.name as companies',
-                                \DB::raw('null as stores'),
-                                \DB::raw('null as departments'),
-                                'locations.name as locations',
-                                'contact_1.first_name as users_1',
-                                'contact_2.first_name as users_2'
-                            )->SelectSearchSortCompany('name', $order, $request->input('search'), 'companies.id', $request->input('company_id'))
-                        );
-                } else if ($request->input('search')) {
-                    $contract = Contract::select(
-                        'contracts.*',
-                        'companies.name as companies',
-                        \DB::raw('null as stores'),
-                        \DB::raw('null as departments'),
-                        'locations.name as locations',
-                        'contact_1.first_name as users_1',
-                        'contact_2.first_name as users_2'
-                    )->SearchSort('name', $order, $request->input('search'));
-                } else {
-                    $contract = $contract->orderBy($sort, $order);
-                }
+                $contract = $contract->orderBy('payment_date', $order);
                 break;
         }
+        $total = $contract->get()->count();
+        $offset = (($contract) && (request('offset') > $contract->get()->count())) ? 0 : request('offset', 0);
+        $contract = $contract->skip($offset)->take($limit)->get();
 
-        if ($request->input('department_id')) {
-            $department = Contract::select('contracts.*')->TotalDepartment('departments.id', $request->input('department_id'))->count();
-            $total = $department;
-        } else if ($request->input('store_id')) {
-            $store = Contract::select('contracts.*')->TotalStore('stores.id', $request->input('store_id'))->count();
-            $department = Contract::select('contracts.*')->TotalDepartment('stores.id', $request->input('store_id'))->count();
-            $total = $store + $department;
-        } else if ($request->input('company_id')) {
-            $company = Contract::select('contracts.*')->TotalCompany('companies.id', $request->input('company_id'))->count();
-            $store = Contract::select('contracts.*')->TotalStore('companies.id', $request->input('company_id'))->count();
-            $department = Contract::select('contracts.*')->TotalDepartment('companies.id', $request->input('company_id'))->count();
-            $total = $company + $store + $department;
-        } else if ($request->input('billing_date')) {
-            $total = Contract::select('contracts.*')
-                ->where('contracts.billing_date', 'LIKE', $request->input('billing_date') . '-%')->whereNull('contracts.deleted_at')->count();
-        } else if ($request->input('search')) {
-            $sub = Contract::select(
+        return (new ContractsTransformer)->transformContractList($contract, $total);
+    }
+
+    public function search($search = "", $company_search = "", $store_search = "", $department_search = "")
+    {
+        $department =
+            Contract::select(
                 'contracts.*',
-                'companies.name as companies',
-                \DB::raw('null as stores'),
-                \DB::raw('null as departments'),
-                'locations.name as locations',
-                'contact_1.first_name as users_1',
-                'contact_2.first_name as users_2'
-            )->SearchSort('name', $order, $request->input('search'));
+                'departments.name as department_name',
+                'stores.name as store_name',
+                'companies.name as company_name',
+                \DB::raw('null AS location_name'),
+                \DB::raw('null AS contact_1'),
+                \DB::raw('null AS contact_2')
+            )
+            ->join('departments', 'departments.id', '=', 'contracts.object_id')
+            ->join('stores', 'stores.id', '=', 'departments.store_id')
+            ->join('companies', 'companies.id', '=', 'stores.company_id')
+            ->where('contracts.object_type', \DB::raw('"App\\\Models\\\Department"'))
+            ->Where(function ($query) use ($search) {
+                $query = $query
+                    ->Where('contracts.name', 'LIKE', '%' . $search . '%')
+                    ->orWhere(DB::raw('CAST(contracts.start_date AS CHAR)'), 'LIKE', '%' . $search . '%')
+                    ->orWhere(DB::raw('CAST(contracts.end_date AS CHAR)'), 'LIKE', '%' . $search . '%')
+                    ->orWhere(DB::raw('CAST(contracts.billing_date AS CHAR)'), 'LIKE', '%' . $search . '%')
+                    ->orWhere(DB::raw('CAST(contracts.payment_date AS CHAR)'), 'LIKE', '%' . $search . '%')
+                    ->orWhere('companies.name', 'LIKE', '%' . $search . '%')
+                    ->orWhere('stores.name', 'LIKE', '%' . $search . '%')
+                    ->orWhere('departments.name', 'LIKE', '%' . $search . '%');
+            })
+            ->Where(function ($query) use ($company_search, $store_search, $department_search) {
+                if ($company_search) {
+                    $query->Where('companies.id', $company_search);
+                }
+                if ($store_search) {
+                    $query->Where('stores.id', $store_search);
+                }
+                if ($department_search) {
+                    $query->Where('departments.id', $department_search);
+                }
+            });
 
-            $total = DB::table(DB::raw("({$sub->toSql()}) as sub"))
-                ->mergeBindings($sub->getQuery())
-                ->count();
+        $store =
+            Contract::select(
+                'contracts.*',
+                \DB::raw('null AS department_name'),
+                'stores.name as store_name',
+                'companies.name as company_name',
+                \DB::raw('null AS location_name'),
+                \DB::raw('null AS contact_1'),
+                \DB::raw('null AS contact_2')
+            )
+            ->join('stores', 'stores.id', '=', 'contracts.object_id')
+            ->join('companies', 'companies.id', '=', 'stores.company_id')
+            ->where('contracts.object_type', \DB::raw('"App\\\Models\\\Store"'))
+            ->Where(function ($query) use ($search) {
+                $query = $query->Where('contracts.name', 'LIKE', '%' . $search . '%')
+                    ->orWhere(DB::raw('CAST(contracts.start_date AS CHAR)'), 'LIKE', '%' . $search . '%')
+                    ->orWhere(DB::raw('CAST(contracts.end_date AS CHAR)'), 'LIKE', '%' . $search . '%')
+                    ->orWhere(DB::raw('CAST(contracts.billing_date AS CHAR)'), 'LIKE', '%' . $search . '%')
+                    ->orWhere(DB::raw('CAST(contracts.payment_date AS CHAR)'), 'LIKE', '%' . $search . '%')
+                    ->orWhere('companies.name', 'LIKE', '%' . $search . '%')
+                    ->orWhere('stores.name', 'LIKE', '%' . $search . '%');
+            })
+            ->Where(function ($query) use ($company_search, $store_search, $department_search) {
+                if ($company_search) {
+                    $query->Where('companies.id', $company_search);
+                }
+                if ($store_search) {
+                    $query->Where('stores.id', $store_search);
+                }
+                if ($department_search) {
+                    $query->whereRaw(0);
+                }
+            });
+
+        $company =
+            Contract::select(
+                'contracts.*',
+                \DB::raw('null AS department_name'),
+                \DB::raw('null AS store_name'),
+                'companies.name as company_name',
+                \DB::raw('null AS location_name'),
+                \DB::raw('null AS contact_1'),
+                \DB::raw('null AS contact_2')
+            )
+            ->join('companies', 'companies.id', '=', 'contracts.object_id')
+            ->where('contracts.object_type', \DB::raw('"App\\\Models\\\Company"'))
+            ->Where(function ($query) use ($search) {
+                $query = $query->Where('contracts.name', 'LIKE', '%' . $search . '%')
+                    ->orWhere(DB::raw('CAST(contracts.start_date AS CHAR)'), 'LIKE', '%' . $search . '%')
+                    ->orWhere(DB::raw('CAST(contracts.end_date AS CHAR)'), 'LIKE', '%' . $search . '%')
+                    ->orWhere(DB::raw('CAST(contracts.billing_date AS CHAR)'), 'LIKE', '%' . $search . '%')
+                    ->orWhere(DB::raw('CAST(contracts.payment_date AS CHAR)'), 'LIKE', '%' . $search . '%')
+                    ->orWhere('companies.name', 'LIKE', '%' . $search . '%');
+            })
+            ->Where(function ($query) use ($company_search, $store_search, $department_search) {
+                if ($company_search) {
+                    $query->Where('companies.id', $company_search);
+                }
+                if ($department_search || $store_search) {
+                    $query->whereRaw(0);
+                }
+            });
+        $location =
+            Contract::select(
+                'contracts.*',
+                \DB::raw('null AS department_name'),
+                \DB::raw('null AS store_name'),
+                \DB::raw('null AS company_name'),
+                'locations.name AS location_name',
+                \DB::raw('null AS contact_1'),
+                \DB::raw('null AS contact_2')
+            )
+            ->join('locations', 'locations.id', '=', 'contracts.location_id')
+            ->Where(function ($query) use ($search) {
+                $query = $query
+                    ->Where('contracts.name', 'LIKE', '%' . $search . '%')
+                    ->orWhere(DB::raw('CAST(contracts.start_date AS CHAR)'), 'LIKE', '%' . $search . '%')
+                    ->orWhere(DB::raw('CAST(contracts.end_date AS CHAR)'), 'LIKE', '%' . $search . '%')
+                    ->orWhere(DB::raw('CAST(contracts.billing_date AS CHAR)'), 'LIKE', '%' . $search . '%')
+                    ->orWhere(DB::raw('CAST(contracts.payment_date AS CHAR)'), 'LIKE', '%' . $search . '%')
+                    ->orWhere('locations.name', 'LIKE', '%' . $search . '%');
+            });
+
+        $user =
+            Contract::select(
+                'contracts.*',
+                \DB::raw('null AS department_name'),
+                \DB::raw('null AS store_name'),
+                \DB::raw('null AS company_name'),
+                \DB::raw('null AS location_name'),
+                'contact_1.first_name as contact_1',
+                'contact_2.first_name as contact_2 '
+            )
+            ->leftJoin('users as contact_1', 'contact_1.id', '=', 'contracts.contact_id_1')
+            ->leftJoin('users as contact_2', 'contact_2.id', '=', 'contracts.contact_id_2')
+            ->Where(function ($query) use ($search) {
+                $query = $query
+                    ->Where('contracts.name', 'LIKE', '%' . $search . '%')
+                    ->orWhere(DB::raw('CAST(contracts.start_date AS CHAR)'), 'LIKE', '%' . $search . '%')
+                    ->orWhere(DB::raw('CAST(contracts.end_date AS CHAR)'), 'LIKE', '%' . $search . '%')
+                    ->orWhere(DB::raw('CAST(contracts.billing_date AS CHAR)'), 'LIKE', '%' . $search . '%')
+                    ->orWhere(DB::raw('CAST(contracts.payment_date AS CHAR)'), 'LIKE', '%' . $search . '%')
+                    ->orWhere('contact_1.first_name', 'LIKE', '%' . $search . '%')
+                    ->orWhere('contact_1.last_name', 'LIKE', '%' . $search . '%')
+                    ->orWhereRaw('CONCAT(' . DB::getTablePrefix() . 'contact_1.first_name," ",' . DB::getTablePrefix() . 'contact_1.last_name) LIKE ?', ["%$search%", "%$search%"])
+                    ->orWhere('contact_1.username', 'LIKE', '%' . $search . '%')
+                    ->orWhere('contact_2.first_name', 'LIKE', '%' . $search . '%')
+                    ->orWhere('contact_2.last_name', 'LIKE', '%' . $search . '%')
+                    ->orWhereRaw('CONCAT(' . DB::getTablePrefix() . 'contact_2.first_name," ",' . DB::getTablePrefix() . 'contact_2.last_name) LIKE ?', ["%$search%", "%$search%"])
+                    ->orWhere('contact_2.username', 'LIKE', '%' . $search . '%');
+            });
+
+        return $department
+            ->union($store)
+            ->union($company)
+            ->union($location)
+            ->union($user);
+    }
+
+    public function filter($company = "", $store = "", $department = "", $contract = "",  $search = "")
+    {
+        if ($department) {
+            if ($search) {
+                $contract = $contract
+                    ->select(
+                        'contracts.*',
+                        'departments.name AS department_name',
+                        'stores.name AS store_name',
+                        'companies.name AS company_name',
+                        \DB::raw('null AS location_name'),
+                        \DB::raw('null AS contact_1'),
+                        \DB::raw('null AS contact_2')
+                    )
+                    ->where('contracts.object_type', '=', \DB::raw('"App\\\Models\\\Department"'))
+                    ->where('contracts.object_id', $department);
+            }
+            if (!$search) {
+                $contract = $contract
+                    ->select(
+                        'contracts.*',
+                        \DB::raw('null AS department_name'),
+                        \DB::raw('null AS store_name'),
+                        \DB::raw('null AS company_name'),
+                        \DB::raw('null AS location_name'),
+                        \DB::raw('null AS contact_1'),
+                        \DB::raw('null AS contact_2')
+                    )
+                    ->where('contracts.object_type', '=', \DB::raw('"App\\\Models\\\Department"'))
+                    ->where('contracts.object_id', $department);
+                $contract->union(
+                    Contract::select(
+                        'contracts.*',
+                        \DB::raw('null AS department_name'),
+                        \DB::raw('null AS store_name'),
+                        \DB::raw('null AS company_name'),
+                        \DB::raw('null AS location_name'),
+                        \DB::raw('null AS contact_1'),
+                        \DB::raw('null AS contact_2')
+                    )
+                        ->whereIn(
+                            'contracts.object_id',
+                            Contract::select('contracts.id')
+                                ->where('contracts.object_type', '=', \DB::raw('"App\\\Models\\\Department"'))
+                                ->whereIn(
+                                    'contracts.object_id',
+                                    Department::select('departments.id')
+                                        ->where('departments.id', '=', $department)
+                                )
+                        )
+                );
+            }
         } else {
-            $total = Contract::select('contract.*')->whereNull('contracts.deleted_at')->count();
-        }
+            if ($store) {
+                if ($search) {
+                    $contract = $contract
+                        ->select(
+                            'contracts.*',
+                            'departments.name AS department_name',
+                            'stores.name AS store_name',
+                            'companies.name AS company_name',
+                            \DB::raw('null AS location_name'),
+                            \DB::raw('null AS contact_1'),
+                            \DB::raw('null AS contact_2')
+                        )
+                        ->where('contracts.object_type', '=', \DB::raw('"App\\\Models\\\Department"'))
+                        ->whereIn(
+                            'contracts.object_id',
+                            Department::select('departments.id')
+                                ->join('stores', 'stores.id', '=', 'departments.store_id')
+                                ->where('stores.id', $store)
+                        );
+                }
+                if (!$search) {
+                    $contract = $contract
+                        ->select(
+                            'contracts.*',
+                            \DB::raw('null AS department_name'),
+                            \DB::raw('null AS store_name'),
+                            \DB::raw('null AS company_name'),
+                            \DB::raw('null AS location_name'),
+                            \DB::raw('null AS contact_1'),
+                            \DB::raw('null AS contact_2')
+                        )
+                        ->where('contracts.object_type', '=', \DB::raw('"App\\\Models\\\Department"'))
+                        ->whereIn(
+                            'contracts.object_id',
+                            Department::select('departments.id')
+                                ->join('stores', 'stores.id', '=', 'departments.store_id')
+                                ->where('stores.id', $store)
+                        );
+                    $contract->union(
+                        Contract::select(
+                            'contracts.*',
+                            \DB::raw('null AS department_name'),
+                            \DB::raw('null AS store_name'),
+                            \DB::raw('null AS company_name'),
+                            \DB::raw('null AS location_name'),
+                            \DB::raw('null AS contact_1'),
+                            \DB::raw('null AS contact_2')
+                        )
+                            ->where('contracts.object_type', '=', \DB::raw('"App\\\Models\\\Store"'))
+                            ->where('contracts.object_id', $store)
+                    )
+                        ->union(
+                            Contract::select(
+                                'contracts.*',
+                                \DB::raw('null AS department_name'),
+                                \DB::raw('null AS store_name'),
+                                \DB::raw('null AS company_name'),
+                                \DB::raw('null AS location_name'),
+                                \DB::raw('null AS contact_1'),
+                                \DB::raw('null AS contact_2')
+                            )
+                                ->whereIn(
+                                    'contracts.object_id',
+                                    Contract::select('contracts.id')
+                                        ->where('contracts.object_type', '=', \DB::raw('"App\\\Models\\\Department"'))
+                                        ->whereIn(
+                                            'contracts.object_id',
+                                            Department::select('departments.id as id')
+                                                ->join('stores', 'stores.id', '=', 'departments.store_id')
+                                                ->where('stores.id', '=', $store)
+                                        )
+                                        ->union(
+                                            Contract::select('contracts.id as id')
+                                                ->where('contracts.object_type', '=', \DB::raw('"App\\\Models\\\Store"'))
+                                                ->where('contracts.object_id', '=', $store)
+                                        )
+                                        ->get()
+                                )
+                        );
+                }
+            } elseif ($company) {
+                if ($search) {
+                    $contract = $contract
+                        ->select(
+                            'contracts.*',
+                            \DB::raw('departments.name AS department_name'),
+                            \DB::raw('null AS store_name'),
+                            \DB::raw('null AS company_name'),
+                            \DB::raw('null AS location_name'),
+                            \DB::raw('null AS contact_1'),
+                            \DB::raw('null AS contact_2')
+                        )
+                        ->where('contracts.object_type', '=', \DB::raw('"App\\\Models\\\Department"'))
+                        ->whereIn(
+                            'contracts.object_id',
+                            Department::select('departments.id')
+                                ->join('stores', 'stores.id', '=', 'departments.store_id')
+                                ->join('companies', 'companies.id', '=', 'stores.company_id')
+                                ->where('companies.id', '=', $company)
+                        );
+                }
+                if (!$search) {
+                    $contract = $contract
+                        ->select(
+                            'contracts.*',
+                            \DB::raw('null AS department_name'),
+                            \DB::raw('null AS store_name'),
+                            \DB::raw('null AS company_name'),
+                            \DB::raw('null AS location_name'),
+                            \DB::raw('null AS contact_1'),
+                            \DB::raw('null AS contact_2')
+                        )
+                        ->where('contracts.object_type', '=', \DB::raw('"App\\\Models\\\Department"'))
+                        ->whereIn(
+                            'contracts.object_id',
+                            Department::select('departments.id')
+                                ->join('stores', 'stores.id', '=', 'departments.store_id')
+                                ->join('companies', 'companies.id', '=', 'stores.company_id')
+                                ->where('companies.id', '=', $company)
+                        );
+                    $contract->union(
+                        Contract::select(
+                            'contracts.*',
+                            \DB::raw('null AS department_name'),
+                            \DB::raw('null AS store_name'),
+                            \DB::raw('null AS company_name'),
+                            \DB::raw('null AS location_name'),
+                            \DB::raw('null AS contact_1'),
+                            \DB::raw('null AS contact_2')
+                        )
+                            ->where('contracts.object_type', '=', \DB::raw('"App\\\Models\\\Store"'))
+                            ->whereIn(
+                                'contracts.object_id',
+                                Store::select('stores.id')
+                                    ->join('companies', 'companies.id', '=', 'stores.company_id')
+                                    ->where('companies.id', '=', $company)
+                            )
+                    )
+                        ->union(
+                            Contract::select(
+                                'contracts.*',
+                                \DB::raw('null AS department_name'),
+                                \DB::raw('null AS store_name'),
+                                \DB::raw('null AS company_name'),
+                                \DB::raw('null AS location_name'),
+                                \DB::raw('null AS contact_1'),
+                                \DB::raw('null AS contact_2')
+                            )
+                                ->where('contracts.object_type', '=', \DB::raw('"App\\\Models\\\Company"'))
+                                ->where('contracts.object_id', '=', $company)
+                        )
+                        ->union(
+                            Contract::select(
+                                'contracts.*',
+                                \DB::raw('null AS department_name'),
+                                \DB::raw('null AS store_name'),
+                                \DB::raw('null AS company_name'),
+                                \DB::raw('null AS location_name'),
+                                \DB::raw('null AS contact_1'),
+                                \DB::raw('null AS contact_2')
+                            )
+                                ->whereIn(
+                                    'contracts.object_id',
+                                    Contract::select('contracts.id')
+                                        ->where('contracts.object_type', '=', \DB::raw('"App\\\Models\\\Department"'))
+                                        ->whereIn(
+                                            'contracts.object_id',
+                                            Department::select('departments.id as id')
+                                                ->join('stores', 'stores.id', '=', 'departments.store_id')
+                                                ->join('companies', 'companies.id', '=', 'stores.company_id')
+                                                ->where('companies.id', '=', $company)
+                                        )
+                                        ->union(
+                                            Contract::select('contracts.id as id')
+                                                ->where('contracts.object_type', '=', \DB::raw('"App\\\Models\\\Company"'))
+                                                ->where('contracts.object_id', '=', $company)
+                                        )
 
-        if ($request->has('billing_date')) {
-            if ($request->input('sort') == 'company' || $request->input('sort') == 'store' || $request->input('sort') == 'department') {
-                $contract = Contract::where('contracts.billing_date', 'LIKE', $request->input('billing_date') . '-%');
-            } else {
-                $contract = $contract->where('contracts.billing_date', 'LIKE', $request->input('billing_date') . '-%');
+                                        ->union(
+                                            Contract::select('contracts.id as id')
+                                                ->where('contracts.object_type', '=', \DB::raw('"App\\\Models\\\Store"'))
+                                                ->whereIn(
+                                                    'contracts.object_id',
+                                                    Store::select('stores.id')
+                                                        ->join('companies', 'companies.id', '=', 'stores.company_id')
+                                                        ->where('companies.id', '=', $company)
+                                                )
+                                        )
+                                        ->get()
+                                )
+                        );
+                }
             }
         }
-
-        $contract = $contract->skip($offset)->take($limit)->whereNull('contracts.deleted_at')->get();
-        return (new ContractsTransformer)->transformContractList($contract, $total);
+        return $contract;
     }
 
     public function selectlist(Request $request)
