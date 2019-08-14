@@ -81,7 +81,7 @@ class ContractsController extends Controller
 
             $this->authorize('update', $item);
 
-            return view('contracts/edit', compact('item', 'check'));
+            return view('contracts/view', compact('item', 'check'));
         }
         return redirect()->route('contracts.index')->with('error', trans('admin/contracts/message.does_not_exist'));
     }

@@ -4,7 +4,7 @@ namespace App\Presenters;
 
 class ContractPresenter extends Presenter
 {
-    
+
     public static function dataTableLayout()
     {
         $layout = [
@@ -23,7 +23,8 @@ class ContractPresenter extends Presenter
                 "sortable" => true,
                 "title" => trans('admin/contracts/table.contract_name'),
                 "visible" => true,
-             
+                "formatter" => "contractsLinkFormatter"
+
             ],
             [
                 "field" => "company",
@@ -105,7 +106,7 @@ class ContractPresenter extends Presenter
                 "visible" => true,
                 "id" => "billing_date",
                 "class" => "billing_date"
-                
+
             ],
             [
                 "field" => "payment_date",
@@ -115,7 +116,7 @@ class ContractPresenter extends Presenter
                 "title" =>  trans('admin/contracts/table.payment'),
                 "visible" => true,
             ]
-            
+
         ];
 
         $layout[] = [
@@ -129,5 +130,4 @@ class ContractPresenter extends Presenter
 
         return json_encode($layout);
     }
-
 }

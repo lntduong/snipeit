@@ -41,7 +41,7 @@ class ContractsController extends Controller
         $limit = request('limit', 50);
         $order = $request->input('order') === 'asc' ? 'asc' : 'desc';
         $allowed_columns = [
-            'id', 'name', 'company', 'store', 'department', 'location', 'start_date', 'end_date', 'billing_date', 'payment_date', 'location'
+            'id', 'name', 'company', 'store', 'department', 'start_date', 'end_date', 'billing_date', 'payment_date', 'location_id', 'contact_id_1', 'contact_id_2'
         ];
 
         $sort = in_array($request->input('sort'), $allowed_columns) ? $request->input('sort') : 'created_at';
@@ -56,8 +56,14 @@ class ContractsController extends Controller
             case 'department':
                 $contract = $contract->SortDepartment($order, $company_search, $store_search, $department_search, $contract = new Contract, $search);
                 break;
-            case 'location':
+            case 'location_id':
                 $contract = $contract->SortLocation($order, $company_search, $store_search, $department_search, $contract = new Contract, $search);
+                break;
+            case 'contact_id_1':
+                $contract = $contract->SortUser($order, $company_search, $store_search, $department_search, $contract = new Contract, $search, 'contracts.contact_id_1', 'user_name_1');
+                break;
+            case 'contact_id_2':
+                $contract = $contract->SortUser($order, $company_search, $store_search, $department_search, $contract = new Contract, $search, 'contracts.contact_id_2', 'user_name_2');
                 break;
             case 'name':
                 $contract = $contract->orderBy('name', $order);
@@ -91,8 +97,8 @@ class ContractsController extends Controller
                 'stores.name as store_name',
                 'companies.name as company_name',
                 \DB::raw('null AS location_name'),
-                \DB::raw('null AS contact_1'),
-                \DB::raw('null AS contact_2')
+                \DB::raw('null AS user_name_1'),
+                \DB::raw('null AS user_name_2')
             )
             ->join('departments', 'departments.id', '=', 'contracts.object_id')
             ->join('stores', 'stores.id', '=', 'departments.store_id')
@@ -128,8 +134,8 @@ class ContractsController extends Controller
                 'stores.name as store_name',
                 'companies.name as company_name',
                 \DB::raw('null AS location_name'),
-                \DB::raw('null AS contact_1'),
-                \DB::raw('null AS contact_2')
+                \DB::raw('null AS user_name_1'),
+                \DB::raw('null AS user_name_2')
             )
             ->join('stores', 'stores.id', '=', 'contracts.object_id')
             ->join('companies', 'companies.id', '=', 'stores.company_id')
@@ -162,8 +168,8 @@ class ContractsController extends Controller
                 \DB::raw('null AS store_name'),
                 'companies.name as company_name',
                 \DB::raw('null AS location_name'),
-                \DB::raw('null AS contact_1'),
-                \DB::raw('null AS contact_2')
+                \DB::raw('null AS user_name_1'),
+                \DB::raw('null AS user_name_2')
             )
             ->join('companies', 'companies.id', '=', 'contracts.object_id')
             ->where('contracts.object_type', \DB::raw('"App\\\Models\\\Company"'))
@@ -190,8 +196,8 @@ class ContractsController extends Controller
                 \DB::raw('null AS store_name'),
                 \DB::raw('null AS company_name'),
                 'locations.name AS location_name',
-                \DB::raw('null AS contact_1'),
-                \DB::raw('null AS contact_2')
+                \DB::raw('null AS user_name_1'),
+                \DB::raw('null AS user_name_2')
             )
             ->join('locations', 'locations.id', '=', 'contracts.location_id')
             ->Where(function ($query) use ($search) {
@@ -211,11 +217,10 @@ class ContractsController extends Controller
                 \DB::raw('null AS store_name'),
                 \DB::raw('null AS company_name'),
                 \DB::raw('null AS location_name'),
-                'contact_1.first_name as contact_1',
-                'contact_2.first_name as contact_2 '
+                'users.first_name AS user_name_1',
+                \DB::raw('null AS user_name_2')
             )
-            ->leftJoin('users as contact_1', 'contact_1.id', '=', 'contracts.contact_id_1')
-            ->leftJoin('users as contact_2', 'contact_2.id', '=', 'contracts.contact_id_2')
+            ->leftJoin('users', 'users.id', '=', 'contracts.contact_id_1')
             ->Where(function ($query) use ($search) {
                 $query = $query
                     ->Where('contracts.name', 'LIKE', '%' . $search . '%')
@@ -223,24 +228,46 @@ class ContractsController extends Controller
                     ->orWhere(DB::raw('CAST(contracts.end_date AS CHAR)'), 'LIKE', '%' . $search . '%')
                     ->orWhere(DB::raw('CAST(contracts.billing_date AS CHAR)'), 'LIKE', '%' . $search . '%')
                     ->orWhere(DB::raw('CAST(contracts.payment_date AS CHAR)'), 'LIKE', '%' . $search . '%')
-                    ->orWhere('contact_1.first_name', 'LIKE', '%' . $search . '%')
-                    ->orWhere('contact_1.last_name', 'LIKE', '%' . $search . '%')
-                    ->orWhereRaw('CONCAT(' . DB::getTablePrefix() . 'contact_1.first_name," ",' . DB::getTablePrefix() . 'contact_1.last_name) LIKE ?', ["%$search%", "%$search%"])
-                    ->orWhere('contact_1.username', 'LIKE', '%' . $search . '%')
-                    ->orWhere('contact_2.first_name', 'LIKE', '%' . $search . '%')
-                    ->orWhere('contact_2.last_name', 'LIKE', '%' . $search . '%')
-                    ->orWhereRaw('CONCAT(' . DB::getTablePrefix() . 'contact_2.first_name," ",' . DB::getTablePrefix() . 'contact_2.last_name) LIKE ?', ["%$search%", "%$search%"])
-                    ->orWhere('contact_2.username', 'LIKE', '%' . $search . '%');
+                    ->orWhere('users.first_name', 'LIKE', '%' . $search . '%')
+                    ->orWhere('users.last_name', 'LIKE', '%' . $search . '%')
+                    ->orWhereRaw('CONCAT(' . DB::getTablePrefix() . 'users.first_name," ",' . DB::getTablePrefix() . 'users.last_name) LIKE ?', ["%$search%", "%$search%"])
+                    ->orWhere('users.username', 'LIKE', '%' . $search . '%');
+            });
+
+        $user2 =
+            Contract::select(
+                'contracts.*',
+                \DB::raw('null AS department_name'),
+                \DB::raw('null AS store_name'),
+                \DB::raw('null AS company_name'),
+                \DB::raw('null AS location_name'),
+                \DB::raw('null AS user_name_1'),
+                'users.first_name AS user_name_2'
+
+            )
+            ->leftJoin('users', 'users.id', '=', 'contracts.contact_id_1')
+            ->Where(function ($query) use ($search) {
+                $query = $query
+                    ->Where('contracts.name', 'LIKE', '%' . $search . '%')
+                    ->orWhere(DB::raw('CAST(contracts.start_date AS CHAR)'), 'LIKE', '%' . $search . '%')
+                    ->orWhere(DB::raw('CAST(contracts.end_date AS CHAR)'), 'LIKE', '%' . $search . '%')
+                    ->orWhere(DB::raw('CAST(contracts.billing_date AS CHAR)'), 'LIKE', '%' . $search . '%')
+                    ->orWhere(DB::raw('CAST(contracts.payment_date AS CHAR)'), 'LIKE', '%' . $search . '%')
+                    ->orWhere('users.first_name', 'LIKE', '%' . $search . '%')
+                    ->orWhere('users.last_name', 'LIKE', '%' . $search . '%')
+                    ->orWhereRaw('CONCAT(' . DB::getTablePrefix() . 'users.first_name," ",' . DB::getTablePrefix() . 'users.last_name) LIKE ?', ["%$search%", "%$search%"])
+                    ->orWhere('users.username', 'LIKE', '%' . $search . '%');
             });
 
         return $department
             ->union($store)
             ->union($company)
             ->union($location)
-            ->union($user);
+            ->union($user)
+            ->union($user2);
     }
 
-    public function filter($company = "", $store = "", $department = "", $contract = "",  $search = "")
+    public function filter($company = "", $store = "", $department = "", $contract,  $search = "")
     {
         if ($department) {
             if ($search) {
@@ -251,8 +278,8 @@ class ContractsController extends Controller
                         'stores.name AS store_name',
                         'companies.name AS company_name',
                         \DB::raw('null AS location_name'),
-                        \DB::raw('null AS contact_1'),
-                        \DB::raw('null AS contact_2')
+                        \DB::raw('null AS user_name_1'),
+                        \DB::raw('null AS user_name_2')
                     )
                     ->where('contracts.object_type', '=', \DB::raw('"App\\\Models\\\Department"'))
                     ->where('contracts.object_id', $department);
@@ -265,8 +292,8 @@ class ContractsController extends Controller
                         \DB::raw('null AS store_name'),
                         \DB::raw('null AS company_name'),
                         \DB::raw('null AS location_name'),
-                        \DB::raw('null AS contact_1'),
-                        \DB::raw('null AS contact_2')
+                        \DB::raw('null AS user_name_1'),
+                        \DB::raw('null AS user_name_2')
                     )
                     ->where('contracts.object_type', '=', \DB::raw('"App\\\Models\\\Department"'))
                     ->where('contracts.object_id', $department);
@@ -277,8 +304,8 @@ class ContractsController extends Controller
                         \DB::raw('null AS store_name'),
                         \DB::raw('null AS company_name'),
                         \DB::raw('null AS location_name'),
-                        \DB::raw('null AS contact_1'),
-                        \DB::raw('null AS contact_2')
+                        \DB::raw('null AS user_name_1'),
+                        \DB::raw('null AS user_name_2')
                     )
                         ->whereIn(
                             'contracts.object_id',
@@ -302,8 +329,8 @@ class ContractsController extends Controller
                             'stores.name AS store_name',
                             'companies.name AS company_name',
                             \DB::raw('null AS location_name'),
-                            \DB::raw('null AS contact_1'),
-                            \DB::raw('null AS contact_2')
+                            \DB::raw('null AS user_name_1'),
+                            \DB::raw('null AS user_name_2')
                         )
                         ->where('contracts.object_type', '=', \DB::raw('"App\\\Models\\\Department"'))
                         ->whereIn(
@@ -321,8 +348,8 @@ class ContractsController extends Controller
                             \DB::raw('null AS store_name'),
                             \DB::raw('null AS company_name'),
                             \DB::raw('null AS location_name'),
-                            \DB::raw('null AS contact_1'),
-                            \DB::raw('null AS contact_2')
+                            \DB::raw('null AS user_name_1'),
+                            \DB::raw('null AS user_name_2')
                         )
                         ->where('contracts.object_type', '=', \DB::raw('"App\\\Models\\\Department"'))
                         ->whereIn(
@@ -338,8 +365,8 @@ class ContractsController extends Controller
                             \DB::raw('null AS store_name'),
                             \DB::raw('null AS company_name'),
                             \DB::raw('null AS location_name'),
-                            \DB::raw('null AS contact_1'),
-                            \DB::raw('null AS contact_2')
+                            \DB::raw('null AS user_name_1'),
+                            \DB::raw('null AS user_name_2')
                         )
                             ->where('contracts.object_type', '=', \DB::raw('"App\\\Models\\\Store"'))
                             ->where('contracts.object_id', $store)
@@ -351,8 +378,8 @@ class ContractsController extends Controller
                                 \DB::raw('null AS store_name'),
                                 \DB::raw('null AS company_name'),
                                 \DB::raw('null AS location_name'),
-                                \DB::raw('null AS contact_1'),
-                                \DB::raw('null AS contact_2')
+                                \DB::raw('null AS user_name_1'),
+                                \DB::raw('null AS user_name_2')
                             )
                                 ->whereIn(
                                     'contracts.object_id',
@@ -382,8 +409,8 @@ class ContractsController extends Controller
                             \DB::raw('null AS store_name'),
                             \DB::raw('null AS company_name'),
                             \DB::raw('null AS location_name'),
-                            \DB::raw('null AS contact_1'),
-                            \DB::raw('null AS contact_2')
+                            \DB::raw('null AS user_name_1'),
+                            \DB::raw('null AS user_name_2')
                         )
                         ->where('contracts.object_type', '=', \DB::raw('"App\\\Models\\\Department"'))
                         ->whereIn(
@@ -402,8 +429,8 @@ class ContractsController extends Controller
                             \DB::raw('null AS store_name'),
                             \DB::raw('null AS company_name'),
                             \DB::raw('null AS location_name'),
-                            \DB::raw('null AS contact_1'),
-                            \DB::raw('null AS contact_2')
+                            \DB::raw('null AS user_name_1'),
+                            \DB::raw('null AS user_name_2')
                         )
                         ->where('contracts.object_type', '=', \DB::raw('"App\\\Models\\\Department"'))
                         ->whereIn(
@@ -420,8 +447,8 @@ class ContractsController extends Controller
                             \DB::raw('null AS store_name'),
                             \DB::raw('null AS company_name'),
                             \DB::raw('null AS location_name'),
-                            \DB::raw('null AS contact_1'),
-                            \DB::raw('null AS contact_2')
+                            \DB::raw('null AS user_name_1'),
+                            \DB::raw('null AS user_name_2')
                         )
                             ->where('contracts.object_type', '=', \DB::raw('"App\\\Models\\\Store"'))
                             ->whereIn(
@@ -438,8 +465,8 @@ class ContractsController extends Controller
                                 \DB::raw('null AS store_name'),
                                 \DB::raw('null AS company_name'),
                                 \DB::raw('null AS location_name'),
-                                \DB::raw('null AS contact_1'),
-                                \DB::raw('null AS contact_2')
+                                \DB::raw('null AS user_name_1'),
+                                \DB::raw('null AS user_name_2')
                             )
                                 ->where('contracts.object_type', '=', \DB::raw('"App\\\Models\\\Company"'))
                                 ->where('contracts.object_id', '=', $company)
@@ -451,8 +478,8 @@ class ContractsController extends Controller
                                 \DB::raw('null AS store_name'),
                                 \DB::raw('null AS company_name'),
                                 \DB::raw('null AS location_name'),
-                                \DB::raw('null AS contact_1'),
-                                \DB::raw('null AS contact_2')
+                                \DB::raw('null AS user_name_1'),
+                                \DB::raw('null AS user_name_2')
                             )
                                 ->whereIn(
                                     'contracts.object_id',
