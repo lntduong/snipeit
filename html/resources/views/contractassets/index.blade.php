@@ -14,5 +14,7 @@
     data-url="{{ route('contractassets.save') }}" 
     >
 </table>
-
+@section('moar_scripts')
+  @include ('partials.bootstrap-table')
+@stop
 

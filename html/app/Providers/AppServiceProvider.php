@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Providers;
 
 
@@ -14,6 +15,7 @@ use App\Observers\StoreObserver;
 use App\Observers\InventoryObserver;
 use App\Observers\InventoryResultObserver;
 use App\Observers\ContractObserver;
+use App\Observers\ContractAssetsObserver;
 use App\Models\Asset;
 use App\Models\License;
 use App\Models\Accessory;
@@ -23,7 +25,7 @@ use App\Models\Store;
 use App\Models\InventoryResult;
 use App\Models\Inventory;
 use App\Models\Contract;
-
+use App\Models\ContractAsset;
 /**
  * This service provider handles setting the observers on models
  *
@@ -52,6 +54,7 @@ class AppServiceProvider extends ServiceProvider
         InventoryResult::observe(InventoryResultObserver::class);
         Inventory::observe(InventoryObserver::class);
         Contract::observe(ContractObserver::class);
+        ContractAsset::observe(ContractAssetsObserver::class);
     }
 
     /**
@@ -64,10 +67,10 @@ class AppServiceProvider extends ServiceProvider
         $monolog = Log::getMonolog();
         $log_level = config('app.log_level');
 
-        if (($this->app->environment('production'))  && (config('services.rollbar.access_token'))){
+        if (($this->app->environment('production'))  && (config('services.rollbar.access_token'))) {
             $this->app->register(\Rollbar\Laravel\RollbarServiceProvider::class);
         }
-        
+
         foreach ($monolog->getHandlers() as $handler) {
             $handler->setLevel($log_level);
         }

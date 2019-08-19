@@ -724,24 +724,24 @@ Route::group(['prefix' => 'v1','namespace' => 'Api', 'middleware' => 'api'], fun
     /*--- ContractAssets API ---*/
     Route::group(['prefix' => 'contractAssets'], function () {
 
-        Route::post('storeAsset',
+        Route::post('store',
             [
                 'as'=>'contractassets.save',
-                'uses'=>'ContractAssetController@storeAsset'
+                'uses'=>'ContractAssetController@store'
             ]
         );
 
-        Route::post('deleteAssetContracts',
+        Route::post('destroy',
             [
                 'as'=>'contractassets.delete',
-                'uses'=>'ContractAssetController@deleteAssetContracts'
+                'uses'=>'ContractAssetController@destroy'
             ]
         );
 
-        Route::get('getAssetContractByIdContract',
+        Route::get('show',
             [
                 'as'=>'contractassets.show',
-                'uses'=>'ContractAssetController@getAssetContractByIdContract'
+                'uses'=>'ContractAssetController@show'
             ]
         );
 

@@ -200,7 +200,7 @@
     });
 
     //remove contract asset
-    function removeAsset(idAsset) {
+    function removeAsset(idAsset, id) {
         $.ajax({
             url: '{{ route('contractassets.delete') }}',
             headers: {
@@ -210,7 +210,8 @@
             method: "POST",
             data: {
                 contract_id: $("#result-contract-id").val(),
-                asset_id: idAsset
+                asset_id: idAsset,
+                id: id
             },
             dataType: "json",
             success: function(data) {

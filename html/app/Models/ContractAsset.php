@@ -1,8 +1,11 @@
 <?php
+
 namespace App\Models;
 
 use App\Models\SnipeModel;
 use Watson\Validating\ValidatingTrait;
+use App\Models\Traits\Searchable;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 
 final class ContractAsset extends SnipeModel
@@ -14,16 +17,16 @@ final class ContractAsset extends SnipeModel
         'asset_id' => 'required',
         'user_id' => 'required',
     ];
+    use ValidatingTrait;
+    use Searchable;
+    use Loggable;
+    use SoftDeletes;
+    protected $dates = ['deleted_at'];
 
-    // protected $presenter = 'App\Presenters\ContractPresenter';
-
-    //use ValidatingTrait;
-
-    // protected $searchableAttributes = ['name', 'created_at', 'updated_at']; 
-    protected $fillable = ['contract_id' , 'asset_id' ,'user_id',];
+    protected $fillable = ['contract_id', 'asset_id', 'user_id', 'deleted_at'];
     public function asset()
     {
-        return $this->belongsToMany(Asset::class);
+        return $this->belongsTo('\App\Models\Asset', 'asset_id');
     }
 
     public function contract()

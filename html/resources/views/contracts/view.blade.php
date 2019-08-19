@@ -35,7 +35,7 @@
                         <a href="#details" data-toggle="tab"><span class="hidden-lg hidden-md"><i class="fa fa-info-circle"></i></span> <span class="hidden-xs hidden-sm">{{ trans('general.details') }}</span></a>
                     </li>
                     <li>
-                        <a href="#history" data-toggle="tab"><span class="hidden-lg hidden-md"><i class="fa fa-history"></i></span> <span class="hidden-xs hidden-sm">{{ trans('general.history') }}</span></a>
+                        <a href="#history_contract" data-toggle="tab"><span class="hidden-lg hidden-md"><i class="fa fa-history"></i></span> <span class="hidden-xs hidden-sm">{{ trans('general.history') }}</span></a>
                     </li>
                 </ul>
                 <!-- Tab-content -->
@@ -164,43 +164,46 @@
                             </div>
                         </div>
                     </div>
-                    <div class="tab-pane fade" id="history">
+                    <div class="tab-pane fade" id="history_contract">
                         <div class="row">
                             <div class="col-md-12">
-                                    <table
-                                    data-cookie-id-table="historyContract"
+                              
+                                <table
+                                    class="table table-striped snipe-table"
+                                    id="contractHistory"
                                     data-pagination="true"
-                                    data-id-table="historyContract"
+                                    data-id-table="contractHistory"
                                     data-search="true"
                                     data-side-pagination="server"
                                     data-show-columns="true"
-                                    data-show-export="true"
                                     data-show-refresh="true"
                                     data-sort-order="desc"
                                     data-sort-name="created_at"
-                                    id="historyContract"
-                                    data-url="{{ route('api.activity.index',['contract_type' => 'contract']) }}"
-                                    data-mobile-responsive="true"
-                                    data-toggle="table"
-                                    data-toolbar="#toolbar"
-                                    class="table table-striped snipe-table"
+                                    data-show-export="true"
                                     data-export-options='{
-                                    "fileName": "activity-contract-report-{{ date('Y-m-d') }}",
-                                    "ignoreColumn": ["actions","image","change","checkbox","checkincheckout","icon"]
-                                    }'>
-            
-                                <thead>
-                                    <tr>
-                                        <th data-field="icon" style="width: 40px;" class="hidden-xs" data-formatter="iconFormatter"></th>
-                                        <th class="col-sm-3" data-searchable="false" data-sortable="true" data-field="created_at" data-formatter="dateDisplayFormatter">{{ trans('general.date') }}</th>
-                                        <th class="col-sm-2" data-field="admin" data-formatter="usersLinkObjFormatter">{{ trans('general.user') }}</th>
-                                        <th class="col-sm-2" data-field="action_type">{{ trans('general.action') }}</th>
-                                        <th class="col-sm-1" data-field="type" data-formatter="itemTypeFormatter">{{ trans('general.type') }}</th>
-                                        <th class="col-sm-3" data-field="item" data-formatter="polymorphicItemFormatter">{{ trans('general.item') }}</th>
-                                        <th class="col-sm-1" data-field="note">{{ trans('general.notes') }}</th>
-                                    </tr>
-                                </thead>
-                            </table>
+                                        "fileName": "export-contracts-{{  $item->id }}-history",
+                                        "ignoreColumn": ["actions","image","change","checkbox","checkincheckout","icon"]
+                                    }'
+                                    data-url="{{ route('api.activity.index', ['item_id' => $item->id]) }}"
+                                    data-cookie-id-table="contractHistory">
+                                    <thead>
+                                        <tr>
+                                            <th data-field="icon" data-visible="true" style="width: 40px;" class="hidden-xs" data-formatter="iconFormatter"></th>
+                                            <th class="col-sm-2" data-visible="true" data-field="created_at" data-formatter="dateDisplayFormatter">{{ trans('general.date') }}</th>
+                                            <th class="col-sm-1" data-visible="true" data-field="admin" data-formatter="usersLinkObjFormatter">{{ trans('general.admin') }}</th>
+                                            <th class="col-sm-1" data-visible="true" data-field="action_type">{{ trans('general.action') }}</th>
+                                            <th class="col-sm-1" data-field="type" data-formatter="itemTypeFormatter">{{ trans('general.type') }}</th>
+                                            <th class="col-sm-2" data-visible="true" data-field="item" data-formatter="polymorphicItemFormatter">{{ trans('general.item') }}</th>
+                                            <th class="col-sm-2" data-visible="true" data-field="target" data-formatter="polymorphicItemFormatter">{{ trans('general.target') }}</th>
+                                            <th class="col-sm-2" data-field="note">{{ trans('general.notes') }}</th>
+                                            @if  ($snipeSettings->require_accept_signature=='1')
+                                            <th class="col-md-3" data-field="signature_file" data-visible="false"  data-formatter="imageFormatter">{{ trans('general.signature') }}</th>
+                                            @endif
+                                            <th class="col-md-3" data-visible="false" data-field="file" data-visible="false"  data-formatter="fileUploadFormatter">{{ trans('general.download') }}</th>
+                                            <th class="col-sm-2" data-field="log_meta" data-visible="true" data-formatter="changeLogFormatter">Changed</th>
+                                        </tr>
+                                    </thead>
+                                </table>
                             </div>
                         </div>
                     </div>
@@ -210,4 +213,9 @@
             <!-- Custom Tabs -->
         </div>
 </div>
+
+@stop
+
+@section('moar_scripts')
+  @include ('partials.bootstrap-table')
 @stop

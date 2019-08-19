@@ -54,16 +54,9 @@ class ReportsController extends Controller
         }
 
         if (($request->has('item_type')) && ($request->has('item_id'))) {
-            $actionlogs = $actionlogs->where('item_id', '=', $request->input('item_id'))
+            $actionlogs = $actionlogs
+                ->where('item_id', '=', $request->input('item_id'))
                 ->where('item_type', '=', "App\\Models\\" . ucwords($request->input('item_type')));
-        }
-
-        if ($request->has('action_type')) {
-            $actionlogs = $actionlogs->where('action_type', '=', $request->input('action_type'))->orderBy('action_logs.created_at', 'desc');
-        }
-
-        if ($request->has('uploads')) {
-            $actionlogs = $actionlogs->whereNotNull('filename')->orderBy('action_logs.created_at', 'desc');
         }
 
         $allowed_columns = [
@@ -77,11 +70,38 @@ class ReportsController extends Controller
 
         $sort = in_array($request->input('sort'), $allowed_columns) ? e($request->input('sort')) : 'action_logs.created_at';
         $order = ($request->input('order') == 'asc') ? 'asc' : 'desc';
+
+        if ($request->has('item_id')) {
+            $actionlogs =
+                Actionlog::select('action_logs.*')->join('contracts', 'contracts.id', '=', 'action_logs.item_id')
+                ->where('action_logs.item_type', '=', \DB::raw('"App\\\Models\\\Contract"'))
+                ->where('contracts.id', '=',  $request->input('item_id'))
+                ->orderBy($sort, $order)
+                ->union(
+                    Actionlog::select('action_logs.*')
+                        ->join('contract_assets', 'contract_assets.id', '=', 'action_logs.item_id')
+                        ->where('action_logs.item_type', '=', \DB::raw('"App\\\Models\\\ContractAsset"'))
+                        ->where('contract_assets.contract_id', '=',  $request->input('item_id'))
+                        ->orderBy($sort, $order)
+                );
+        }
+
+        if ($request->has('action_type')) {
+            $actionlogs = $actionlogs->where('action_type', '=', $request->input('action_type'))->orderBy('action_logs.created_at', 'desc');
+        }
+
+        if ($request->has('uploads')) {
+            $actionlogs = $actionlogs->whereNotNull('filename')->orderBy('action_logs.created_at', 'desc');
+        }
+
         $offset = request('offset', 0);
         $limit = request('limit', 50);
-        $total = $actionlogs->count();
-        $actionlogs = $actionlogs->orderBy($sort, $order)->skip($offset)->take($limit)->get();
-
+        $total = $actionlogs->get()->count();
+        if ($request->has('item_id')) {
+            $actionlogs = $actionlogs->skip($offset)->take($limit)->get();
+        } else {
+            $actionlogs = $actionlogs->orderBy($sort, $order)->skip($offset)->take($limit)->get();
+        }
         return response()->json((new ActionlogsTransformer)->transformActionlogs($actionlogs, $total), 200, ['Content-Type' => 'application/json;charset=utf8'], JSON_UNESCAPED_UNICODE);
     }
 }

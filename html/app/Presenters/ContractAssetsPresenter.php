@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Presenters;
 
 use App\Models\CustomField;
@@ -25,7 +26,7 @@ class ContractAssetsPresenter extends Presenter
                 "searchable" => false,
                 "switchable" => true,
                 "title" => trans('general.id'),
-                "visible" => false
+                "visible" => true
             ], [
                 "field" => "name",
                 "searchable" => true,

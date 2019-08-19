@@ -383,7 +383,10 @@
             }
             else if (value.type == 'contract') {
                 item_destination = 'contracts'
-                item_icon = 'fa-map-marker';
+                item_icon = 'fa fa-file-text-o';
+            }else if (value.type == 'contractAsset') {
+                item_destination = 'hardware'
+                item_icon = 'fa-barcode';
             }
 
             return '<nobr><a href="{{ url('/') }}/' + item_destination +'/' + value.id + '" data-tooltip="true" title="' + value.type + '"><i class="fa ' + item_icon + ' text-blue"></i> ' + value.name + '</a></nobr>';
