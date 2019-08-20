@@ -2,11 +2,12 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Http\Transformers\StoreTransformer;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use App\Http\Transformers\StoreTransformer;
-use App\Http\Transformers\SelectlistTransformer;
+use App\Helpers\Helper;
 use App\Models\Store;
+use App\Http\Transformers\SelectlistTransformer;
 
 
 /** 
@@ -27,7 +28,7 @@ class StoresController extends Controller
         $allowed_columns = ['location', 'company', 'department_count', 'department_count', 'contract_count'];
 
         $store = Store::select('stores.*')
-            ->with('company', 'location')->with('department')->withCount('department');
+            ->with('company')->with('location')->with('department')->withCount('department');
         if ($request->has('search')) {
             $store = $store->TextSearch($request->input('search'));
         }

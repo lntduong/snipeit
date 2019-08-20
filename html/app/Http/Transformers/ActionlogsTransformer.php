@@ -53,10 +53,9 @@ class ActionlogsTransformer
                 'id' => e($actionlog->itemType()) == 'inventoryResult' ? (int) $actionlog->item->inventories->id : (e($actionlog->itemType()) == 'contractAsset' ?
                     (int) $actionlog->item->asset->id : (int) $actionlog->item->id),
                 'name' => e($actionlog->itemType()) == 'inventoryResult' ?
-                    $actionlog->item->inventories->name . '-' . $actionlog->item->asset->asset_tag : (e($actionlog->itemType()) == 'contractAsset' ?
-                        $actionlog->item->asset->asset_tag
+                    $actionlog->item->inventories->name . '-' . $actionlog->item->asset->asset_tag : (e($actionlog->itemType()) == 'contractAsset' ? (($actionlog->item->asset->name) !== null ? $actionlog->item->asset->name . '-' . $actionlog->item->asset->asset_tag : $actionlog->item->asset->asset_tag)
                         : e($actionlog->item->getDisplayNameAttribute())),
-                'type' => e($actionlog->itemType()),
+                'type' => e($actionlog->itemType()) == 'contractAsset' ? 'contract asset' : e($actionlog->itemType()),
             ] : null,
             'location' => ($actionlog->location) ? [
                 'id' => (int) $actionlog->location->id,
@@ -66,7 +65,7 @@ class ActionlogsTransformer
             'updated_at'    => Helper::getFormattedDateObject($actionlog->updated_at, 'datetime'),
             'next_audit_date' => ($actionlog->itemType() == 'asset') ? Helper::getFormattedDateObject($actionlog->calcNextAuditDate(null, $actionlog->item), 'date') : null,
             'days_to_next_audit' => $actionlog->daysUntilNextAudit($settings->audit_interval, $actionlog->item),
-            'action_type'   => $actionlog->present()->actionType(),
+            'action_type'   =>  $actionlog->present()->actionType(),
             'admin' => ($actionlog->user) ? [
                 'id' => (int) $actionlog->user->id,
                 'name' => e($actionlog->user->getFullNameAttribute()),

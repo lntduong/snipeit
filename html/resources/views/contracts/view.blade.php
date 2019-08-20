@@ -9,16 +9,23 @@
 @section('header_right')
 
 @can('manage', \App\Models\Contract::class)
+  {{--
 <div class="dropdown pull-right">
-  <button class="btn btn-default dropdown-toggle" data-toggle="dropdown">{{ trans('button.actions') }}
+ <button class="btn btn-default dropdown-toggle" data-toggle="dropdown">{{ trans('button.actions') }}
     <span class="caret"></span>
-  </button>
+  </button> 
+  
   <ul class="dropdown-menu pull-right" role="menu" aria-labelledby="dropdownMenu1">
       @can('update', \App\Models\Contract::class)
     <li role="presentation"><a href="{{ route('contracts.edit', $item->id) }}">{{ trans('admin/contracts/general.edit') }}</a></li>
       @endcan
   </ul>
 </div>
+--}}
+
+    <div class="col-md-12">
+        <a href="{{ route('contracts.edit', $item->id) }}" style="width: 100%;" class="btn btn-sm btn-default hidden-print">{{ trans('admin/contracts/general.edit') }}</a>
+    </div>
 @endcan
 @stop
 
@@ -48,15 +55,29 @@
                                             <tbody>
                                                 @if ($item->name)
                                                 <tr>
-                                                    <td>{{ trans('admin/hardware/form.name') }}</td>
+                                                    <td>{{ trans('admin/contracts/table.contract_name') }}</td>
                                                     <td>{{ $item->name }}</td>
                                                 </tr>
                                                 @endif
                       
-                                                @if ($item->company) 
+                                                @if ($item->object_type == 'App\Models\Company') 
                                                     <tr>
                                                         <td>{{ trans('general.company') }}</td>
                                                         <td><a href="{{ url('/companies/' . $item->company->id) }}">{{ $item->company->name }}</a></td>
+                                                    </tr>
+                                                @endif
+
+                                                @if ($item->object_type == 'App\Models\Store') 
+                                                    <tr>
+                                                        <td>{{ trans('general.store') }}</td>
+                                                        <td><a href="{{ url('/stores/' . $item->store->id) }}">{{ $item->store->name }}</a></td>
+                                                    </tr>
+                                                @endif
+
+                                                @if ($item->object_type == 'App\Models\Department') 
+                                                    <tr>
+                                                        <td>{{ trans('general.department') }}</td>
+                                                        <td><a href="{{ url('/departments/' . $item->department->id) }}">{{ $item->department->name }}</a></td>
                                                     </tr>
                                                 @endif
 
@@ -65,6 +86,7 @@
                                                     <td>{{ trans('general.location') }}</td>
                                                     <td>
                                                         @can('superuser')
+                                                        <i class="fa fa-map-marker"></i> 
                                                         <a href="{{ route('locations.show', ['location' => $item->location->id]) }}">
                                                             {{ $item->location->name }}
                                                         </a>
@@ -77,14 +99,15 @@
 
                                                 @if ($item->contact_id_1)
                                                     <tr>
-                                                    <td>{{ trans('general.user') }}</td>
+                                                    <td>{{ trans('admin/contracts/table.contact_person1') }}</td>
                                                     <td>
                                                         @can('superuser')
-                                                        <a href="{{ route('users.show', ['user' => $item->user->id]) }}">
-                                                            {{ $item->user->first_name . ' ' . $item->user->last_name}}
-                                                        </a>
+                                                            <i class="fa fa-user fa-fw"></i>
+                                                            <a href="{{ route('users.show', ['user' => $item->user->id]) }}">
+                                                                {{ $item->user->first_name . ' ' . $item->user->last_name}}
+                                                            </a>
                                                         @else
-                                                        {{ $item->user->first_name . ' ' . $item->user->last_name }}
+                                                            {{ $item->user->first_name . ' ' . $item->user->last_name }}
                                                         @endcan
                                                     </td>
                                                     </tr>
@@ -92,9 +115,10 @@
                                                 
                                                 @if ($item->contact_id_2)
                                                     <tr>
-                                                    <td>{{ trans('general.user') }}</td>
+                                                    <td>{{ trans('admin/contracts/table.contact_person2') }}</td>
                                                     <td>
                                                         @can('superuser')
+                                                            <i class="fa fa-user fa-fw"></i>
                                                             <a href="{{ route('users.show', ['user' => $item->user2->id]) }}">
                                                                 {{ $item->user2->first_name . ' ' . $item->user2->last_name}}
                                                             </a>
@@ -164,10 +188,10 @@
                             </div>
                         </div>
                     </div>
+
                     <div class="tab-pane fade" id="history_contract">
                         <div class="row">
                             <div class="col-md-12">
-                              
                                 <table
                                     class="table table-striped snipe-table"
                                     id="contractHistory"
@@ -190,11 +214,10 @@
                                         <tr>
                                             <th data-field="icon" data-visible="true" style="width: 40px;" class="hidden-xs" data-formatter="iconFormatter"></th>
                                             <th class="col-sm-2" data-visible="true" data-field="created_at" data-formatter="dateDisplayFormatter">{{ trans('general.date') }}</th>
-                                            <th class="col-sm-1" data-visible="true" data-field="admin" data-formatter="usersLinkObjFormatter">{{ trans('general.admin') }}</th>
+                                            <th class="col-sm-1" data-visible="true" data-field="admin" data-formatter="usersLinkObjFormatter">{{ trans('general.user') }}</th>
                                             <th class="col-sm-1" data-visible="true" data-field="action_type">{{ trans('general.action') }}</th>
                                             <th class="col-sm-1" data-field="type" data-formatter="itemTypeFormatter">{{ trans('general.type') }}</th>
                                             <th class="col-sm-2" data-visible="true" data-field="item" data-formatter="polymorphicItemFormatter">{{ trans('general.item') }}</th>
-                                            <th class="col-sm-2" data-visible="true" data-field="target" data-formatter="polymorphicItemFormatter">{{ trans('general.target') }}</th>
                                             <th class="col-sm-2" data-field="note">{{ trans('general.notes') }}</th>
                                             @if  ($snipeSettings->require_accept_signature=='1')
                                             <th class="col-md-3" data-field="signature_file" data-visible="false"  data-formatter="imageFormatter">{{ trans('general.signature') }}</th>

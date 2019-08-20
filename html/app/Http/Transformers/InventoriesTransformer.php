@@ -6,6 +6,7 @@ use App\Models\Inventory;
 use Illuminate\Database\Eloquent\Collection;
 use Gate;
 use App\Helpers\Helper;
+use App\Models\InventoryResult;
 
 class InventoriesTransformer
 {
@@ -141,7 +142,7 @@ class InventoriesTransformer
         $permissions_array['available_actions'] = [
             'update' => (bool) Gate::allows('update', Inventory::class),
             'delete' => ((bool) Gate::allows('delete', Inventory::class) && ($inventory->inventoryresult ? false : true)  && ($inventory->deleted_at == '')) ? true : false,
-            'result' => (bool) Gate::allows('result', Inventory::class),
+            'result' => (bool) Gate::allows('view', InventoryResult::class),
         ];
         $array += $permissions_array;
 

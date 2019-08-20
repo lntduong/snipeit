@@ -272,6 +272,8 @@ final class Company extends SnipeModel
                 then contracts.object_id	= companies.id
             end 
         ) as sum ")
-        )->orderBy('sum', $order);
+        )
+            ->withCount('assets', 'licenses', 'accessories', 'consumables', 'components', 'users')
+            ->orderBy('sum', $order);
     }
 }

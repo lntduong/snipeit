@@ -44,19 +44,13 @@ class ContractAssetController extends Controller
 
     public function destroy(Request $request)
     {
-
         $this->authorize('delete', ContractAsset::class);
-        //$results = ContractAsset::findOrFail($request->id);
         $results = ContractAsset::select('contract_assets.id')
             ->where('contract_id', '=', $request->contract_id)
-            ->where('asset_id', '=', $request->asset_id);
-        $results->delete();
+            ->where('asset_id', '=', $request->asset_id)->first();
+        $results_id = ContractAsset::find($results->id);
 
-        // DB::table('contract_assets')
-        //     ->where('contract_id', '=', $request->contract_id)
-        //     ->where('asset_id', '=', $request->asset_id)
-        //     ->delete();
-
+        $results_id->delete();
 
         $listAssets = ContractAsset::select([
             'contract_assets.id',

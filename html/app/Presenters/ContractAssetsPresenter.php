@@ -26,7 +26,7 @@ class ContractAssetsPresenter extends Presenter
                 "searchable" => false,
                 "switchable" => true,
                 "title" => trans('general.id'),
-                "visible" => true
+                "visible" => false
             ], [
                 "field" => "name",
                 "searchable" => true,

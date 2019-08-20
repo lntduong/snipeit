@@ -2,13 +2,15 @@
 
 namespace App\Models;
 
+use App\Models\SnipeModel;
 use App\Models\Traits\Searchable;
 use App\Presenters\Presentable;
+use Auth;
+use DB;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Watson\Validating\ValidatingTrait;
 use App\Models\Department;
 use App\Models\Contract;
-use DB;
 
 /**
  * Model for Components.
@@ -18,7 +20,6 @@ use DB;
 class Store extends SnipeModel
 {
     protected $presenter = 'App\Presenters\StorePresenter';
-    use CompanyableTrait;
     use Loggable, Presentable;
     use SoftDeletes;
 
@@ -185,6 +186,8 @@ class Store extends SnipeModel
                 then contracts.object_id	= stores.id
             end 
         ) as sum ")
-        )->orderBy('sum', $order);
+        )
+            ->withCount('department')
+            ->orderBy('sum', $order);
     }
 }

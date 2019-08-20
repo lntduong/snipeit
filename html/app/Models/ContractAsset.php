@@ -6,10 +6,11 @@ use App\Models\SnipeModel;
 use Watson\Validating\ValidatingTrait;
 use App\Models\Traits\Searchable;
 use Illuminate\Database\Eloquent\SoftDeletes;
-
+use App\Presenters\Presentable;
 
 final class ContractAsset extends SnipeModel
 {
+    protected $presenter = 'App\Presenters\ContractAssetsPresenter';
     protected $table = 'contract_assets';
 
     protected $rules = [
@@ -19,7 +20,7 @@ final class ContractAsset extends SnipeModel
     ];
     use ValidatingTrait;
     use Searchable;
-    use Loggable;
+    use Loggable, Presentable;
     use SoftDeletes;
     protected $dates = ['deleted_at'];
 
@@ -32,5 +33,10 @@ final class ContractAsset extends SnipeModel
     public function contract()
     {
         return $this->belongsTo(Contract::class);
+    }
+
+    public function assetlog()
+    {
+        return $this->hasMany('\App\Models\Actionlog', 'item_id')->where('item_type', Component::class)->orderBy('created_at', 'desc')->withTrashed();
     }
 }

@@ -77,7 +77,7 @@
                         data-toolbar="#toolbar" 
                         id="contractsTable" 
                         class="table table-striped snipe-table" 
-                        data-url="{{ route('api.contracts.index',['department'=> $department->id]) }}"
+                        data-url="{{ route('api.contracts.index',['department_id'=> $department->id]) }}"
                         data-export-options='{
                            "fileName": "export-contracts-{{ date('Y-m-d') }}",
                            "ignoreColumn": ["actions","image","change","checkbox","checkincheckout","icon"]

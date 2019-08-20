@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ImageUploadRequest;
@@ -16,12 +17,12 @@ use File;
 class StoresController extends Controller
 {
     /**
-    * Returns a view that invokes the ajax tables which actually contains
-    * the content for the stores listing, which is generated in getDatatable.
-    *
-    * @see storesController::getDatatable() method that generates the JSON response
-    * @return \Illuminate\Contracts\View\View
-    */
+     * Returns a view that invokes the ajax tables which actually contains
+     * the content for the stores listing, which is generated in getDatatable.
+     *
+     * @see storesController::getDatatable() method that generates the JSON response
+     * @return \Illuminate\Contracts\View\View
+     */
     public function index()
     {
         $this->authorize('view', Store::class);
@@ -30,30 +31,30 @@ class StoresController extends Controller
 
 
     /**
-    * Returns a form to create a new store.
-    *
-    * @see storesController::postCreate() method that stores the data
-    * @return \Illuminate\Contracts\View\View
-    */
+     * Returns a form to create a new store.
+     *
+     * @see storesController::postCreate() method that stores the data
+     * @return \Illuminate\Contracts\View\View
+     */
     public function create()
     {
         $this->authorize('create', Store::class);
-        return view('store/edit')->with('item',new Store);
+        return view('store/edit')->with('item', new Store);
     }
 
 
     /**
-    * Validate and store data for new store.
-    *
-    * @see storesController::getCreate() method that generates the view
-    * @return \Illuminate\Http\RedirectResponse
+     * Validate and store data for new store.
+     *
+     * @see storesController::getCreate() method that generates the view
+     * @return \Illuminate\Http\RedirectResponse
      */
     public function store(ImageUploadRequest $request)
     {
         $this->authorize('create', Store::class);
         $store = new Store();
         $store->name                   = $request->input('name');
-     
+
         $store->location_id            = $request->input('location_id');
         $store->company_id             = Company::getIdForCurrentUser($request->input('company_id'));
         $store->user_id                = Auth::id();
@@ -61,8 +62,8 @@ class StoresController extends Controller
 
         if ($request->file('image')) {
             $image = $request->file('image');
-            $file_name = str_random(25).".".$image->getClientOriginalExtension();
-            $path = public_path('uploads/store/'.$file_name);
+            $file_name = str_random(25) . "." . $image->getClientOriginalExtension();
+            $path = public_path('uploads/store/' . $file_name);
             Image::make($image->getRealPath())->resize(800, null, function ($constraint) {
                 $constraint->aspectRatio();
                 $constraint->upsize();
@@ -77,11 +78,11 @@ class StoresController extends Controller
     }
 
     /**
-    * Return a view to edit a store.
-    *
-    * @see storesController::postEdit() method that stores the data.
-    * @param int $storeId
-    * @return \Illuminate\Contracts\View\View
+     * Return a view to edit a store.
+     *
+     * @see storesController::postEdit() method that stores the data.
+     * @param int $storeId
+     * @return \Illuminate\Contracts\View\View
      */
     public function edit($store = null)
     {
@@ -90,14 +91,13 @@ class StoresController extends Controller
             return view('store/edit', compact('item'));
         }
         return redirect()->route('stores.index')->with('error', trans('admin/store/message.not_found'));
-
     }
     /**
-    * Return a view to edit a store.
-    *
-    * @see storesController::getEdit() method presents the form.
-    * @param int $storeId
-    * @return \Illuminate\Http\RedirectResponse
+     * Return a view to edit a store.
+     *
+     * @see storesController::getEdit() method presents the form.
+     * @param int $storeId
+     * @return \Illuminate\Http\RedirectResponse
      */
     public function update(ImageUploadRequest $request, $storeId = null)
     {
@@ -111,31 +111,30 @@ class StoresController extends Controller
         $store->name                   = Input::get('name');
         $store->location_id            = Input::get('location_id');
         $store->company_id             = Company::getIdForCurrentUser(Input::get('company_id'));
-       
+
         if ($request->file('image')) {
             // delete file image (S)
-            $image_path = public_path('uploads/store/'.$store->image); // Value is not URL but directory file path
-            if(File::exists($image_path)) {
+            $image_path = public_path('uploads/store/' . $store->image); // Value is not URL but directory file path
+            if (File::exists($image_path)) {
                 File::delete($image_path);
             }
             // delete file image (E)
             $image = $request->file('image');
-            $file_name = str_random(25).".".$image->getClientOriginalExtension();
-            $path = public_path('uploads/store/'.$file_name);
+            $file_name = str_random(25) . "." . $image->getClientOriginalExtension();
+            $path = public_path('uploads/store/' . $file_name);
             Image::make($image->getRealPath())->resize(800, null, function ($constraint) {
                 $constraint->aspectRatio();
                 $constraint->upsize();
             })->save($path);
             $store->image = $file_name;
         } elseif ($request->input('image_delete') == '1') {
-             // delete file image (S)
-             $image_path = public_path('uploads/store/'.$store->image); // Value is not URL but directory file path
-             if(File::exists($image_path)) {
-                 File::delete($image_path);
-             }
-             // delete file image (E)
+            // delete file image (S)
+            $image_path = public_path('uploads/store/' . $store->image); // Value is not URL but directory file path
+            if (File::exists($image_path)) {
+                File::delete($image_path);
+            }
+            // delete file image (E)
             $store->image = null;
-            
         }
 
         if ($store->save()) {
@@ -145,10 +144,10 @@ class StoresController extends Controller
     }
 
     /**
-    * Delete a store.
-    *
-    * @param int $storeId
-    * @return \Illuminate\Http\RedirectResponse
+     * Delete a store.
+     *
+     * @param int $storeId
+     * @return \Illuminate\Http\RedirectResponse
      */
     public function destroy($storeId)
     {
@@ -161,16 +160,15 @@ class StoresController extends Controller
         return redirect()->route('stores.index')->with('success', trans('admin/store/message.delete.success'));
     }
 
-    public function show($id) {
+    public function show($id)
+    {
         $this->authorize('view', Store::class);
 
         if (is_null($store = Store::find($id))) {
             return redirect()->route('stores.index')
                 ->with('error', trans('admin/store/message.not_found'));
         } else {
-            return view('store/view')->with('store',$store);
+            return view('store/view')->with('store', $store);
         }
-
     }
-    
 }

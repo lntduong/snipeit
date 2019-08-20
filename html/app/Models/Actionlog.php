@@ -168,9 +168,7 @@ class Actionlog extends SnipeModel
        */
     public function logaction($actiontype)
     {
-
         $this->action_type = $actiontype;
-
         if ($this->save()) {
             return true;
         } else {

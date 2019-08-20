@@ -244,7 +244,7 @@
                                  </a>
                              </li>
                          @endcan
-                         @can('create', \App\Models\User::class)
+                         @can('create', \App\Models\Contract::class)
                          <li {!! (Request::is('contracts/create') ? 'class="active"' : '') !!}>
                              <a href="{{ route('contracts.create') }}">
                                  <i class="fa fa-file-text-o">  </i>
@@ -252,7 +252,7 @@
                              </a>
                          </li>
                      @endcan
-                     @can('create', \App\Models\User::class)
+                     @can('create', \App\Models\Inventory::class)
                          <li {!! (Request::is('inventory/create') ? 'class="active"' : '') !!}>
                              <a href="{{ route('inventories.create') }}">
                                  <i class="fa fa-qrcode">  </i>
@@ -260,7 +260,7 @@
                              </a>
                          </li>
                      @endcan
-                     @can('create', \App\Models\User::class)
+                     @can('create', \App\Models\Inventory::class)
                          <li {!! (Request::is('inventoryresults_sp_online') ? 'class="active"' : '') !!}>
                              <a href="{{ route('inventoryresults_sp_online') }}">
                                  <i class="fa fa-qrcode">  </i>
@@ -553,51 +553,58 @@
                 </a>
             </li>
             @endcan
-            @can('view', \App\Models\User::class)
+          
             <li class="treeview{{ (Request::is('users*') ? ' active' : '') }}">
                 <a href="#"  class="dropdown-toggle">
                     <i class="fa fa-users"></i>
                     <span>{{ trans('general.people') }}</span>
                     <i class="fa fa-angle-left pull-right"></i>
                 </a>
-
+              
                 <ul class="treeview-menu">
+                    @can('view', \App\Models\User::class)
                     <li{!! (Request::is('users*') ? ' class="active"' : '') !!}>
                         <a href="{{ route('users.index') }}">
                             <i class="fa fa-users"></i>
                             <span>{{ trans('general.people') }}</span>
                         </a>
                     </li>
-
+                    @endcan
+                    @can('view', \App\Models\Contract::class)
                     <li{!! (Request::is('contracts*') ? ' class="active"' : '') !!}>
                         <a href="{{ route('contracts.index') }}">
                                 <i class=" 	fa fa-file-text-o"></i>
                             <span> {{ trans('general.contracts') }}</span>
                         </a>
                     </li>
-
+                    @endcan
+                    @can('view', \App\Models\Inventory::class)
                     <li>
                         <a href="{{ route('inventories.index') }}">
                             <i class="fa fa-qrcode">  </i>
                             <span> {{ trans('general.inventories') }}</span>
                         </a>
                     </li>
+                    @endcan
+                    @can('view', \App\Models\InventoryResult::class)
                     <li>
                         <a href="{{ route('inventoryresults.index') }}">
                             <i class="fa fa-list-ul">  </i>
                             <span> {{ trans('general.inventoryresult_list') }}</span>
                         </a>
                     </li>
-                    
+                    @endcan
+                    @can('view', \App\Models\InventoryResult::class)
                     <li>
                         <a href="{{ route('inventoryresults_sp_online') }}">
                             <i class="fa fa-list-ul">  </i>
                             <span> {{ trans('general.inventory_mobile') }}</span>
                         </a>
                     </li>
+                    @endcan
                 </ul>
             </li>
-            @endcan
+       
             @can('import')
                 <li{!! (Request::is('import/*') ? ' class="active"' : '') !!}>
                     <a href="{{ route('imports.index') }}">

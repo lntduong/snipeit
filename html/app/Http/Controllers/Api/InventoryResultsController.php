@@ -187,7 +187,7 @@ class InventoryResultsController extends Controller
                         ->Where('assets.name', 'LIKE', '%' . $search . '%')
                         ->orWhere('status_labels.name', 'LIKE', '%' . $search . '%')
                         ->orWhere('assets.asset_tag', 'LIKE', '%' . $search . '%')
-                        ->orWhere('checked_time', 'LIKE', '%' . $search . '%')
+                        ->orWhere(DB::raw('CAST(checked_time AS char)'), 'LIKE', '%' . $search . '%')
                         ->orWhere(DB::raw('(CASE WHEN familiar = 1 THEN "Farmilar" ELSE "Unknown" END)'), 'LIKE', '%' . $search . '%');
                 });
             }

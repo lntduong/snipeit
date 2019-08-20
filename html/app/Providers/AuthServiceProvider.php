@@ -18,7 +18,12 @@ use App\Models\Statuslabel;
 use App\Models\Supplier;
 use App\Models\Manufacturer;
 use App\Models\Company;
+
 use App\Models\User;
+use App\Models\InventoryResult;
+use App\Models\Inventory;
+use App\Models\Contract;
+use App\Models\Store;
 use App\Policies\AccessoryPolicy;
 use App\Policies\AssetModelPolicy;
 use App\Policies\AssetPolicy;
@@ -36,6 +41,10 @@ use App\Policies\SupplierPolicy;
 use App\Policies\UserPolicy;
 use App\Policies\ManufacturerPolicy;
 use App\Policies\CompanyPolicy;
+use App\Policies\StorePolicy;
+use App\Policies\ContractPolicy;
+use App\Policies\InventoryPolicy;
+use App\Policies\InventoryResultPolicy;
 use Carbon\Carbon;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 use Illuminate\Support\Facades\Gate;
@@ -68,6 +77,10 @@ class AuthServiceProvider extends ServiceProvider
         User::class => UserPolicy::class,
         Manufacturer::class => ManufacturerPolicy::class,
         Company::class => CompanyPolicy::class,
+        Store::class => StorePolicy::class,
+        Contract::class => ContractPolicy::class,
+        Inventory::class => InventoryPolicy::class,
+        InventoryResult::class => InventoryResultPolicy::class,
     ];
 
     /**
@@ -115,7 +128,7 @@ class AuthServiceProvider extends ServiceProvider
 
         // Can the user import CSVs?
         Gate::define('import', function ($user) {
-            if ($user->hasAccess('import') ) {
+            if ($user->hasAccess('import')) {
                 return true;
             }
         });
@@ -139,11 +152,11 @@ class AuthServiceProvider extends ServiceProvider
             }
         });
 
-        Gate::define('self.api', function($user) {
+        Gate::define('self.api', function ($user) {
             return $user->hasAccess('self.api');
         });
 
-        Gate::define('self.edit_location', function($user) {
+        Gate::define('self.edit_location', function ($user) {
             return $user->hasAccess('self.edit_location');
         });
 
@@ -158,7 +171,11 @@ class AuthServiceProvider extends ServiceProvider
                 || $user->can('view', Company::class)
                 || $user->can('view', Manufacturer::class)
                 || $user->can('view', CustomField::class)
-                || $user->can('view', CustomFieldset::class)                
+                || $user->can('view', CustomFieldset::class)
+                || $user->can('view', Store::class)
+                || $user->can('view', Contract::class)
+                || $user->can('view', Inventory::class)
+                || $user->can('view', InventoryResult::class)
                 || $user->can('view', Depreciation::class);
         });
     }

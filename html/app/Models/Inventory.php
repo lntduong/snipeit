@@ -15,7 +15,6 @@ use Watson\Validating\ValidatingTrait;
 class Inventory extends SnipeModel
 {
     protected $presenter = 'App\Presenters\InventoryPresenter';
-    use CompanyableTrait;
     use Loggable, Presentable;
     use SoftDeletes;
 

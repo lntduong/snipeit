@@ -384,7 +384,7 @@
             else if (value.type == 'contract') {
                 item_destination = 'contracts'
                 item_icon = 'fa fa-file-text-o';
-            }else if (value.type == 'contractAsset') {
+            }else if (value.type == 'contract asset') {
                 item_destination = 'hardware'
                 item_icon = 'fa-barcode';
             }

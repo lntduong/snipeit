@@ -211,7 +211,6 @@
             data: {
                 contract_id: $("#result-contract-id").val(),
                 asset_id: idAsset,
-                id: id
             },
             dataType: "json",
             success: function(data) {

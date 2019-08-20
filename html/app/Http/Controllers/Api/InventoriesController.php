@@ -20,6 +20,7 @@ use DateTime;
 use App\Http\Transformers\SelectlistInventoryTransformer;
 use App\Http\Transformers\InventoriesTransformer;
 use Input;
+use DB;
 
 /**
  * @version    v1.0
@@ -141,7 +142,7 @@ class InventoriesController extends Controller
                 $query = $query
                     ->Where('inventories.name', 'LIKE', '%' . $search . '%')
                     ->orWhere('inventories.notes', 'LIKE', '%' . $search . '%')
-                    ->orWhere('inventories.inventory_date', 'LIKE', '%' . $search . '%')
+                    ->orWhere(DB::raw('CAST(inventories.inventory_date AS char)'), 'LIKE', '%' . $search . '%')
                     ->orWhere('companies.name', 'LIKE', '%' . $search . '%')
                     ->orWhere('stores.name', 'LIKE', '%' . $search . '%')
                     ->orWhere('departments.name', 'LIKE', '%' . $search . '%');
@@ -169,7 +170,7 @@ class InventoriesController extends Controller
             ->Where(function ($query) use ($search) {
                 $query = $query->Where('inventories.name', 'LIKE', '%' . $search . '%')
                     ->orWhere('inventories.notes', 'LIKE', '%' . $search . '%')
-                    ->orWhere('inventories.inventory_date', 'LIKE', '%' . $search . '%')
+                    ->orWhere(DB::raw('CAST(inventories.inventory_date AS char)'), 'LIKE', '%' . $search . '%')
                     ->orWhere('companies.name', 'LIKE', '%' . $search . '%')
                     ->orWhere('stores.name', 'LIKE', '%' . $search . '%');
             })
@@ -193,7 +194,7 @@ class InventoriesController extends Controller
             ->Where(function ($query) use ($search) {
                 $query = $query->Where('inventories.name', 'LIKE', '%' . $search . '%')
                     ->orWhere('inventories.notes', 'LIKE', '%' . $search . '%')
-                    ->orWhere('inventories.inventory_date', 'LIKE', '%' . $search . '%')
+                    ->orWhere(DB::raw('CAST(inventories.inventory_date AS char)'), 'LIKE', '%' . $search . '%')
                     ->orWhere('companies.name', 'LIKE', '%' . $search . '%');
             })
             ->Where(function ($query) use ($company_search, $store_search, $department_search, $contract_search) {
@@ -212,7 +213,7 @@ class InventoriesController extends Controller
                 $query = $query
                     ->Where('inventories.name', 'LIKE', '%' . $search . '%')
                     ->orWhere('inventories.notes', 'LIKE', '%' . $search . '%')
-                    ->orWhere('inventories.inventory_date', 'LIKE', '%' . $search . '%')
+                    ->orWhere(DB::raw('CAST(inventories.inventory_date AS char)'), 'LIKE', '%' . $search . '%')
                     ->orWhere('locations.name', 'LIKE', '%' . $search . '%');
             })
             ->Where(function ($query) use ($company_search, $store_search, $department_search, $contract_search) {
@@ -233,7 +234,7 @@ class InventoriesController extends Controller
             ->Where(function ($query) use ($search) {
                 $query = $query->Where('inventories.name', 'LIKE', '%' . $search . '%')
                     ->orWhere('inventories.notes', 'LIKE', '%' . $search . '%')
-                    ->orWhere('inventories.inventory_date', 'LIKE', '%' . $search . '%')
+                    ->orWhere(DB::raw('CAST(inventories.inventory_date AS char)'), 'LIKE', '%' . $search . '%')
                     ->orWhere('companies.name', 'LIKE', '%' . $search . '%')
                     ->orWhere('stores.name', 'LIKE', '%' . $search . '%')
                     ->orWhere('departments.name', 'LIKE', '%' . $search . '%')
@@ -266,7 +267,7 @@ class InventoriesController extends Controller
             ->Where(function ($query) use ($search) {
                 $query = $query->Where('inventories.name', 'LIKE', '%' . $search . '%')
                     ->orWhere('inventories.notes', 'LIKE', '%' . $search . '%')
-                    ->orWhere('inventories.inventory_date', 'LIKE', '%' . $search . '%')
+                    ->orWhere(DB::raw('CAST(inventories.inventory_date AS char)'), 'LIKE', '%' . $search . '%')
                     ->orWhere('companies.name', 'LIKE', '%' . $search . '%')
                     ->orWhere('stores.name', 'LIKE', '%' . $search . '%')
                     ->orWhere('contracts.name', 'LIKE', '%' . $search . '%')
@@ -297,7 +298,7 @@ class InventoriesController extends Controller
             ->Where(function ($query) use ($search) {
                 $query = $query->Where('inventories.name', 'LIKE', '%' . $search . '%')
                     ->orWhere('inventories.notes', 'LIKE', '%' . $search . '%')
-                    ->orWhere('inventories.inventory_date', 'LIKE', '%' . $search . '%')
+                    ->orWhere(DB::raw('CAST(inventories.inventory_date AS char)'), 'LIKE', '%' . $search . '%')
                     ->orWhere('companies.name', 'LIKE', '%' . $search . '%')
                     ->orWhere('contracts.name', 'LIKE', '%' . $search . '%')
                     ->orWhere('locations.name', 'LIKE', '%' . $search . '%');

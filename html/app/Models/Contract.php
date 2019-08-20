@@ -132,6 +132,9 @@ final class Contract extends SnipeModel
         return $this->hasMany('\App\Models\Actionlog', 'item_id')->where('item_type', Component::class)->orderBy('created_at', 'desc')->withTrashed();
     }
 
+    /*
+    * Filter Company, Store, Department
+    */
     public function scopeSortCompany($query, $order, $company = "", $store = "", $department = "", $search)
     {
         if ($department) {
@@ -143,60 +146,43 @@ final class Contract extends SnipeModel
                 return $query;
             }
         }
-        $store = Contract::select('contracts.*', \DB::raw('null AS department_name'), \DB::raw('null AS store_name'), \DB::raw('null AS company_name'), \DB::raw('companies.name AS name_sort'))
+        $store = Contract::select('contracts.*', \DB::raw('null AS department_name'), 'stores.name as store_name', 'companies.name as company_name', 'user1.first_name as contact_1', 'user2.first_name as contact_2', 'locations.name as location_name')
             ->join('stores', 'stores.id', '=', 'contracts.object_id')
             ->join('companies', 'companies.id', '=', 'stores.company_id')
-            ->where('contracts.object_type', '=', \DB::raw('"App\\\Models\\\Store"'));
-        $department = Contract::select('contracts.*', \DB::raw('null AS department_name'), \DB::raw('null AS store_name'), 'companies.name AS company_name', \DB::raw('companies.name AS name_sort'))
+            ->leftjoin('locations', 'locations.id', '=', 'contracts.location_id')
+            ->leftjoin('users as user1', 'user1.id', '=', 'contracts.contact_id_1')
+            ->leftjoin('users as user2', 'user2.id', '=', 'contracts.contact_id_2')
+            ->where('contracts.object_type', \DB::raw('"App\\\Models\\\Store"'));
+        $department =  Contract::select('contracts.*', 'departments.name as department_name', 'stores.name as store_name', 'companies.name as company_name', 'user1.first_name as contact_1', 'user2.first_name as contact_2', 'locations.name as location_name')
             ->join('departments', 'departments.id', '=', 'contracts.object_id')
             ->join('stores', 'stores.id', '=', 'departments.store_id')
             ->join('companies', 'companies.id', '=', 'stores.company_id')
-            ->where('contracts.object_type', '=', \DB::raw('"App\\\Models\\\Department"'));
-        $location = Contract::select('contracts.*', \DB::raw('null AS department_name'), \DB::raw('null AS store_name'), \DB::raw('null AS company_name'), \DB::raw('null AS name_sort'))
-            ->join('locations', 'locations.id', '=', 'contracts.object_id')
-            ->where('contracts.object_type', '=', \DB::raw('"App\\\Models\\\Location"'));
+            ->leftjoin('locations', 'locations.id', '=', 'contracts.location_id')
+            ->leftjoin('users as user1', 'user1.id', '=', 'contracts.contact_id_1')
+            ->leftjoin('users as user2', 'user2.id', '=', 'contracts.contact_id_2')
+            ->where('contracts.object_type', \DB::raw('"App\\\Models\\\Department"'));
+
         if (!$search) {
             return $query
-                ->select('contracts.*', \DB::raw('null AS department_name'), \DB::raw('null AS store_name'), \DB::raw('null AS company_name'), \DB::raw('companies.name AS name_sort'))
+                ->select('contracts.*', \DB::raw('null AS department_name'), \DB::raw('null AS store_name'), 'companies.name as company_name', 'user1.first_name as contact_1', 'user2.first_name as contact_2', 'locations.name as location_name')
                 ->join('companies', 'companies.id', '=', 'contracts.object_id')
-                ->where('contracts.object_type', '=', \DB::raw('"App\\\Models\\\Company"'))
+                ->leftjoin('locations', 'locations.id', '=', 'contracts.location_id')
+                ->leftjoin('users as user1', 'user1.id', '=', 'contracts.contact_id_1')
+                ->leftjoin('users as user2', 'user2.id', '=', 'contracts.contact_id_2')
+                ->where('contracts.object_type', \DB::raw('"App\\\Models\\\Company"'))
                 ->union($store)
                 ->union($department)
-                ->union($location)
-                ->orderBy('name_sort', $order);
+                ->orderBy('company_name', $order);
         } else {
             return $query
                 ->orderBy('company_name', $order);
         }
     }
 
-    public function scopeSortStore($query, $order, $company = "", $store = "", $department = "", $contract, $search = "")
+    public function scopeSortStore($query, $order, $company = "", $store = "", $department = "", $search = "", $contract = "")
     {
         if ($department) {
-            return $contract
-                ->select('contracts.*', \DB::raw('null AS department_name'), \DB::raw('null AS store_name'), \DB::raw('null AS company_name'), \DB::raw('null AS name_sort'))
-                ->where('contracts.object_type', '=', \DB::raw('"App\\\Models\\\Department"'))
-                ->whereIn(
-                    'contracts.object_id',
-                    Department::select('departments.id')
-                        ->join('stores', 'stores.id', '=', 'departments.store_id')
-                        ->join('companies', 'companies.id', '=', 'stores.company_id')
-                        ->where('departments.id', '=', $department)
-                )
-                ->union(
-                    Contract::select('contracts.*', \DB::raw('null AS department_name'), \DB::raw('null AS store_name'), \DB::raw('null AS company_name'), \DB::raw('null AS name_sort'))
-                        ->leftjoin('stores', 'stores.id', '=', 'contracts.object_id')
-                        ->whereIn(
-                            'contracts.object_id',
-                            Contract::select('contracts.id')
-                                ->where('contracts.object_type', '=', \DB::raw('"App\\\Models\\\Department"'))
-                                ->whereIn(
-                                    'contracts.object_id',
-                                    Department::select('departments.id')
-                                        ->where('departments.id', '=', $department)
-                                )
-                        )
-                );
+            return $query;
         } else {
             if ($store) {
                 return $query;
@@ -205,7 +191,7 @@ final class Contract extends SnipeModel
                     return $query->orderBy('store_name', $order);
                 } else {
                     $contract = $contract
-                        ->select('contracts.*', \DB::raw('null AS department_name'), \DB::raw('null AS store_name'), \DB::raw('null AS company_name'), \DB::raw('stores.name AS name_sort'))
+                        ->select('contracts.*', \DB::raw('null AS department_name'), \DB::raw('stores.name AS store_name'), \DB::raw('null AS company_name'), \DB::raw('null AS contact_1'), \DB::raw('null AS contact_2'), \DB::raw('null AS location_name'))
                         ->join('departments', 'departments.id', '=', 'contracts.object_id')
                         ->join('stores', 'stores.id', '=', 'departments.store_id')
                         ->where('contracts.object_type', '=', \DB::raw('"App\\\Models\\\Department"'))
@@ -216,41 +202,8 @@ final class Contract extends SnipeModel
                                 ->join('companies', 'companies.id', '=', 'stores.company_id')
                                 ->where('companies.id', '=', $company)
                         )
-
                         ->union(
-                            Contract::select('contracts.*', \DB::raw('null AS department_name'), \DB::raw('null AS store_name'), \DB::raw('null AS company_name'), \DB::raw('stores.name AS name_sort'))
-                                ->leftjoin('stores', 'stores.id', '=', 'contracts.object_id', 'and', 'contracts.object_type', '=', \DB::raw('"App\\\Models\\\Store"'))
-                                ->whereIn(
-                                    'contracts.object_id',
-                                    Contract::select('contracts.id as id')
-                                        ->where('contracts.object_type', '=', \DB::raw('"App\\\Models\\\Store"'))
-                                        ->whereIn(
-                                            'contracts.object_id',
-                                            Store::select('stores.id')
-                                                ->join('companies', 'companies.id', '=', 'stores.company_id')
-                                                ->where('companies.id', '=', $company)
-                                        )
-                                )
-                        )
-                        ->union(
-                            Contract::select('contracts.*', \DB::raw('null AS department_name'), \DB::raw('null AS store_name'), \DB::raw('null AS company_name'), \DB::raw('stores.name AS name_sort'))
-                                ->leftjoin('departments', 'departments.id', '=', 'contracts.object_id', 'and', 'contracts.object_type', '=', \DB::raw('"App\\\Models\\\Department"'))
-                                ->leftjoin('stores', 'stores.id', '=', 'departments.store_id')
-                                ->whereIn(
-                                    'contracts.object_id',
-                                    Contract::select('contracts.id')
-                                        ->where('contracts.object_type', '=', \DB::raw('"App\\\Models\\\Department"'))
-                                        ->whereIn(
-                                            'contracts.object_id',
-                                            Department::select('departments.id as id')
-                                                ->join('stores', 'stores.id', '=', 'departments.store_id')
-                                                ->join('companies', 'companies.id', '=', 'stores.company_id')
-                                                ->where('companies.id', '=', $company)
-                                        )
-                                )
-                        )
-                        ->union(
-                            Contract::select('contracts.*', \DB::raw('null AS department_name'), \DB::raw('null AS store_name'), \DB::raw('null AS company_name'), \DB::raw('stores.name AS name_sort'))
+                            Contract::select('contracts.*', \DB::raw('null AS department_name'), \DB::raw('stores.name AS store_name'), \DB::raw('null AS company_name'), \DB::raw('null AS contact_1'), \DB::raw('null AS contact_2'), \DB::raw('null AS location_name'))
                                 ->join('stores', 'stores.id', '=', 'contracts.object_id')
                                 ->where('contracts.object_type', '=', \DB::raw('"App\\\Models\\\Store"'))
                                 ->whereIn(
@@ -261,52 +214,51 @@ final class Contract extends SnipeModel
                                 )
                         )
                         ->union(
-                            Contract::select('contracts.*', \DB::raw('null AS department_name'), \DB::raw('null AS store_name'), \DB::raw('null AS company_name'), \DB::raw('null AS name_sort'))
+                            Contract::select('contracts.*', \DB::raw('null AS department_name'), \DB::raw('null AS store_name'), \DB::raw('null AS company_name'), \DB::raw('null AS contact_1'), \DB::raw('null AS contact_2'), \DB::raw('null AS location_name'))
                                 ->join('companies', 'companies.id', '=', 'contracts.object_id')
                                 ->where('contracts.object_type', '=', \DB::raw('"App\\\Models\\\Company"'))
                                 ->where('contracts.object_id', '=', $company)
-                        )
-                        ->union(
-                            Contract::select('contracts.*', \DB::raw('null AS department_name'), \DB::raw('null AS store_name'), \DB::raw('null AS company_name'), \DB::raw('null AS name_sort'))
-                                ->whereIn(
-                                    'contracts.object_id',
-                                    Contract::select('contracts.id as id')
-                                        ->where('contracts.object_type', '=', \DB::raw('"App\\\Models\\\Company"'))
-                                        ->where('contracts.object_id', '=', $company)
-                                )
                         );
-                    return $contract->orderBy('name_sort', $order);
+
+                    return $contract->orderBy('store_name', $order);
                 }
             }
         }
 
-        $company = Contract::select('contracts.*', \DB::raw('null AS department_name'), \DB::raw('null AS store_name'), \DB::raw('null AS company_name'), \DB::raw('null AS name_sort'))
+
+        $company =  Contract::select('contracts.*', \DB::raw('null AS department_name'), \DB::raw('null AS store_name'), 'companies.name as company_name', 'user1.first_name as contact_1', 'user2.first_name as contact_2', 'locations.name as location_name')
             ->join('companies', 'companies.id', '=', 'contracts.object_id')
-            ->where('contracts.object_type', '=', \DB::raw('"App\\\Models\\\Company"'));
-        $department = Contract::select('contracts.*', \DB::raw('null AS department_name'), 'stores.name AS store_name', \DB::raw('null AS company_name'), \DB::raw('stores.name AS name_sort'))
+            ->leftjoin('locations', 'locations.id', '=', 'contracts.location_id')
+            ->leftjoin('users as user1', 'user1.id', '=', 'contracts.contact_id_1')
+            ->leftjoin('users as user2', 'user2.id', '=', 'contracts.contact_id_2')
+            ->where('contracts.object_type', \DB::raw('"App\\\Models\\\Company"'));
+        $department =  Contract::select('contracts.*', 'departments.name as department_name', 'stores.name as store_name', 'companies.name as company_name', 'user1.first_name as contact_1', 'user2.first_name as contact_2', 'locations.name as location_name')
             ->join('departments', 'departments.id', '=', 'contracts.object_id')
             ->join('stores', 'stores.id', '=', 'departments.store_id')
-            ->where('contracts.object_type', '=', \DB::raw('"App\\\Models\\\Department"'));
-        $location = Contract::select('contracts.*', \DB::raw('null AS department_name'), \DB::raw('null AS store_name'), \DB::raw('null AS company_name'), \DB::raw('null AS name_sort'))
-            ->join('locations', 'locations.id', '=', 'contracts.object_id')
-            ->where('contracts.object_type', '=', \DB::raw('"App\\\Models\\\Location"'));
+            ->join('companies', 'companies.id', '=', 'stores.company_id')
+            ->leftjoin('locations', 'locations.id', '=', 'contracts.location_id')
+            ->leftjoin('users as user1', 'user1.id', '=', 'contracts.contact_id_1')
+            ->leftjoin('users as user2', 'user2.id', '=', 'contracts.contact_id_2')
+            ->where('contracts.object_type', \DB::raw('"App\\\Models\\\Department"'));
         if (!$search) {
-
             return $query
+                ->select('contracts.*', \DB::raw('null AS department_name'), 'stores.name as store_name', 'companies.name as company_name', 'user1.first_name as contact_1', 'user2.first_name as contact_2', 'locations.name as location_name')
                 ->join('stores', 'stores.id', '=', 'contracts.object_id')
-                ->where('contracts.object_type', '=', \DB::raw('"App\\\Models\\\Store"'))
-                ->select('contracts.*', \DB::raw('null AS department_name'), \DB::raw('null AS store_name'), \DB::raw('null AS company_name'), \DB::raw('stores.name AS name_sort'))
+                ->join('companies', 'companies.id', '=', 'stores.company_id')
+                ->leftjoin('locations', 'locations.id', '=', 'contracts.location_id')
+                ->leftjoin('users as user1', 'user1.id', '=', 'contracts.contact_id_1')
+                ->leftjoin('users as user2', 'user2.id', '=', 'contracts.contact_id_2')
+                ->where('contracts.object_type', \DB::raw('"App\\\Models\\\Store"'))
                 ->union($company)
                 ->union($department)
-                ->union($location)
-                ->orderBy('name_sort', $order);
+                ->orderBy('store_name', $order);
         } else {
             return $query
                 ->orderBy('store_name', $order);
         }
     }
 
-    public function scopeSortDepartment($query, $order, $company = "", $store = "", $department = "", $contract, $search = "")
+    public function scopeSortDepartment($query, $order, $company = "", $store = "", $department = "", $search = "", $contract = "")
     {
         if ($department) {
             return $query;
@@ -315,7 +267,7 @@ final class Contract extends SnipeModel
                 return $query->orderBy('department_name', $order);
             } else {
                 return $contract
-                    ->select('contracts.*', \DB::raw('null AS department_name'), \DB::raw('null AS store_name'), \DB::raw('null AS company_name'), \DB::raw('departments.name AS name_sort'))
+                    ->select('contracts.*', \DB::raw('departments.name AS department_name'), \DB::raw('null AS store_name'), \DB::raw('null AS company_name'), \DB::raw('null AS contact_1'), \DB::raw('null AS contact_2'), \DB::raw('null AS location_name'))
                     ->leftjoin('departments', 'departments.id', '=', 'contracts.object_id')
                     ->where('contracts.object_type', '=', \DB::raw('"App\\\Models\\\Department"'))
                     ->whereIn(
@@ -325,43 +277,19 @@ final class Contract extends SnipeModel
                             ->where('stores.id', $store)
                     )
                     ->union(
-                        Contract::select('contracts.*', \DB::raw('null AS department_name'), \DB::raw('null AS store_name'), \DB::raw('null AS company_name'), \DB::raw('null AS name_sort'))
+                        Contract::select('contracts.*', \DB::raw('null AS department_name'), \DB::raw('null AS store_name'), \DB::raw('null AS company_name'), \DB::raw('null AS contact_1'), \DB::raw('null AS contact_2'), \DB::raw('null AS location_name'))
                             ->where('contracts.object_type', '=', \DB::raw('"App\\\Models\\\Store"'))
                             ->where('contracts.object_id', $store)
                     )
-                    ->union(
-                        Contract::select('contracts.*', \DB::raw('null AS department_name'), \DB::raw('null AS store_name'), \DB::raw('null AS company_name'), \DB::raw('departments.name AS name_sort'))
-                            ->leftjoin('departments', 'departments.id', '=', 'contracts.object_id', 'and', 'contracts.object_type', '=', \DB::raw('"App\\\Models\\\Department"'))
-                            ->whereIn(
-                                'contracts.object_id',
-                                Contract::select('contracts.id')
-                                    ->where('contracts.object_type', '=', \DB::raw('"App\\\Models\\\Department"'))
-                                    ->whereIn(
-                                        'contracts.object_id',
-                                        Department::select('departments.id as id')
-                                            ->join('stores', 'stores.id', '=', 'departments.store_id')
-                                            ->where('stores.id', '=', $store)
-                                    )
-                            )
-                    )
-                    ->union(
-                        Contract::select('contracts.*', \DB::raw('null AS department_name'), \DB::raw('null AS store_name'), \DB::raw('null AS company_name'), \DB::raw('null AS name_sort'))
-                            ->whereIn(
-                                'contracts.object_id',
-                                Contract::select('contracts.id as id')
-                                    ->where('contracts.object_type', '=', \DB::raw('"App\\\Models\\\Store"'))
-                                    ->where('contracts.object_id', '=', $store)
-                            )
-                    )
-                    ->orderBy('name_sort', $order);
+
+                    ->orderBy('department_name', $order);
             }
         } elseif ($company) {
-
             if ($search) {
                 return $query->orderBy('department_name', $order);
             } else {
                 $contract = $contract
-                    ->select('contracts.*', \DB::raw('null AS department_name'), \DB::raw('null AS store_name'), \DB::raw('null AS company_name'), \DB::raw('departments.name AS name_sort'))
+                    ->select('contracts.*', \DB::raw('departments.name AS department_name'), \DB::raw('null AS store_name'), \DB::raw('null AS company_name'), \DB::raw('null AS contact_1'), \DB::raw('null AS contact_2'), \DB::raw('null AS location_name'))
                     ->join('departments', 'departments.id', '=', 'contracts.object_id')
                     ->where('contracts.object_type', '=', \DB::raw('"App\\\Models\\\Department"'))
                     ->whereIn(
@@ -372,7 +300,7 @@ final class Contract extends SnipeModel
                             ->where('companies.id', '=', $company)
                     )
                     ->union(
-                        Contract::select('contracts.*', \DB::raw('null AS department_name'), \DB::raw('null AS store_name'), \DB::raw('null AS company_name'), \DB::raw('null AS name_sort'))
+                        Contract::select('contracts.*', \DB::raw('null AS department_name'), \DB::raw('null AS store_name'), \DB::raw('null AS company_name'), \DB::raw('null AS contact_1'), \DB::raw('null AS contact_2'), \DB::raw('null AS location_name'))
                             ->where('contracts.object_type', '=', \DB::raw('"App\\\Models\\\Store"'))
                             ->whereIn(
                                 'contracts.object_id',
@@ -382,433 +310,43 @@ final class Contract extends SnipeModel
                             )
                     )
                     ->union(
-                        Contract::select('contracts.*', \DB::raw('null AS department_name'), \DB::raw('null AS store_name'), \DB::raw('null AS company_name'), \DB::raw('null AS name_sort'))
+                        Contract::select('contracts.*', \DB::raw('null AS department_name'), \DB::raw('null AS store_name'), \DB::raw('null AS company_name'), \DB::raw('null AS contact_1'), \DB::raw('null AS contact_2'), \DB::raw('null AS location_name'))
                             ->where('contracts.object_type', '=', \DB::raw('"App\\\Models\\\Company"'))
                             ->where('contracts.object_id', '=', $company)
-                    )
-                    ->union(
-                        Contract::select('contracts.*', \DB::raw('null AS department_name'), \DB::raw('null AS store_name'), \DB::raw('null AS company_name'), \DB::raw('null AS name_sort'))
-                            ->whereIn(
-                                'contracts.object_id',
-                                Contract::select('contracts.id as id')
-                                    ->where('contracts.object_type', '=', \DB::raw('"App\\\Models\\\Store"'))
-                                    ->whereIn(
-                                        'contracts.object_id',
-                                        Store::select('stores.id')
-                                            ->join('companies', 'companies.id', '=', 'stores.company_id')
-                                            ->where('companies.id', '=', $company)
-                                    )
-                            )
-                    )
-                    ->union(
-                        Contract::select('contracts.*', \DB::raw('null AS department_name'), \DB::raw('null AS store_name'), \DB::raw('null AS company_name'), \DB::raw('departments.name AS name_sort'))
-                            ->leftjoin('departments', 'departments.id', '=', 'contracts.object_id', 'and', 'contracts.object_type', '=', \DB::raw('"App\\\Models\\\Department"'))
-                            ->whereIn(
-                                'contracts.object_id',
-                                Contract::select('contracts.id')
-                                    ->where('contracts.object_type', '=', \DB::raw('"App\\\Models\\\Department"'))
-                                    ->whereIn(
-                                        'contracts.object_id',
-                                        Department::select('departments.id as id')
-                                            ->join('stores', 'stores.id', '=', 'departments.store_id')
-                                            ->join('companies', 'companies.id', '=', 'stores.company_id')
-                                            ->where('companies.id', '=', $company)
-                                    )
-                            )
-                    )
-                    ->union(
-                        Contract::select('contracts.*', \DB::raw('null AS department_name'), \DB::raw('null AS store_name'), \DB::raw('null AS company_name'), \DB::raw('null AS name_sort'))
-                            ->whereIn(
-                                'contracts.object_id',
-                                Contract::select('contracts.id as id')
-                                    ->where('contracts.object_type', '=', \DB::raw('"App\\\Models\\\Company"'))
-                                    ->where('contracts.object_id', '=', $company)
-                            )
                     );
-                return $contract->orderBy('name_sort', $order);
+                return $contract->orderBy('department_name', $order);
             }
         }
 
         if (!$search) {
-            $company = Contract::select('contracts.*', \DB::raw('null AS department_name'), \DB::raw('null AS store_name'), \DB::raw('null AS company_name'), \DB::raw('null AS name_sort'))
+            $company =  Contract::select('contracts.*', \DB::raw('null AS department_name'), \DB::raw('null AS store_name'), 'companies.name as company_name', 'user1.first_name as contact_1', 'user2.first_name as contact_2', 'locations.name as location_name')
                 ->join('companies', 'companies.id', '=', 'contracts.object_id')
-                ->where('contracts.object_type', '=', \DB::raw('"App\\\Models\\\Company"'));
-            $store = Contract::select('contracts.*', \DB::raw('null AS department_name'), \DB::raw('null AS store_name'), \DB::raw('null AS company_name'), \DB::raw('null AS name_sort'))
+                ->leftjoin('locations', 'locations.id', '=', 'contracts.location_id')
+                ->leftjoin('users as user1', 'user1.id', '=', 'contracts.contact_id_1')
+                ->leftjoin('users as user2', 'user2.id', '=', 'contracts.contact_id_2')
+                ->where('contracts.object_type', \DB::raw('"App\\\Models\\\Company"'));
+            $store = Contract::select('contracts.*', \DB::raw('null AS department_name'), 'stores.name as store_name', 'companies.name as company_name', 'user1.first_name as contact_1', 'user2.first_name as contact_2', 'locations.name as location_name')
                 ->join('stores', 'stores.id', '=', 'contracts.object_id')
-                ->where('contracts.object_type', '=', \DB::raw('"App\\\Models\\\Store"'));
-            $location = Contract::select('contracts.*', \DB::raw('null AS department_name'), \DB::raw('null AS store_name'), \DB::raw('null AS company_name'), \DB::raw('null AS name_sort'))
-                ->join('locations', 'locations.id', '=', 'contracts.object_id')
-                ->where('contracts.object_type', '=', \DB::raw('"App\\\Models\\\Location"'));
-
+                ->join('companies', 'companies.id', '=', 'stores.company_id')
+                ->leftjoin('locations', 'locations.id', '=', 'contracts.location_id')
+                ->leftjoin('users as user1', 'user1.id', '=', 'contracts.contact_id_1')
+                ->leftjoin('users as user2', 'user2.id', '=', 'contracts.contact_id_2')
+                ->where('contracts.object_type', \DB::raw('"App\\\Models\\\Store"'));
             return $query
+                ->select('contracts.*', 'departments.name as department_name', 'stores.name as store_name', 'companies.name as company_name', 'user1.first_name as contact_1', 'user2.first_name as contact_2', 'locations.name as location_name')
                 ->join('departments', 'departments.id', '=', 'contracts.object_id')
-                ->where('contracts.object_type', '=', \DB::raw('"App\\\Models\\\Department"'))
-                ->select('contracts.*', \DB::raw('null AS department_name'), \DB::raw('null AS store_name'), \DB::raw('null AS company_name'), \DB::raw('departments.name AS name_sort'))
+                ->join('stores', 'stores.id', '=', 'departments.store_id')
+                ->join('companies', 'companies.id', '=', 'stores.company_id')
+                ->leftjoin('locations', 'locations.id', '=', 'contracts.location_id')
+                ->leftjoin('users as user1', 'user1.id', '=', 'contracts.contact_id_1')
+                ->leftjoin('users as user2', 'user2.id', '=', 'contracts.contact_id_2')
+                ->where('contracts.object_type', \DB::raw('"App\\\Models\\\Department"'))
                 ->union($company)
                 ->union($store)
-                ->union($location)
-                ->orderBy('name_sort', $order);
+                ->orderBy('department_name', $order);
         } else {
             return $query
                 ->orderBy('department_name', $order);
-        }
-    }
-
-    public function scopeSortLocation($query, $order, $company = "", $store = "", $department = "", $contract, $search)
-    {
-        if ($department) {
-            if ($search) {
-                return $query->orderBy('location_name', $order);
-            } else {
-                return $contract
-                    ->select(
-                        'contracts.*',
-                        \DB::raw('null AS department_name'),
-                        \DB::raw('null AS store_name'),
-                        \DB::raw('null AS company_name'),
-                        \DB::raw('locations.name AS name_sort')
-                    )
-                    ->leftjoin('locations', 'locations.id', '=', 'contracts.location_id')
-                    ->where('contracts.object_type', '=', \DB::raw('"App\\\Models\\\Department"'))
-                    ->whereIn(
-                        'contracts.object_id',
-                        Department::select('departments.id')
-                            ->join('stores', 'stores.id', '=', 'departments.store_id')
-                            ->join('companies', 'companies.id', '=', 'stores.company_id')
-                            ->where('departments.id', '=', $department)
-                    )->orderBy('name_sort', $order);
-            }
-        } else {
-            if ($store) {
-                if ($search) {
-                    return $query->orderBy('location_name', $order);
-                } else {
-                    return $contract
-                        ->select('contracts.*', \DB::raw('null AS department_name'), \DB::raw('null AS store_name'), \DB::raw('null AS company_name'), \DB::raw('locations.name AS name_sort'))
-                        ->leftjoin('locations', 'locations.id', '=', 'contracts.location_id')
-                        ->where('contracts.object_type', '=', \DB::raw('"App\\\Models\\\Department"'))
-                        ->whereIn(
-                            'contracts.object_id',
-                            Department::select('departments.id')
-                                ->join('stores', 'stores.id', '=', 'departments.store_id')
-                                ->where('stores.id', $store)
-                        )
-                        ->union(
-                            Contract::select('contracts.*', \DB::raw('null AS department_name'), \DB::raw('null AS store_name'), \DB::raw('null AS company_name'), \DB::raw('locations.name AS name_sort'))
-                                ->leftjoin('locations', 'locations.id', '=', 'contracts.location_id')
-                                ->where('contracts.object_type', '=', \DB::raw('"App\\\Models\\\Store"'))
-                                ->where('contracts.object_id', $store)
-                        )
-                        ->union(
-                            Contract::select('contracts.*', \DB::raw('null AS department_name'), \DB::raw('null AS store_name'), \DB::raw('null AS company_name'), \DB::raw('locations.name AS name_sort'))
-                                ->leftjoin('locations', 'locations.id', '=', 'contracts.location_id')
-                                ->whereIn(
-                                    'contracts.object_id',
-                                    Contract::select('contracts.id')
-                                        ->where('contracts.object_type', '=', \DB::raw('"App\\\Models\\\Department"'))
-                                        ->whereIn(
-                                            'contracts.object_id',
-                                            Department::select('departments.id as id')
-                                                ->join('stores', 'stores.id', '=', 'departments.store_id')
-                                                ->where('stores.id', '=', $store)
-                                        )
-                                )
-                        )->orderBy('name_sort', $order);
-                }
-            } elseif ($company) {
-                if ($search) {
-                    return $query->orderBy('location_name', $order);
-                } else {
-                    $contract = $contract
-                        ->select('contracts.*', \DB::raw('null AS department_name'), \DB::raw('null AS store_name'), \DB::raw('null AS company_name'), \DB::raw('locations.name AS name_sort'))
-                        ->leftjoin('locations', 'locations.id', '=', 'contracts.location_id')
-                        ->where('contracts.object_type', '=', \DB::raw('"App\\\Models\\\Department"'))
-                        ->whereIn(
-                            'contracts.object_id',
-                            Department::select('departments.id')
-                                ->join('stores', 'stores.id', '=', 'departments.store_id')
-                                ->join('companies', 'companies.id', '=', 'stores.company_id')
-                                ->where('companies.id', '=', $company)
-                        )
-                        ->union(
-                            Contract::select('contracts.*', \DB::raw('null AS department_name'), \DB::raw('null AS store_name'), \DB::raw('null AS company_name'), \DB::raw('locations.name AS name_sort'))
-                                ->leftjoin('locations', 'locations.id', '=', 'contracts.location_id')
-                                ->where('contracts.object_type', '=', \DB::raw('"App\\\Models\\\Store"'))
-                                ->whereIn(
-                                    'contracts.object_id',
-                                    Store::select('stores.id')
-                                        ->join('companies', 'companies.id', '=', 'stores.company_id')
-                                        ->where('companies.id', '=', $company)
-                                )
-                        )
-                        ->union(
-                            Contract::select('contracts.*', \DB::raw('null AS department_name'), \DB::raw('null AS store_name'), \DB::raw('null AS company_name'), \DB::raw('locations.name AS name_sort'))
-                                ->leftjoin('locations', 'locations.id', '=', 'contracts.location_id')
-                                ->where('contracts.object_type', '=', \DB::raw('"App\\\Models\\\Company"'))
-                                ->where('contracts.object_id', '=', $company)
-                        )
-                        ->union(
-                            Contract::select('contracts.*', \DB::raw('null AS department_name'), \DB::raw('null AS store_name'), \DB::raw('null AS company_name'), \DB::raw('locations.name AS name_sort'))
-                                ->leftjoin('locations', 'locations.id', '=', 'contracts.location_id')
-                                ->whereIn(
-                                    'contracts.object_id',
-                                    Contract::select('contracts.id as id')
-                                        ->where('contracts.object_type', '=', \DB::raw('"App\\\Models\\\Store"'))
-                                        ->whereIn(
-                                            'contracts.object_id',
-                                            Store::select('stores.id')
-                                                ->join('companies', 'companies.id', '=', 'stores.company_id')
-                                                ->where('companies.id', '=', $company)
-                                        )
-                                )
-                        )
-                        ->union(
-                            Contract::select('contracts.*', \DB::raw('null AS department_name'), \DB::raw('null AS store_name'), \DB::raw('null AS company_name'), \DB::raw('locations.name AS name_sort'))
-                                ->leftjoin('locations', 'locations.id', '=', 'contracts.location_id')
-                                ->whereIn(
-                                    'contracts.object_id',
-                                    Contract::select('contracts.id')
-                                        ->where('contracts.object_type', '=', \DB::raw('"App\\\Models\\\Department"'))
-                                        ->whereIn(
-                                            'contracts.object_id',
-                                            Department::select('departments.id as id')
-                                                ->join('stores', 'stores.id', '=', 'departments.store_id')
-                                                ->join('companies', 'companies.id', '=', 'stores.company_id')
-                                                ->where('companies.id', '=', $company)
-                                        )
-                                )
-                        )
-                        ->union(
-                            Contract::select('contracts.*', \DB::raw('null AS department_name'), \DB::raw('null AS store_name'), \DB::raw('null AS company_name'), \DB::raw('locations.name AS name_sort'))
-                                ->leftjoin('locations', 'locations.id', '=', 'contracts.location_id')
-                                ->whereIn(
-                                    'contracts.object_id',
-                                    Contract::select('contracts.id as id')
-                                        ->where('contracts.object_type', '=', \DB::raw('"App\\\Models\\\Company"'))
-                                        ->where('contracts.object_id', '=', $company)
-                                )
-                        );
-                    return $contract->orderBy('name_sort', $order);
-                }
-            }
-        }
-        if (!$search) {
-            return $query
-                ->select('contracts.*', \DB::raw('null AS department_name'), \DB::raw('null AS store_name'), \DB::raw('null AS company_name'), \DB::raw('locations.name AS name_sort'))
-                ->leftjoin('locations', 'locations.id', '=', 'contracts.location_id')
-                ->orderBy('name_sort', $order);
-        } else {
-            return $query
-                ->orderBy('location_name', $order);
-        }
-    }
-
-    public function scopeSortUser($query, $order, $company = "", $store = "", $department = "", $contract, $search, $field, $orderBy)
-    {
-        if ($department) {
-            if ($search) {
-                return $query->orderBy($orderBy, $order);
-            } else {
-                return $contract
-                    ->select(
-                        'contracts.*',
-                        \DB::raw('null AS department_name'),
-                        \DB::raw('null AS store_name'),
-                        \DB::raw('null AS company_name'),
-                        \DB::raw('users.first_name AS name_sort')
-                    )
-                    ->leftjoin('users', 'users.id', '=', $field)
-                    ->where('contracts.object_type', '=', \DB::raw('"App\\\Models\\\Department"'))
-                    ->whereIn(
-                        'contracts.object_id',
-                        Department::select('departments.id')
-                            ->join('stores', 'stores.id', '=', 'departments.store_id')
-                            ->join('companies', 'companies.id', '=', 'stores.company_id')
-                            ->where('departments.id', '=', $department)
-                    )->orderBy('name_sort', $order);
-            }
-        } else {
-            if ($store) {
-                if ($search) {
-                    return $query->orderBy($orderBy, $order);
-                } else {
-                    return $contract
-                        ->select(
-                            'contracts.*',
-                            \DB::raw('null AS department_name'),
-                            \DB::raw('null AS store_name'),
-                            \DB::raw('null AS company_name'),
-                            \DB::raw('users.first_name AS name_sort')
-                        )
-                        ->leftjoin('users', 'users.id', '=', $field)
-                        ->where('contracts.object_type', '=', \DB::raw('"App\\\Models\\\Department"'))
-                        ->whereIn(
-                            'contracts.object_id',
-                            Department::select('departments.id')
-                                ->join('stores', 'stores.id', '=', 'departments.store_id')
-                                ->where('stores.id', $store)
-                        )
-                        ->union(
-                            Contract::select(
-                                'contracts.*',
-                                \DB::raw('null AS department_name'),
-                                \DB::raw('null AS store_name'),
-                                \DB::raw('null AS company_name'),
-                                \DB::raw('users.first_name AS name_sort')
-                            )
-                                ->leftjoin('users', 'users.id', '=', $field)
-                                ->where('contracts.object_type', '=', \DB::raw('"App\\\Models\\\Store"'))
-                                ->where('contracts.object_id', $store)
-                        )
-                        ->union(
-                            Contract::select(
-                                'contracts.*',
-                                \DB::raw('null AS department_name'),
-                                \DB::raw('null AS store_name'),
-                                \DB::raw('null AS company_name'),
-                                \DB::raw('users.first_name AS name_sort')
-                            )
-                                ->leftjoin('users', 'users.id', '=', $field)
-                                ->whereIn(
-                                    'contracts.object_id',
-                                    Contract::select('contracts.id')
-                                        ->where('contracts.object_type', '=', \DB::raw('"App\\\Models\\\Department"'))
-                                        ->whereIn(
-                                            'contracts.object_id',
-                                            Department::select('departments.id as id')
-                                                ->join('stores', 'stores.id', '=', 'departments.store_id')
-                                                ->where('stores.id', '=', $store)
-                                        )
-                                )
-                        )->orderBy('name_sort', $order);
-                }
-            } elseif ($company) {
-                if ($search) {
-                    return $query->orderBy($orderBy, $order);
-                } else {
-                    $contract = $contract
-                        ->select(
-                            'contracts.*',
-                            \DB::raw('null AS department_name'),
-                            \DB::raw('null AS store_name'),
-                            \DB::raw('null AS company_name'),
-                            \DB::raw('users.first_name AS name_sort')
-                        )
-                        ->leftjoin('users', 'users.id', '=', $field)
-                        ->where('contracts.object_type', '=', \DB::raw('"App\\\Models\\\Department"'))
-                        ->whereIn(
-                            'contracts.object_id',
-                            Department::select('departments.id')
-                                ->join('stores', 'stores.id', '=', 'departments.store_id')
-                                ->join('companies', 'companies.id', '=', 'stores.company_id')
-                                ->where('companies.id', '=', $company)
-                        )
-                        ->union(
-                            Contract::select(
-                                'contracts.*',
-                                \DB::raw('null AS department_name'),
-                                \DB::raw('null AS store_name'),
-                                \DB::raw('null AS company_name'),
-                                \DB::raw('users.first_name AS name_sort')
-                            )
-                                ->leftjoin('users', 'users.id', '=', $field)
-                                ->where('contracts.object_type', '=', \DB::raw('"App\\\Models\\\Store"'))
-                                ->whereIn(
-                                    'contracts.object_id',
-                                    Store::select('stores.id')
-                                        ->join('companies', 'companies.id', '=', 'stores.company_id')
-                                        ->where('companies.id', '=', $company)
-                                )
-                        )
-                        ->union(
-                            Contract::select(
-                                'contracts.*',
-                                \DB::raw('null AS department_name'),
-                                \DB::raw('null AS store_name'),
-                                \DB::raw('null AS company_name'),
-                                \DB::raw('users.first_name AS name_sort')
-                            )
-                                ->leftjoin('users', 'users.id', '=', $field)
-                                ->where('contracts.object_type', '=', \DB::raw('"App\\\Models\\\Company"'))
-                                ->where('contracts.object_id', '=', $company)
-                        )
-                        ->union(
-                            Contract::select(
-                                'contracts.*',
-                                \DB::raw('null AS department_name'),
-                                \DB::raw('null AS store_name'),
-                                \DB::raw('null AS company_name'),
-                                \DB::raw('users.first_name AS name_sort')
-                            )
-                                ->leftjoin('users', 'users.id', '=', $field)
-                                ->whereIn(
-                                    'contracts.object_id',
-                                    Contract::select('contracts.id as id')
-                                        ->where('contracts.object_type', '=', \DB::raw('"App\\\Models\\\Store"'))
-                                        ->whereIn(
-                                            'contracts.object_id',
-                                            Store::select('stores.id')
-                                                ->join('companies', 'companies.id', '=', 'stores.company_id')
-                                                ->where('companies.id', '=', $company)
-                                        )
-                                )
-                        )
-                        ->union(
-                            Contract::select(
-                                'contracts.*',
-                                \DB::raw('null AS department_name'),
-                                \DB::raw('null AS store_name'),
-                                \DB::raw('null AS company_name'),
-                                \DB::raw('users.first_name AS name_sort')
-                            )
-                                ->leftjoin('users', 'users.id', '=', $field)
-                                ->whereIn(
-                                    'contracts.object_id',
-                                    Contract::select('contracts.id')
-                                        ->where('contracts.object_type', '=', \DB::raw('"App\\\Models\\\Department"'))
-                                        ->whereIn(
-                                            'contracts.object_id',
-                                            Department::select('departments.id as id')
-                                                ->join('stores', 'stores.id', '=', 'departments.store_id')
-                                                ->join('companies', 'companies.id', '=', 'stores.company_id')
-                                                ->where('companies.id', '=', $company)
-                                        )
-                                )
-                        )
-                        ->union(
-                            Contract::select(
-                                'contracts.*',
-                                \DB::raw('null AS department_name'),
-                                \DB::raw('null AS store_name'),
-                                \DB::raw('null AS company_name'),
-                                \DB::raw('users.first_name AS name_sort')
-                            )
-                                ->leftjoin('users', 'users.id', '=', $field)
-                                ->whereIn(
-                                    'contracts.object_id',
-                                    Contract::select('contracts.id as id')
-                                        ->where('contracts.object_type', '=', \DB::raw('"App\\\Models\\\Company"'))
-                                        ->where('contracts.object_id', '=', $company)
-                                )
-                        );
-                    return $contract->orderBy('name_sort', $order);
-                }
-            }
-        }
-        if (!$search) {
-            return $query
-                ->select(
-                    'contracts.*',
-                    \DB::raw('null AS department_name'),
-                    \DB::raw('null AS store_name'),
-                    \DB::raw('null AS company_name'),
-                    \DB::raw('users.first_name AS name_sort')
-                )
-                ->leftjoin('users', 'users.id', '=', $field)
-                ->orderBy('name_sort', $order);
-        } else {
-            return $query
-                ->orderBy($orderBy, $order);
         }
     }
 }

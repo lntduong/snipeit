@@ -52,7 +52,7 @@ class InventoryResultPresenter extends Presenter
                 "switchable" => true,
                 "title" => trans('admin/inventories/table.checked'),
                 "visible" => true,
-                "formatter" => 'dateDisplayFormatter',
+
             ],
             [
                 "field" => "familiar",
