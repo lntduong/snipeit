@@ -42,6 +42,9 @@
                         <a href="#details" data-toggle="tab"><span class="hidden-lg hidden-md"><i class="fa fa-info-circle"></i></span> <span class="hidden-xs hidden-sm">{{ trans('general.details') }}</span></a>
                     </li>
                     <li>
+                        <a href="#asset_tab" data-toggle="tab"><span class="hidden-lg hidden-md"><i class="fa fa-info-circle"></i></span> <span class="hidden-xs hidden-sm">{{ trans('general.assets_in_contract') }}</span></a>
+                    </li>
+                    <li>
                         <a href="#history_contract" data-toggle="tab"><span class="hidden-lg hidden-md"><i class="fa fa-history"></i></span> <span class="hidden-xs hidden-sm">{{ trans('general.history') }}</span></a>
                     </li>
                 </ul>
@@ -51,7 +54,7 @@
                         <div class="row">
                             <div class="col-md-8">
                                 <div class="table-responsive" style="margin-top: 10px;">
-                                    <table class="table">
+                                    <table class="table table-striped">
                                             <tbody>
                                                 @if ($item->name)
                                                 <tr>
@@ -182,13 +185,88 @@
                                                         </td>
                                                     </tr>
                                                 @endif
+
+                                                @if ($item->terms_and_conditions)
+                                                    <tr>
+                                                        <td>{{ trans('admin/contracts/table.terms_and_conditions') }}</td>
+                                                        <td>{{ $item->terms_and_conditions }}</td>
+                                                    </tr>
+                                                @endif
+
+                                                @if ($item->notes)
+                                                    <tr>
+                                                        <td>{{ trans('admin/contracts/table.notes') }}</td>
+                                                        <td>{{ $item->notes }}</td>
+                                                    </tr>
+                                                @endif
+                      
                                         </tbody>
                                     </table>
                                 </div>
                             </div>
                         </div>
                     </div>
-
+                    <div class="tab-pane" id="asset_tab">
+                        <!-- checked out assets table -->
+                        <div class="table-responsive">
+                          <table class="display table table-striped">
+                            <thead>
+                              <tr>
+                                <th class="col-md-3">{{ trans('general.name') }}</th>
+                                <th class="col-md-2">{{ trans('admin/hardware/table.asset_tag') }}</th>
+                                <th class="col-md-2">{{ trans('admin/hardware/form.serial') }}</th>
+                                <th class="col-md-2">{{ trans('admin/hardware/table.asset_model') }}</th>
+                                <th class="col-md-2">{{ trans('admin/models/table.modelnumber') }}</th>
+                                <th class="col-md-3">{{ trans('general.category') }}</th>
+                                <th class="col-md-4">{{ trans('general.location') }}</th>
+                                <th class="col-md-3">{{ trans('general.company') }}</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              @foreach ($item->assets as $asset)
+                              <tr>
+                                <td>{!! $asset->present()->nameUrl() !!}</td>
+                                <td>
+                                    @can('view', $asset)
+                                        <a href="{{ route('hardware.show', $asset->id) }}">{{ $asset->asset_tag }}</a>
+                                    @endcan
+                                </td>   
+                                <td>
+                                    @can('view', $asset)
+                                        <a href="{{ route('hardware.show', $asset->id) }}">{{ $asset->serial }}</a>
+                                    @endcan
+                                </td>                            
+                                <td>
+                                  @if ($asset->physical=='1')
+                                    <a href="{{ route('models.show', $asset->model->id) }}">{{ $asset->model->name }}</a>
+                                  @endif
+                                </td>
+                                <td>
+                                    @if ($asset->physical=='1')
+                                        {{ $asset->model->model_number }}
+                                    @endif
+                                </td>
+                                <td>
+                                    @if ($asset->physical=='1')
+                                        <a href="{{ route('categories.show', $asset->model->category->id) }}">{{ $asset->model->category->name }}</a>
+                                    @endif
+                                </td>
+                                <td>
+                                    @can('view', $asset)
+                                        <a href="{{ route('locations.show', $asset->location->id) }}">{{ $asset->location->name }}</a>
+                                    @endcan
+                                </td> 
+                                <td>
+                                    @if ($asset->company_id)
+                                        <a href="{{ route('companies.show', $asset->company->id) }}">{{ $asset->company->name }}</a>
+                                    @endif
+                                </td> 
+                              </tr>
+                              @endforeach
+                            </tbody>
+                          </table>
+                        </div>
+                      </div><!-- /asset_tab -->
                     <div class="tab-pane fade" id="history_contract">
                         <div class="row">
                             <div class="col-md-12">

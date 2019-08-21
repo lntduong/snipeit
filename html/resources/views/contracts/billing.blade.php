@@ -72,7 +72,9 @@
 @section('moar_scripts')
 <script nonce="{{ csrf_token() }}">
   var $table = $('#contractsBillingTable');
-  
+
+   document.getElementById('billing_date').value = ""; 
+
    $("#datepicker").datepicker( {
       format: "yyyy-mm",
       viewMode: "months", 
@@ -88,8 +90,6 @@
         $('.datepicker').hide();
       });
    };
-
-   
 </script>
 @include ('partials.bootstrap-table', ['exportFile' => 'components-export', 'search' => true, 'showFooter' => true, 'columns' => \App\Presenters\ContractPresenter::dataTableLayout()])
 @stop

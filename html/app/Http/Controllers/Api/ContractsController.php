@@ -30,16 +30,16 @@ class ContractsController extends Controller
             ->leftjoin('users as user2', 'user2.id', '=', 'contracts.contact_id_2')
             ->with('company', 'store', 'location', 'user');
 
-
         $search = $request->input('search');
         $company_search = $request->input('company_id');
         $store_search = $request->input('store_id');
         $department_search = $request->input('department_id');
+        $billing_date = $request->input('billing_date');
 
         if ($search) {
-            $contract = self::search($search, $company_search, $store_search, $department_search);
+            $contract = self::search($search, $company_search, $store_search, $department_search, $billing_date);
         }
-        $contract = self::filter($company_search, $store_search, $department_search, $contract, $search);
+        $contract = self::filter($company_search, $store_search, $department_search, $contract, $search, $billing_date);
 
         $limit = request('limit', 50);
         $order = $request->input('order') === 'asc' ? 'asc' : 'desc';
@@ -47,21 +47,17 @@ class ContractsController extends Controller
             'id', 'name', 'start_date', 'end_date', 'company', 'store', 'department', 'location', 'billing_date', 'payment_date', 'location_id', 'contact_id_1', 'contact_id_2'
         ];
 
-        if ($request->has('billing_date')) {
-            $contract = $contract->where('contracts.billing_date', 'LIKE', $request->input('billing_date') . '-%');
-        }
-
         $sort = in_array($request->input('sort'), $allowed_columns) ? $request->input('sort') : 'created_at';
         switch ($sort) {
 
             case 'company':
-                $contract = $contract->SortCompany($order, $company_search, $store_search, $department_search, $search, $contract = new Contract);
+                $contract = $contract->SortCompany($order, $company_search, $store_search, $department_search, $billing_date, $search, $contract = new Contract);
                 break;
             case 'store':
-                $contract = $contract->SortStore($order, $company_search, $store_search, $department_search, $search, $contract = new Contract);
+                $contract = $contract->SortStore($order, $company_search, $store_search, $department_search, $billing_date, $search, $contract = new Contract);
                 break;
             case 'department':
-                $contract = $contract->SortDepartment($order, $company_search, $store_search, $department_search, $search, $contract = new Contract);
+                $contract = $contract->SortDepartment($order, $company_search, $store_search, $department_search, $billing_date, $search, $contract = new Contract);
                 break;
             case 'location_id':
                 $contract = $contract->orderBy('location_name', $order);
@@ -83,7 +79,7 @@ class ContractsController extends Controller
         return (new ContractsTransformer)->transformContractList($contract, $total);
     }
 
-    public function search($search = "", $company_search = "", $store_search = "", $department_search = "")
+    public function search($search = "", $company_search = "", $store_search = "", $department_search = "", $billing_date = "")
     {
         $department =
             Contract::select('contracts.*', 'departments.name as department_name', 'stores.name as store_name', 'companies.name as company_name', 'user1.first_name as contact_1', 'user2.first_name as contact_2', 'locations.name as location_name')
@@ -108,7 +104,7 @@ class ContractsController extends Controller
                     ->orWhere(DB::raw('CAST(contracts.billing_date AS char)'), 'LIKE', '%' . $search . '%')
                     ->orWhere(DB::raw('CAST(contracts.payment_date AS char)'), 'LIKE', '%' . $search . '%');
             })
-            ->Where(function ($query) use ($company_search, $store_search, $department_search) {
+            ->Where(function ($query) use ($company_search, $store_search, $department_search, $billing_date) {
                 if ($company_search) {
                     $query->Where('companies.id', $company_search);
                 }
@@ -117,6 +113,9 @@ class ContractsController extends Controller
                 }
                 if ($department_search) {
                     $query->Where('departments.id', $department_search);
+                }
+                if ($billing_date) {
+                    $query->Where(DB::raw('CAST(contracts.billing_date AS char)'), 'LIKE', '%' . $billing_date . '%');
                 }
             });
 
@@ -141,7 +140,7 @@ class ContractsController extends Controller
                     ->orWhere(DB::raw('CAST(contracts.billing_date AS char)'), 'LIKE', '%' . $search . '%')
                     ->orWhere(DB::raw('CAST(contracts.payment_date AS char)'), 'LIKE', '%' . $search . '%');
             })
-            ->Where(function ($query) use ($company_search, $store_search, $department_search) {
+            ->Where(function ($query) use ($company_search, $store_search, $department_search, $billing_date) {
                 if ($company_search) {
                     $query->Where('companies.id', $company_search);
                 }
@@ -150,6 +149,9 @@ class ContractsController extends Controller
                 }
                 if ($department_search) {
                     $query->whereRaw(0);
+                }
+                if ($billing_date) {
+                    $query->Where(DB::raw('CAST(contracts.billing_date AS char)'), 'LIKE', '%' . $billing_date . '%');
                 }
             });
 
@@ -172,7 +174,7 @@ class ContractsController extends Controller
                     ->orWhere(DB::raw('CAST(contracts.billing_date AS char)'), 'LIKE', '%' . $search . '%')
                     ->orWhere(DB::raw('CAST(contracts.payment_date AS char)'), 'LIKE', '%' . $search . '%');
             })
-            ->Where(function ($query) use ($company_search, $store_search, $department_search) {
+            ->Where(function ($query) use ($company_search, $store_search, $department_search, $billing_date) {
                 if ($company_search) {
                     $query->Where('companies.id', $company_search);
                 }
@@ -182,13 +184,16 @@ class ContractsController extends Controller
                 if ($department_search) {
                     $query->whereRaw(0);
                 }
+                if ($billing_date) {
+                    $query->Where(DB::raw('CAST(contracts.billing_date AS char)'), 'LIKE', '%' . $billing_date . '%');
+                }
             });
         return $department
             ->union($store)
             ->union($company);
     }
 
-    public function filter($company = "", $store = "", $department = "", $contract = "", $search = "")
+    public function filter($company = "", $store = "", $department = "", $contract = "", $search = "", $billing_date = "")
     {
         if ($department) {
 
@@ -285,7 +290,9 @@ class ContractsController extends Controller
                 }
             }
         }
-
+        if ($billing_date) {
+            $contract = $contract->Where(DB::raw('CAST(contracts.billing_date AS char)'), 'LIKE', '%' . $billing_date . '%');
+        }
         return $contract;
     }
 

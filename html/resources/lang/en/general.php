@@ -243,4 +243,5 @@ return [
     'all_contracts'         => 'All Contracts',
     'scope'                 => 'Scope',
     'object'                => 'Object',
+    'assets_in_contract'       => 'Assets in contract'
 ];
