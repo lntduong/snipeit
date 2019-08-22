@@ -237,5 +237,5 @@ return [
     'go'                    => 'Go',
     'scope'                 => 'Phạm vi',
     'object'                => 'Đối tượng',
-    'assets_in_contract'    => 'Tài sản trong hợp đồng'
+    'changed'               => 'Thay đổi'
 ];

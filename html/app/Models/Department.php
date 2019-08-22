@@ -53,7 +53,7 @@ class Department extends SnipeModel
      * 
      * @var array
      */
-    protected $searchableAttributes = ['name', 'notes'];
+    protected $searchableAttributes = ['name'];
 
     /**
      * The relations and their attributes that should be included when searching the model.
@@ -124,9 +124,9 @@ class Department extends SnipeModel
     public function scopeOrderCompany($query, $order)
     {
         return $query
-            ->leftJoin('stores', 'departments.store_id', '=', 'stores.id')
-            ->leftJoin('companies', 'companies.id', '=', 'stores.company_id')
-            ->orderBy('companies.name', $order);
+            ->leftJoin('stores as department_store', 'departments.store_id', '=', 'department_store.id')
+            ->leftJoin('companies as department_company', 'department_company.id', '=', 'stores.company_id')
+            ->orderBy('department_company.name', $order);
     }
 
     /**
@@ -139,7 +139,7 @@ class Department extends SnipeModel
      */
     public function scopeOrderStore($query, $order)
     {
-        return $query->leftJoin('stores', 'departments.store_id', '=', 'stores.id')->orderBy('stores.name', $order);
+        return $query->leftJoin('stores as department_store', 'departments.store_id', '=', 'department_store.id')->orderBy('department_store.name', $order);
     }
     /**
      * Query builder scope to order on manager name

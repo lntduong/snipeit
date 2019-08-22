@@ -25,7 +25,7 @@ class StoresController extends Controller
     public function index(Request $request)
     {
         $this->authorize('view', Store::class);
-        $allowed_columns = ['location', 'company', 'department_count', 'department_count', 'contract_count'];
+        $allowed_columns = ['name', 'location', 'company', 'department_count', 'department_count', 'contract_count'];
 
         $store = Store::select('stores.*')
             ->with('company')->with('location')->with('department')->withCount('department');

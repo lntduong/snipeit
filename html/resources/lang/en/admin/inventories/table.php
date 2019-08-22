@@ -18,5 +18,6 @@ return array(
     'familiar'              => 'Familiar',
     'device_image'          => 'Device Image',
     'select_status'         => 'Select Status',
-    'add_unknown_asset'     => 'Add Unknown Asset'
+    'add_unknown_asset'     => 'Add Unknown Asset',
+    'view'                  => 'View Inventory',
 );

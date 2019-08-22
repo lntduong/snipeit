@@ -235,5 +235,5 @@ return [
     'select_inventory'      => 'Select Inventory',
     'scope'                 => 'Scope',
     'object'                => 'Object',
-    'assets_in_contract'       => 'Assets in contract',
+    'changed'               => 'Changed'
 ];

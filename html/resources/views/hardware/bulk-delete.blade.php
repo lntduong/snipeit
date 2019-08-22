@@ -38,7 +38,11 @@
             <tbody>
               @foreach ($assets as $asset)
               <tr>
+                @if($asset->contract_assets)
+                <td></td>
+                @else
                 <td><input type="checkbox" name="ids[]" value="{{ $asset->id }}" checked="checked"></td>
+                @endif
                 <td>{{ $asset->id }}</td>
                 <td>{{ $asset->present()->name() }}</td>
                 <td>
@@ -59,7 +63,11 @@
 
         <div class="box-footer text-right">
           <a class="btn btn-link" href="{{ URL::previous() }}" method="post" enctype="multipart/form-data">{{ trans('button.cancel') }}</a>
-          <button type="submit" class="btn btn-success" id="submit-button"><i class="fa fa-check icon-white"></i> {{ trans('general.delete') }}</button>
+          @if($asset->contract_assets)
+            <button disabled type="submit" class="btn btn-success" id="submit-button"><i class="fa fa-check icon-white"></i> {{ trans('general.delete') }}</button>
+          @else 
+            <button type="submit" class="btn btn-success" id="submit-button"><i class="fa fa-check icon-white"></i> {{ trans('general.delete') }}</button>
+          @endif
         </div><!-- /.box-footer -->
       </div><!-- /.box -->
     </form>

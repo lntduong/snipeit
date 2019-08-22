@@ -78,6 +78,13 @@ final class Contract extends SnipeModel
         return $this->belongsTo('\App\Models\Location', 'location_id');
     }
 
+    public function inventories()
+    {
+        return $this->belongsTo('\App\Models\Inventory', 'id', 'object_id')
+            ->join('contracts', 'contracts.id', '=', 'inventories.object_id')
+            ->where('inventories.object_type', '=', "App\\Models\\Contract");
+    }
+
     public function company()
     {
         return $this->belongsTo('\App\Models\Company', 'object_id', 'id')

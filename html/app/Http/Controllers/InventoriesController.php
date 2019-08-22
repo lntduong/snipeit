@@ -100,6 +100,24 @@ class InventoriesController extends Controller
     }
 
     /**
+     * Returns a view that presents information about an inventory for detail view.
+     *
+     * @param int $inventory
+     * @since [v1.0]
+     * @return View
+     */
+    public function show($inventory = null)
+    {
+        $item = Inventory::find($inventory);
+        $this->authorize('view', $item);
+
+        if (isset($item->id)) {
+            return view('inventories/view', compact('item'));
+        }
+        return redirect()->route('inventories.index')->with('error', trans('admin/inventories/message.does_not_exist', compact('id')));
+    }
+
+    /**
      * Return a view to edit a inventory.
      *
      * @see inventorysController::postEdit() method that stores the data.

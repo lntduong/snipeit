@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Models\Actionlog;
 use App\Http\Transformers\ActionlogsTransformer;
+use App\Models\InventoryResult;
 
 class ReportsController extends Controller
 {
@@ -51,6 +52,20 @@ class ReportsController extends Controller
         if (($request->has('target_type')) && ($request->has('target_id'))) {
             $actionlogs = $actionlogs->where('target_id', '=', $request->input('target_id'))
                 ->where('target_type', '=', "App\\Models\\" . ucwords($request->input('target_type')));
+        }
+
+        if (($request->has('inventory'))) {
+            $inventory_result_id = InventoryResult::withTrashed()->where('inventory_id', $request->input('inventory'))->pluck('id')->toArray();
+            $inventory_id = $request->input('inventory');
+            $actionlogs = $actionlogs->where(function ($query) use ($inventory_id) {
+                $query->where('item_id', '=', $inventory_id)
+                    ->where('item_type', '=', "App\\Models\\Inventory");
+            })->orwhere(function ($query) use ($inventory_result_id) {
+                $query
+                    ->whereIn('item_id', $inventory_result_id)
+                    ->orderByRaw(\DB::raw("FIELD(id, " . implode(",", $inventory_result_id) . ")"))
+                    ->where('item_type', '=', "App\\Models\\InventoryResult");
+            });
         }
 
         if (($request->has('item_type')) && ($request->has('item_id'))) {

@@ -83,6 +83,7 @@ class InventoryPresenter extends Presenter
                 "sortable" => true,
                 "title" => trans('admin/inventories/table.inventory'),
                 "visible" => true,
+                "formatter" => "inventoriesLinkFormatter"
 
             ],
             [

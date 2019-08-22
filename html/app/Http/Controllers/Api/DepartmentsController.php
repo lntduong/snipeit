@@ -10,6 +10,7 @@ use App\Http\Transformers\DepartmentsTransformer;
 use App\Helpers\Helper;
 use Auth;
 use App\Http\Transformers\SelectlistTransformer;
+use DB;
 
 class DepartmentsController extends Controller
 {
@@ -23,7 +24,7 @@ class DepartmentsController extends Controller
     public function index(Request $request)
     {
         $this->authorize('view', Department::class);
-        $allowed_columns = ['id', 'name', 'image', 'users_count', 'contract_count', 'store', 'company'];
+
 
         $departments = Department::select([
             'departments.id',
@@ -40,9 +41,9 @@ class DepartmentsController extends Controller
             $departments = $departments->where('store_id', $request->input('store_id'));
         }
         if ($request->has('search')) {
-            $departments = $departments->TextSearch($request->input('search'));
+            $departments = self::search($request->input('search'), $departments);
         }
-
+        $allowed_columns = ['id', 'name', 'image', 'users_count', 'contract_count', 'store', 'company'];
         $offset = (($departments) && (request('offset') > $departments->count())) ? 0 : request('offset', 0);
         $limit = $request->input('limit', 50);
         $order = $request->input('order') === 'asc' ? 'asc' : 'desc';
@@ -69,6 +70,42 @@ class DepartmentsController extends Controller
         $total = $departments->count();
         $departments = $departments->skip($offset)->take($limit)->get();
         return (new DepartmentsTransformer)->transformDepartments($departments, $total);
+    }
+
+    /**
+     * Search Department
+     * @param search
+     * @return Department
+     */
+    public function search($search = "", $query)
+    {
+        $query = $query->select(
+            'departments.id',
+            'departments.name',
+            'departments.location_id',
+            'departments.store_id',
+            'departments.manager_id',
+            'departments.created_at',
+            'departments.updated_at',
+            'departments.image',
+            'stores.name as store_name',
+            'locations.name as location_name',
+            'companies.name as companies_name'
+        )
+            ->leftjoin('stores', 'stores.id', '=', 'departments.store_id')
+            ->leftjoin('companies', 'companies.id', '=', 'stores.company_id')
+            ->leftjoin('locations', 'locations.id', '=', 'departments.location_id')
+            ->leftjoin('users', 'users.id', '=', 'departments.manager_id')
+            ->Where(function ($query) use ($search) {
+                $query = $query
+                    ->Where('departments.name', 'LIKE', '%' . $search . '%')
+                    ->orWhere('stores.name', 'LIKE', '%' . $search . '%')
+                    ->orWhere('companies.name', 'LIKE', '%' . $search . '%')
+                    ->orWhere('locations.name', 'LIKE', '%' . $search . '%')
+                    ->orWhereRaw('CONCAT(' . DB::getTablePrefix() . 'users.first_name," ",' . DB::getTablePrefix() . 'users.last_name) LIKE ?', ["%$search%", "%$search%"]);
+            })
+            ->with('users')->with('location')->with('manager')->with('store')->withCount('users')->withCount('contract');
+        return $query;
     }
 
     /**

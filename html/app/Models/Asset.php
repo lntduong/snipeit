@@ -149,6 +149,11 @@ class Asset extends Depreciable
         'model.category'     => ['name'],
         'model.manufacturer' => ['name'],
     ];     
+    
+    public function contract_assets()
+    {
+        return $this->belongsTo('\App\Models\ContractAsset', 'id', 'asset_id');
+    }
 
     public function getDisplayNameAttribute()
     {

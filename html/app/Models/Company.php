@@ -261,15 +261,18 @@ final class Company extends SnipeModel
                                                 FROM departments
                                                 JOIN stores ON stores.id = departments.store_id
                                                 where stores.company_id = companies.id
-                                            )
+                                                and stores.deleted_at is null
+                                                and departments.deleted_at is null
+                                            ) and contracts.deleted_at is null
             when contracts.object_type = 'App\\\Models\\\Store' 
                 then contracts.object_id IN
                                             (SELECT stores.id
                                                 FROM stores
                                                 where stores.company_id = companies.id
-                                            )
+                                                and stores.deleted_at is null
+                                            ) and contracts.deleted_at is null
             when contracts.object_type = 'App\\\Models\\\Company' 
-                then contracts.object_id	= companies.id
+                then contracts.object_id = companies.id and contracts.deleted_at is null
             end 
         ) as sum ")
         )

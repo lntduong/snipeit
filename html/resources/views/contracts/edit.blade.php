@@ -118,9 +118,14 @@
                 dataType: "json",
                 success: function(data) {
                     $("#plzAddContract").css("display","none");
-                    $("#mgsContractAssets").css("display","block");
-                    $("#mgsContractAssetsFailed").css("display","none");
                     $("#mgsContractAssetsDel").css("display","none");
+                    if($("#asset_id").val() === '' ) {
+                        $("#mgsContractAssetsFailed").css("display","block");
+                        $("#mgsContractAssets").css("display","none");
+                    } else {
+                        $("#mgsContractAssets").css("display","block");
+                        $("#mgsContractAssetsFailed").css("display","none");
+                    }
                     $table.bootstrapTable('removeAll');
                     for(var i =0 ; i<data.length ;i++){
                         

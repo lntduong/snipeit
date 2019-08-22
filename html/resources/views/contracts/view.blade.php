@@ -42,7 +42,7 @@
                         <a href="#details" data-toggle="tab"><span class="hidden-lg hidden-md"><i class="fa fa-info-circle"></i></span> <span class="hidden-xs hidden-sm">{{ trans('general.details') }}</span></a>
                     </li>
                     <li>
-                        <a href="#asset_tab" data-toggle="tab"><span class="hidden-lg hidden-md"><i class="fa fa-info-circle"></i></span> <span class="hidden-xs hidden-sm">{{ trans('general.assets_in_contract') }}</span></a>
+                        <a href="#asset_tab" data-toggle="tab"><span class="hidden-lg hidden-md"><i class="fa fa-info-circle"></i></span> <span class="hidden-xs hidden-sm">{{ trans('general.asset') }}</span></a>
                     </li>
                     <li>
                         <a href="#history_contract" data-toggle="tab"><span class="hidden-lg hidden-md"><i class="fa fa-history"></i></span> <span class="hidden-xs hidden-sm">{{ trans('general.history') }}</span></a>
@@ -56,13 +56,6 @@
                                 <div class="table-responsive" style="margin-top: 10px;">
                                     <table class="table table-striped">
                                             <tbody>
-                                                @if ($item->name)
-                                                <tr>
-                                                    <td>{{ trans('admin/contracts/table.contract_name') }}</td>
-                                                    <td>{{ $item->name }}</td>
-                                                </tr>
-                                                @endif
-                      
                                                 @if ($item->object_type == 'App\Models\Company') 
                                                     <tr>
                                                         <td>{{ trans('general.company') }}</td>
@@ -72,12 +65,24 @@
 
                                                 @if ($item->object_type == 'App\Models\Store') 
                                                     <tr>
+                                                        <td>{{ trans('general.company') }}</td>
+                                                        <td><a href="{{ url('/companies/' . $item->store->company_id) }}">{{ $item->store->company_name}}</a></td>
+                                                    </tr>
+                                                    <tr>
                                                         <td>{{ trans('general.store') }}</td>
                                                         <td><a href="{{ url('/stores/' . $item->store->id) }}">{{ $item->store->name }}</a></td>
                                                     </tr>
                                                 @endif
 
                                                 @if ($item->object_type == 'App\Models\Department') 
+                                                    <tr>
+                                                        <td>{{ trans('general.company') }}</td>
+                                                        <td><a href="{{ url('/companies/' . $item->department->company_id) }}">{{ $item->department->company_name}}</a></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>{{ trans('general.store') }}</td>
+                                                        <td><a href="{{ url('/stores/' . $item->department->store_id) }}">{{ $item->department->store_name }}</a></td>
+                                                    </tr>
                                                     <tr>
                                                         <td>{{ trans('general.department') }}</td>
                                                         <td><a href="{{ url('/departments/' . $item->department->id) }}">{{ $item->department->name }}</a></td>
@@ -220,6 +225,7 @@
                                 <th class="col-md-3">{{ trans('general.category') }}</th>
                                 <th class="col-md-4">{{ trans('general.location') }}</th>
                                 <th class="col-md-3">{{ trans('general.company') }}</th>
+                                <th class="col-md-3">{{ trans('general.action') }}</th>
                               </tr>
                             </thead>
                             <tbody>
@@ -261,6 +267,9 @@
                                         <a href="{{ route('companies.show', $asset->company->id) }}">{{ $asset->company->name }}</a>
                                     @endif
                                 </td> 
+                                <td>
+                                    <a href="{{ url('/') }}/hardware/{{$asset->id}}/edit" class="btn btn-sm btn-warning" data-tooltip="true" title="Update"><i class="fa fa-pencil"></i></a>
+                                </td>
                               </tr>
                               @endforeach
                             </tbody>
@@ -297,11 +306,7 @@
                                             <th class="col-sm-1" data-field="type" data-formatter="itemTypeFormatter">{{ trans('general.type') }}</th>
                                             <th class="col-sm-2" data-visible="true" data-field="item" data-formatter="polymorphicItemFormatter">{{ trans('general.item') }}</th>
                                             <th class="col-sm-2" data-field="note">{{ trans('general.notes') }}</th>
-                                            @if  ($snipeSettings->require_accept_signature=='1')
-                                            <th class="col-md-3" data-field="signature_file" data-visible="false"  data-formatter="imageFormatter">{{ trans('general.signature') }}</th>
-                                            @endif
-                                            <th class="col-md-3" data-visible="false" data-field="file" data-visible="false"  data-formatter="fileUploadFormatter">{{ trans('general.download') }}</th>
-                                            <th class="col-sm-2" data-field="log_meta" data-visible="true" data-formatter="changeLogFormatter">Changed</th>
+                                            <th class="col-sm-2" data-field="log_meta" data-visible="true" data-formatter="changeLogFormatter">{{ trans('general.changed') }}</th>
                                         </tr>
                                     </thead>
                                 </table>

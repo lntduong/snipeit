@@ -180,10 +180,10 @@ class Store extends SnipeModel
                 then contracts.object_id IN
                                             (SELECT departments.id
                                                 FROM departments
-                                                where departments.store_id = stores.id
-                                            )
+                                                where departments.store_id = stores.id and departments.deleted_at is null
+                                            ) and contracts.deleted_at is null
             when contracts.object_type = 'App\\\Models\\\Store' 
-                then contracts.object_id	= stores.id
+                then contracts.object_id = stores.id and contracts.deleted_at is null
             end 
         ) as sum ")
         )
