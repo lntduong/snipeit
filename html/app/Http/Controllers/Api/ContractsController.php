@@ -199,7 +199,7 @@ class ContractsController extends Controller
 
             if ($search) {
                 $contract = $contract
-                    ->select('contracts.*', 'departments.name AS department_name', 'stores.name AS store_name', 'companies.name AS company_name', \DB::raw('null AS contact_1'), \DB::raw('null AS contact_2'), \DB::raw('null AS location_name'))
+                    ->select('contracts.*', 'departments.name AS department_name', 'stores.name AS store_name', 'companies.name AS company_name', 'user1.first_name as contact_1', 'user2.first_name as contact_2', 'locations.name as location_name')
                     ->where('contracts.object_type', '=', \DB::raw('"App\\\Models\\\Department"'))
                     ->where('contracts.object_id', $department);
             }
@@ -213,7 +213,7 @@ class ContractsController extends Controller
             if ($store) {
                 if ($search) {
                     $contract = $contract
-                        ->select('contracts.*', 'departments.name AS department_name', 'stores.name AS store_name', 'companies.name AS company_name', \DB::raw('null AS contact_1'), \DB::raw('null AS contact_2'), \DB::raw('null AS location_name'))
+                        ->select('contracts.*', 'departments.name AS department_name', 'stores.name AS store_name', 'companies.name AS company_name', 'user1.first_name as contact_1', 'user2.first_name as contact_2', 'locations.name as location_name')
                         ->where('contracts.object_type', '=', \DB::raw('"App\\\Models\\\Department"'))
                         ->whereIn(
                             'contracts.object_id',
@@ -245,7 +245,7 @@ class ContractsController extends Controller
 
                 if ($search) {
                     $contract = $contract
-                        ->select('contracts.*', 'departments.name AS department_name', 'stores.name AS store_name', 'companies.name AS company_name', \DB::raw('null AS contact_1'), \DB::raw('null AS contact_2'), \DB::raw('null AS location_name'))
+                        ->select('contracts.*', 'departments.name AS department_name', 'stores.name AS store_name', 'companies.name AS company_name', 'user1.first_name as contact_1', 'user2.first_name as contact_2', 'locations.name as location_name')
                         ->where('contracts.object_type', '=', \DB::raw('"App\\\Models\\\Department"'))
                         ->whereIn(
                             'contracts.object_id',

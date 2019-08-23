@@ -42,7 +42,7 @@
                         <a href="#details" data-toggle="tab"><span class="hidden-lg hidden-md"><i class="fa fa-info-circle"></i></span> <span class="hidden-xs hidden-sm">{{ trans('general.details') }}</span></a>
                     </li>
                     <li>
-                        <a href="#asset_tab" data-toggle="tab"><span class="hidden-lg hidden-md"><i class="fa fa-info-circle"></i></span> <span class="hidden-xs hidden-sm">{{ trans('general.asset') }}</span></a>
+                        <a href="#asset_tab" data-toggle="tab"><span class="hidden-lg hidden-md"><i class="fa fa-info-circle"></i></span> <span class="hidden-xs hidden-sm">{{ trans('general.assets') }}</span></a>
                     </li>
                     <li>
                         <a href="#history_contract" data-toggle="tab"><span class="hidden-lg hidden-md"><i class="fa fa-history"></i></span> <span class="hidden-xs hidden-sm">{{ trans('general.history') }}</span></a>
@@ -292,7 +292,7 @@
                                     data-sort-name="created_at"
                                     data-show-export="true"
                                     data-export-options='{
-                                        "fileName": "export-contracts-{{  $item->id }}-history",
+                                        "fileName": "export-contracts-{{  $item->name }}-history",
                                         "ignoreColumn": ["actions","image","change","checkbox","checkincheckout","icon"]
                                     }'
                                     data-url="{{ route('api.activity.index', ['item_id' => $item->id]) }}"

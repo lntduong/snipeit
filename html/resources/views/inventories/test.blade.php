@@ -36,7 +36,14 @@
                 <span class="hidden-xs hidden-sm">{{ trans('general.history') }}</span>
                 </a>
             </li>
-
+            <li>
+                <a href="#contracts_tab" data-toggle="tab">
+                <span class="hidden-lg hidden-md">
+                <i class="fa fa-barcode"></i>
+                </span>
+                <span class="hidden-xs hidden-sm">{{ trans('general.contracts') }}</span>
+                </a>
+             </li>
            
          </ul>
          <div class="tab-content">
@@ -133,72 +140,87 @@
                </div><!-- /row -->
              </div><!-- /.tab-pane inventory details -->
     
-            <div class="tab-pane" id="history">
+            <div class="tab-pane" id="inventory_results">
                 <!-- checked out inventorys table -->
-                <div class="table-responsive">
-                  <table
-                        data-cookie-id-table="userActivityReport"
+                <div class="row">
+                    <div class="col-md-12">
+                        <table
+                        class="table table-striped snipe-table"
+                        id="inventoryresultTable"
                         data-pagination="true"
-                        data-id-table="userActivityReport"
+                        data-id-table="inventoryresultTab le"
                         data-search="true"
                         data-side-pagination="server"
                         data-show-columns="true"
-                        data-show-export="true"
                         data-show-refresh="true"
                         data-sort-order="desc"
-                        id="userActivityReport"
-                        class="table table-striped snipe-table"
-                        data-url="{{route('api.activity.index',['inventory' => $item->id]) }}"
+                        data-sort-name="created_at"
+                        data-show-export="true"
                         data-export-options='{
-                          "fileName": "my-history-{{ date('Y-m-d') }}",
-                          "ignoreColumn": ["actions","image","change","checkbox","checkincheckout","icon"]
-                        }'>
-                    <thead>
-                    <tr>
-                      <th data-field="icon" data-visible="true" style="width: 40px;" class="hidden-xs" data-formatter="iconFormatter"></th>
-                      <th class="col-sm-2" data-visible="true" data-field="created_at" data-formatter="dateDisplayFormatter">{{ trans('general.date') }}</th>
-                      <th class="col-sm-2" data-visible="true" data-field="admin" data-formatter="usersLinkObjFormatter">{{ trans('general.admin') }}</th>
-                      <th class="col-sm-2" data-visible="true" data-field="action_type">{{ trans('general.action') }}</th>
-                      <th class="col-sm-2" data-visible="true" data-field="item" data-formatter="polymorphicItemFormatter">{{ trans('general.item') }}</th>
-                      <th class="col-sm-3" data-field="log_meta" data-visible="true" data-formatter="changeLogFormatter">Changed</th>
-                    </tr>
-                    </thead>
-                  </table>
-                </div> <!--.table-responsive-->
+                          "fileName": "export-inventory-result-{{ date('Y-m-d') }}",
+                          "ignoreColumn": ["actions","image"]
+                          }'
+  
+                         data-url="{{ route('api.inventoryresults.index',['inventory_id' => $item->id]) }}"
+                        data-cookie-id-table="inventoryresultTable">
+                        <thead>
+                          <tr>
+                            <th class="col-sm-2" data-visible="true" data-field="deviece" data-formatter="inventoryresultsLinkFormatter">{{ trans('admin/hardware/form.name') }}</th>
+                            <th class="col-sm-2" data-visible="true" data-field="image" data-formatter="imageFormatter">{{ trans('admin/inventories/table.device_image') }}</th>
+                            <th class="col-sm-2" data-visible="true" data-field="asset_tag" data-formatter="inventoryresultsHardwareLinkFormatter">{{ trans('admin/hardware/table.asset_tag') }}</th>
+                            <th class="col-sm-2" data-visible="true" data-field="checked" >{{ trans('admin/inventories/table.checked') }}</th>
+                            <th class="col-sm-2" data-visible="true" data-field="familiar" data-formatter="RecognizedFormatter">{{ trans('admin/inventories/table.recognized') }}</th>
+                            <th class="col-sm-2" data-visible="true" data-field="status_label" data-formatter="statuslabelsLinkObjFormatter">{{ trans('admin/hardware/table.status') }}</th>
+                            <th class="col-sm-3" data-visible="true" data-field="actions"  data-formatter="inventoryresultsActionsFormatter">{{ trans('table.actions') }}</th>
+                          </tr>
+                        </thead>
+                     </table>
+                      <div class="box-footer text-right">
+                        <button href='{{ route('modal.inventory-result',['inventory_id'=>$item->id]) }}' data-toggle="modal"  data-target="#createModal" data-select='assigned_user_select' type="button" class="btn btn-success" id="addasset" {{isset($item->id) ? "" : "disabled" }} ><i class=""></i> {{trans('admin/inventories/table.add_unknown_asset')}}</button>
+                      </div>
+                    </div>
+                  </div> <!-- /.row -->
             </div> <!-- /.tab-pane history -->
-
-            <div class="tab-pane" id="inventory_results">
+            <div class="tab-pane" id="history">
                <!-- checked out inventorys table -->
                <div class="row">
                  <div class="col-md-12">
-                  <table
-                  data-columns="{{ \App\Presenters\InventoryResultPresenter::dataTableLayout() }}"
-                  data-cookie-id-table="inventoryresultTable"
-                  data-toolbar="#toolbar"
-                  data-pagination="true"
-                  data-id-table="inventoryresultTable"
-                  data-search="true"
-                  data-side-pagination="server"
-                  data-show-columns="true"
-                  data-show-export="true"
-                  data-show-footer="true"
-                  data-show-refresh="true"
-                  data-sort-order="asc"
-                  data-sort-name="name"
-                  id="inventoryresultTable"
-                  class="table table-striped snipe-table"
-                  data-url="{{ route('api.inventoryresults.index',['inventory_id' => $item->id]) }}"
-                  data-export-options='{
-                     "fileName": "export-inventory-{{ str_slug($item->name) }}-inventory-result-{{ date('Y-m-d') }}",
-                     "ignoreColumn": ["actions","image"]
-                     }'>
-              </table>
-                <div class="box-footer text-right">
-                  <button href='{{ route('modal.inventory-result',['inventory_id'=>$item->id]) }}' data-toggle="modal"  data-target="#createModal" data-select='assigned_user_select' type="button" class="btn btn-success" id="addasset" {{isset($item->id) ? "" : "disabled" }} ><i class=""></i> {{trans('admin/inventories/table.add_unknown_asset')}}</button>
-                </div>
+                   <table
+                           class="table table-striped snipe-table"
+                           id="inventoryHistory"
+                           data-pagination="true"
+                           data-id-table="inventoryHistory"
+                           data-search="true"
+                           data-side-pagination="server"
+                           data-show-columns="true"
+                           data-show-refresh="true"
+                           data-sort-order="desc"
+                           data-sort-name="created_at"
+                           data-show-export="true"
+                           data-export-options='{
+                              "fileName": "export-inventory-{{  $item->id }}-history",
+                              "ignoreColumn": ["actions","image","change","checkbox","checkincheckout","icon"]
+                            }'
+     
+                           data-url="{{ route('api.activity.index', ['inventory' => $item->id]) }}"
+                           data-cookie-id-table="inventoryHistory">
+                     <thead>
+                     <tr>
+                       <th data-field="icon" data-visible="true" style="width: 40px;" class="hidden-xs" data-formatter="iconFormatter"></th>
+                       <th class="col-sm-2" data-visible="true" data-field="created_at" data-formatter="dateDisplayFormatter">{{ trans('general.date') }}</th>
+                       <th class="col-sm-2" data-visible="true" data-field="admin" data-formatter="usersLinkObjFormatter">{{ trans('general.admin') }}</th>
+                       <th class="col-sm-2" data-visible="true" data-field="action_type">{{ trans('general.action') }}</th>
+                       <th class="col-sm-2" data-visible="true" data-field="item" data-formatter="polymorphicItemFormatter">{{ trans('general.item') }}</th>
+                       <th class="col-sm-3" data-field="log_meta" data-visible="true" data-formatter="changeLogFormatter">Changed</th>
+                     </tr>
+                     </thead>
+                   </table>
+     
                  </div>
                </div> <!-- /.row -->
              </div> <!-- /.tab-pane history -->
+             
+
          </div>
          <!-- /.tab-content -->
       </div>

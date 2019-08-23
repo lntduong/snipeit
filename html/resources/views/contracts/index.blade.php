@@ -78,11 +78,11 @@
       });
     } else if($('#store_select').val() && $('#department_select').val() == null) {
       $table.bootstrapTable('refresh', {
-        url: '{{url('/') }}/api/v1/contracts?store_id='+ $('#store_select').val()+'&company_id=' +$('#company_select').val()
+        url: '{{url('/') }}/api/v1/contracts?store_id='+ $('#store_select').val()
       });
     } else if($('#department_select').val()) {
       $table.bootstrapTable('refresh', {
-        url: '{{url('/') }}/api/v1/contracts?store_id='+ $('#store_select').val()+'&company_id=' +$('#company_select').val()+'&department_id=' +$('#department_select').val()
+        url: '{{url('/') }}/api/v1/contracts?&department_id=' +$('#department_select').val()
       });
     } else {
       $table.bootstrapTable('refresh', {

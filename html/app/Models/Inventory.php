@@ -385,48 +385,9 @@ class Inventory extends SnipeModel
     {
         if ($department) {
             if ($contract) {
-                return $inventory
-                    ->select('inventories.*', \DB::raw('null AS department_name'), \DB::raw('null AS store_name'), \DB::raw('null AS company_name'), \DB::raw('null AS contract_name'), \DB::raw('null AS name_sort'))
-                    ->join('contracts', 'contracts.id', '=', 'inventories.object_id')
-                    ->leftjoin('stores', 'stores.id', '=', 'contracts.object_id')
-                    ->where('inventories.object_type', '=', \DB::raw('"App\\\Models\\\Contract"'))
-                    ->whereIn(
-                        'inventories.object_id',
-                        Contract::select('contracts.id')
-                            ->where('contracts.object_type', '=', \DB::raw('"App\\\Models\\\Department"'))
-                            ->whereIn(
-                                'contracts.object_id',
-                                Department::select('departments.id')
-                                    ->where('departments.id', '=', $department)
-                            )
-                    );
+                return $query;
             } else {
-                return $inventory
-                    ->select('inventories.*', \DB::raw('null AS department_name'), \DB::raw('null AS store_name'), \DB::raw('null AS company_name'), \DB::raw('null AS contract_name'), \DB::raw('null AS name_sort'))
-                    ->where('inventories.object_type', '=', \DB::raw('"App\\\Models\\\Department"'))
-                    ->whereIn(
-                        'inventories.object_id',
-                        Department::select('departments.id')
-                            ->join('stores', 'stores.id', '=', 'departments.store_id')
-                            ->join('companies', 'companies.id', '=', 'stores.company_id')
-                            ->where('departments.id', '=', $department)
-                    )
-                    ->union(
-                        Inventory::select('inventories.*', \DB::raw('null AS department_name'), \DB::raw('null AS store_name'), \DB::raw('null AS company_name'), \DB::raw('null AS contract_name'), \DB::raw('null AS name_sort'))
-                            ->join('contracts', 'contracts.id', '=', 'inventories.object_id')
-                            ->leftjoin('stores', 'stores.id', '=', 'contracts.object_id')
-                            ->where('inventories.object_type', '=', \DB::raw('"App\\\Models\\\Contract"'))
-                            ->whereIn(
-                                'inventories.object_id',
-                                Contract::select('contracts.id')
-                                    ->where('contracts.object_type', '=', \DB::raw('"App\\\Models\\\Department"'))
-                                    ->whereIn(
-                                        'contracts.object_id',
-                                        Department::select('departments.id')
-                                            ->where('departments.id', '=', $department)
-                                    )
-                            )
-                    );
+                return $query;
             }
         } else {
             if ($store) {

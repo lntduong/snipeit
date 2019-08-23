@@ -252,7 +252,7 @@
                                      class="table table-striped snipe-table" 
                                      data-url="{{ route('api.contracts.index',['company_id' => $company->id]) }}"
                                      data-export-options='{
-                                        "fileName": "export-contracts-{{ date('Y-m-d') }}",
+                                        "fileName": "export-companies-{{ str_slug($company->name) }}-contracts-{{ date('Y-m-d') }}",
                                         "ignoreColumn": ["actions","image","change","checkbox","checkincheckout","icon"]
                                         }'>
                                      <thead>
@@ -260,7 +260,7 @@
                                               <th data-sortable="true" data-field="id" data-visible="false" data-searchable="false">{{ trans('general.id') }}</th>
                                               <th data-sortable="true" data-field="store" data-visible="true" data-searchable="true" data-formatter="storesLinkObjFormatter">{{ trans('general.store') }}</th>
                                               <th data-sortable="true" data-field="department" data-visible="true" data-searchable="true" data-formatter="departmentsLinkObjFormatter">{{ trans('general.department') }}</th>
-                                              <th data-sortable="true" data-field="name" data-visible="true" data-searchable="true">{{ trans('admin/contracts/table.contract_name') }}</th>
+                                              <th data-sortable="true" data-field="name" data-visible="true" data-searchable="true"  data-formatter="contractsLinkFormatter" >{{ trans('admin/contracts/table.contract_name') }}</th>
                                               <th data-sortable="true" data-field="location_id" data-visible="true" data-searchable="false" data-formatter="locationsLinkObjFormatter">{{ trans('admin/contracts/table.location') }}</th>
                                               <th data-sortable="true" data-field="contact_id_1" data-visible="true" data-searchable="false" data-formatter="usersLinkObjFormatter">{{ trans('admin/contracts/table.contact_person1') }}</th>
                                               <th data-sortable="true" data-field="contact_id_2" data-visible="true" data-searchable="false" data-formatter="usersLinkObjFormatter">{{ trans('admin/contracts/table.contact_person2') }}</th>

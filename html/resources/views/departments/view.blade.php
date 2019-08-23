@@ -16,7 +16,7 @@
       <div class="nav-tabs-custom">
          <ul class="nav nav-tabs">
             <li class="active">
-               <a href="#asset_tab" data-toggle="tab">
+               <a href="#users_tab" data-toggle="tab">
                <span class="hidden-lg hidden-md">
                <i class="fa fa-barcode"></i>
                </span>
@@ -24,7 +24,7 @@
                </a>
             </li>
             <li>
-               <a href="#licenses_tab" data-toggle="tab">
+               <a href="#contracts_tab" data-toggle="tab">
                <span class="hidden-lg hidden-md">
                <i class="fa fa-floppy-o"></i>
                </span>
@@ -33,7 +33,7 @@
             </li>
          </ul>
          <div class="tab-content">
-            <div class="tab-pane fade in active" id="asset_tab">
+            <div class="tab-pane fade in active" id="users_tab">
                <!-- checked out assets table -->
                <div class="table-responsive">
                     <table
@@ -52,14 +52,14 @@
                         class="table table-striped snipe-table"
                         data-url="{{ route('api.users.index',['department_id'=> $department->id]) }}"
                         data-export-options='{
-                        "fileName": "export-departments-{{ str_slug($department->name) }}-{{ date('Y-m-d') }}",
+                        "fileName": "export-departments-{{ str_slug($department->name) }}-users-{{ date('Y-m-d') }}",
                         "ignoreColumn": ["actions","image","change","checkbox","checkincheckout","icon"]
                         }'>
                     </table>
                </div>
             </div>
             <!-- /asset_tab -->
-            <div class="tab-pane" id="licenses_tab">
+            <div class="tab-pane" id="contracts_tab">
                <div class="table-responsive">
                     <table 
                         data-click-to-select="true" 
@@ -79,13 +79,13 @@
                         class="table table-striped snipe-table" 
                         data-url="{{ route('api.contracts.index',['department_id'=> $department->id]) }}"
                         data-export-options='{
-                           "fileName": "export-contracts-{{ date('Y-m-d') }}",
+                           "fileName": "export-departments-{{ str_slug($department->name) }}-contracts-{{ date('Y-m-d') }}",
                            "ignoreColumn": ["actions","image","change","checkbox","checkincheckout","icon"]
                            }'>
                         <thead>
                             <tr>
                                 <th data-sortable="true" data-field="id" data-visible="false" data-searchable="false">{{ trans('general.id') }}</th>
-                                <th data-sortable="true" data-field="name" data-visible="true" data-searchable="true">{{ trans('admin/contracts/table.contract_name') }}</th>
+                                <th data-sortable="true" data-field="name" data-visible="true" data-searchable="true" data-formatter="contractsLinkFormatter">{{ trans('admin/contracts/table.contract_name') }}</th>
                                 <th data-sortable="true" data-field="location_id" data-visible="true" data-searchable="false" data-formatter="locationsLinkObjFormatter">{{ trans('admin/contracts/table.location') }}</th>
                                 <th data-sortable="true" data-field="contact_id_1" data-visible="true" data-searchable="false" data-formatter="usersLinkObjFormatter">{{ trans('admin/contracts/table.contact_person1') }}</th>
                                 <th data-sortable="true" data-field="contact_id_2" data-visible="true" data-searchable="false" data-formatter="usersLinkObjFormatter">{{ trans('admin/contracts/table.contact_person2') }}</th>

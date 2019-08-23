@@ -125,7 +125,7 @@ class Department extends SnipeModel
     {
         return $query
             ->leftJoin('stores as department_store', 'departments.store_id', '=', 'department_store.id')
-            ->leftJoin('companies as department_company', 'department_company.id', '=', 'stores.company_id')
+            ->leftJoin('companies as department_company', 'department_company.id', '=', 'department_store.company_id')
             ->orderBy('department_company.name', $order);
     }
 
